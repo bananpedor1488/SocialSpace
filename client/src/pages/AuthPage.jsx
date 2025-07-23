@@ -37,10 +37,24 @@ const AuthPage = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    if (!isLogin && !isValidEmail(data.identifier)) {
-      showMessage("Введите корректный email");
+    // Валидация
+    if (!data.identifier || !data.password) {
+      showMessage("Заполните все поля");
       setIsLoading(false);
       return;
+    }
+
+    if (!isLogin) {
+      if (!data.username) {
+        showMessage("Введите имя пользователя");
+        setIsLoading(false);
+        return;
+      }
+      if (!isValidEmail(data.identifier)) {
+        showMessage("Введите корректный email");
+        setIsLoading(false);
+        return;
+      }
     }
 
     try {
@@ -52,18 +66,56 @@ const AuthPage = () => {
         ? { email: data.identifier, password: data.password }
         : { username: data.username, email: data.identifier, password: data.password };
 
-      const res = await axios.post(url, payload, { withCredentials: true });
+      console.log('Отправка запроса:', { url, payload });
 
-      showMessage(
-        `${isLogin ? 'Добро пожаловать' : 'Регистрация прошла успешно'}: ${res.data.user?.username || data.username}`,
-        'success'
-      );
+      const response = await axios.post(url, payload, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
 
-      setTimeout(() => navigate('/home'), 1000);
+      console.log('Ответ сервера:', response.data);
+
+      // Сохраняем JWT токены в localStorage
+      const { accessToken, refreshToken, user } = response.data;
+      
+      if (accessToken && refreshToken && user) {
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
+        localStorage.setItem('user', JSON.stringify(user));
+
+        showMessage(
+          `${isLogin ? 'Добро пожаловать' : 'Регистрация прошла успешно'}: ${user.username}`,
+          'success'
+        );
+
+        // Перенаправляем на главную страницу
+        setTimeout(() => {
+          navigate('/home');
+          window.location.reload(); // Обновляем страницу для применения токенов
+        }, 1000);
+      } else {
+        throw new Error('Не получены токены от сервера');
+      }
+
     } catch (err) {
-      showMessage(
-        isLogin ? 'Неверный email/ник или пароль' : 'Ошибка регистрации. Попробуйте еще раз'
-      );
+      console.error('Ошибка авторизации:', err);
+      
+      let errorMessage = 'Произошла ошибка';
+      
+      if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err.response?.status === 400) {
+        errorMessage = isLogin ? 'Неверный email или пароль' : 'Пользователь с таким email уже существует';
+      } else if (err.response?.status === 401) {
+        errorMessage = 'Неверные данные для входа';
+      } else if (err.response?.status >= 500) {
+        errorMessage = 'Ошибка сервера. Попробуйте позже';
+      } else if (!err.response) {
+        errorMessage = 'Проблема с соединением. Проверьте интернет';
+      }
+      
+      showMessage(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -146,7 +198,7 @@ const AuthPage = () => {
                   placeholder="Имя пользователя"
                   value={data.username}
                   onChange={handleChange}
-                  required
+                  required={!isLogin}
                   className="form-input"
                 />
               </div>
@@ -185,6 +237,7 @@ const AuthPage = () => {
                 onChange={handleChange}
                 required
                 className="form-input"
+                minLength="6"
               />
             </div>
 
