@@ -9,10 +9,9 @@ dotenv.config();
 const app = express();
 
 app.use(cors({
-  origin: '*',
+  origin: '*',  // Разрешаем все источники (для теста)
   credentials: true
 }));
-
 
 app.use(express.json());
 
@@ -27,6 +26,7 @@ app.use(session({
     secure: false
   }
 }));
+
 const postRoutes = require('./routes/posts');
 app.use('/api/posts', postRoutes);
 const userRoutes = require('./routes/users');
@@ -45,13 +45,15 @@ app.get('/api/me', (req, res) => {
   }
 });
 
+// Экспортируем Express приложение как серверную функцию для Vercel
+module.exports = (req, res) => {
+  app(req, res); // Вызываем express приложение
+};
+
+// Подключение к MongoDB
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 }).then(() => {
   console.log('MongoDB connected');
- app.listen(5000, '0.0.0.0', () => {
-  console.log('Server running on port 5000');
-});
-
-}).catch(err => console.error(err));
+}).catch(err => console.error('MongoDB connection error:', err));
