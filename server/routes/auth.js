@@ -1,38 +1,47 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
-const User = require('../models/User'); // путь к модели
-const app = express();
+const router = express.Router();
+const authController = require('../controllers/authController');
 
-app.use(express.json());
-
-app.post('/api/auth/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const user = await User.findOne({
-      $or: [{ email }, { username: email }]
-    });
-
-    if (!user) return res.status(400).json({ message: 'User not found' });
-
-    const valid = await bcrypt.compare(password, user.password);
-    if (!valid) return res.status(401).json({ message: 'Invalid credentials' });
-
-    res.json({ user: { id: user._id, username: user.username } });
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
-  }
+// Middleware для логирования запросов
+router.use((req, res, next) => {
+  console.log(`AUTH JWT: ${req.method} ${req.path}`);
+  console.log('Headers:', {
+    authorization: req.get('Authorization'),
+    contentType: req.get('Content-Type'),
+    origin: req.get('Origin')
+  });
+  console.log('Body:', req.body);
+  next();
 });
 
-app.post('/api/auth/register', async (req, res) => {
-  try {
-    const { username, email, password } = req.body;
-    const hash = await bcrypt.hash(password, 10);
-    const user = await User.create({ username, email, password: hash });
-    
-    res.json({ user: { id: user._id, username: user.username } });
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
-  }
+// Публичные роуты (не требуют авторизации)
+router.post('/register', authController.register);
+router.post('/login', authController.login);
+router.post('/refresh', authController.refreshToken);
+
+// Защищенные роуты (требуют JWT токен)
+router.get('/me', authController.authenticateToken, authController.getCurrentUser);
+router.post('/logout', authController.authenticateToken, authController.logout);
+
+// Health check для auth
+router.get('/health', (req, res) => {
+  res.json({
+    status: 'OK',
+    service: 'Auth Service',
+    type: 'JWT',
+    timestamp: new Date().toISOString(),
+    endpoints: {
+      public: [
+        'POST /api/auth/login',
+        'POST /api/auth/register',
+        'POST /api/auth/refresh'
+      ],
+      protected: [
+        'GET /api/auth/me (requires Bearer token)',
+        'POST /api/auth/logout (requires Bearer token)'
+      ]
+    }
+  });
 });
 
-module.exports = app;
+module.exports = router;

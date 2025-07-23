@@ -3,6 +3,84 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './AuthPage.css';
 
+// Создаем axios instance с JWT поддержкой
+const apiClient = axios.create({
+  baseURL: 'https://server-1-vr19.onrender.com/api',
+  timeout: 10000,
+});
+
+// Функции для работы с токенами
+const tokenManager = {
+  getAccessToken: () => localStorage.getItem('accessToken'),
+  getRefreshToken: () => localStorage.getItem('refreshToken'),
+  setTokens: (accessToken, refreshToken) => {
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('refreshToken', refreshToken);
+  },
+  clearTokens: () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
+  },
+  getUser: () => {
+    const user = localStorage.getItem('user');
+    return user ? JSON.parse(user) : null;
+  },
+  setUser: (user) => {
+    localStorage.setItem('user', JSON.stringify(user));
+  }
+};
+
+// Interceptor для автоматического добавления токена
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = tokenManager.getAccessToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Interceptor для обработки истекших токенов
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      const refreshToken = tokenManager.getRefreshToken();
+      
+      if (refreshToken) {
+        try {
+          console.log('Trying to refresh token...');
+          const response = await axios.post(
+            'https://server-1-vr19.onrender.com/api/auth/refresh',
+            { refreshToken }
+          );
+          
+          const { accessToken, refreshToken: newRefreshToken } = response.data;
+          tokenManager.setTokens(accessToken, newRefreshToken);
+          
+          // Повторяем оригинальный запрос
+          const originalRequest = error.config;
+          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+          return apiClient(originalRequest);
+          
+        } catch (refreshError) {
+          console.error('Token refresh failed:', refreshError);
+          tokenManager.clearTokens();
+          window.location.href = '/';
+          return Promise.reject(refreshError);
+        }
+      } else {
+        tokenManager.clearTokens();
+        window.location.href = '/';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [data, setData] = useState({ username: '', identifier: '', password: '' });
@@ -44,26 +122,47 @@ const AuthPage = () => {
     }
 
     try {
-      const url = isLogin
-        ? 'https://server-1-vr19.onrender.com/api/auth/login'
-        : 'https://server-1-vr19.onrender.com/api/auth/register';
-
+      const endpoint = isLogin ? '/auth/login' : '/auth/register';
       const payload = isLogin
         ? { email: data.identifier, password: data.password }
         : { username: data.username, email: data.identifier, password: data.password };
 
-      const res = await axios.post(url, payload, { withCredentials: true });
+      console.log('Sending request to:', endpoint, payload);
+      
+      const res = await apiClient.post(endpoint, payload);
+      
+      console.log('Auth response:', res.data);
 
-      showMessage(
-        `${isLogin ? 'Добро пожаловать' : 'Регистрация прошла успешно'}: ${res.data.user?.username || data.username}`,
-        'success'
-      );
+      if (res.data.token || res.data.accessToken) {
+        // JWT ответ
+        const accessToken = res.data.accessToken || res.data.token;
+        const refreshToken = res.data.refreshToken;
+        const user = res.data.user;
 
-      setTimeout(() => navigate('/home'), 1000);
+        tokenManager.setTokens(accessToken, refreshToken);
+        tokenManager.setUser(user);
+
+        showMessage(
+          `${isLogin ? 'Добро пожаловать' : 'Регистрация прошла успешно'}: ${user?.username || data.username}`,
+          'success'
+        );
+
+        setTimeout(() => navigate('/home'), 1000);
+      } else if (res.data.user) {
+        // Session-based ответ (fallback)
+        showMessage(
+          `${isLogin ? 'Добро пожаловать' : 'Регистрация прошла успешно'}: ${res.data.user?.username || data.username}`,
+          'success'
+        );
+
+        setTimeout(() => navigate('/home'), 1000);
+      }
+      
     } catch (err) {
-      showMessage(
-        isLogin ? 'Неверный email/ник или пароль' : 'Ошибка регистрации. Попробуйте еще раз'
-      );
+      console.error('Auth error:', err);
+      const errorMessage = err.response?.data?.message || 
+        (isLogin ? 'Неверный email/ник или пароль' : 'Ошибка регистрации. Попробуйте еще раз');
+      showMessage(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -215,4 +314,6 @@ const AuthPage = () => {
   );
 };
 
+// Экспортируем также утилиты для использования в других компонентах
+export { apiClient, tokenManager };
 export default AuthPage;
