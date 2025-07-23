@@ -30,7 +30,133 @@ const HomePage = () => {
 
   const navigate = useNavigate();
 
-  // Функция для работы с куки
+  // JWT утилиты
+  const getTokens = () => {
+    return {
+      accessToken: localStorage.getItem('accessToken'),
+      refreshToken: localStorage.getItem('refreshToken')
+    };
+  };
+
+  const setTokens = (accessToken, refreshToken) => {
+    if (accessToken) localStorage.setItem('accessToken', accessToken);
+    if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
+  };
+
+  const clearTokens = () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
+  };
+
+  const isAuthenticated = () => {
+    const { accessToken } = getTokens();
+    return !!accessToken;
+  };
+
+  // Функция для декодирования JWT токена (проверка на истечение)
+  const isTokenExpired = (token) => {
+    if (!token) return true;
+    
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const currentTime = Date.now() / 1000;
+      return payload.exp < currentTime;
+    } catch (error) {
+      return true;
+    }
+  };
+
+  // Функция обновления токена
+  const refreshAccessToken = async () => {
+    const { refreshToken } = getTokens();
+    
+    if (!refreshToken || isTokenExpired(refreshToken)) {
+      throw new Error('Refresh token expired');
+    }
+
+    try {
+      const response = await axios.post('https://server-1-vr19.onrender.com/api/auth/refresh', {
+        refreshToken: refreshToken
+      });
+      
+      const { accessToken, refreshToken: newRefreshToken } = response.data;
+      setTokens(accessToken, newRefreshToken || refreshToken);
+      
+      return accessToken;
+    } catch (error) {
+      clearTokens();
+      throw error;
+    }
+  };
+
+  // Настройка axios interceptors для JWT
+  useEffect(() => {
+    const requestInterceptor = axios.interceptors.request.use(
+      async (config) => {
+        // Пропускаем добавление токена для публичных эндпоинтов
+        const publicEndpoints = ['/auth/login', '/auth/register', '/auth/refresh'];
+        const isPublicEndpoint = publicEndpoints.some(endpoint => 
+          config.url?.includes(endpoint)
+        );
+
+        if (!isPublicEndpoint) {
+          let { accessToken } = getTokens();
+          
+          // Проверяем, не истек ли токен
+          if (accessToken && isTokenExpired(accessToken)) {
+            try {
+              accessToken = await refreshAccessToken();
+            } catch (error) {
+              clearTokens();
+              navigate('/');
+              return Promise.reject(error);
+            }
+          }
+          
+          if (accessToken) {
+            config.headers.Authorization = `Bearer ${accessToken}`;
+          }
+        }
+        
+        // Убираем withCredentials для JWT
+        delete config.withCredentials;
+        return config;
+      },
+      (error) => Promise.reject(error)
+    );
+
+    const responseInterceptor = axios.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        const originalRequest = error.config;
+
+        if (error.response?.status === 401 && !originalRequest._retry) {
+          originalRequest._retry = true;
+          
+          try {
+            const newAccessToken = await refreshAccessToken();
+            originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+            return axios(originalRequest);
+          } catch (refreshError) {
+            clearTokens();
+            navigate('/');
+            return Promise.reject(refreshError);
+          }
+        }
+        
+        return Promise.reject(error);
+      }
+    );
+
+    // Очистка interceptors при размонтировании
+    return () => {
+      axios.interceptors.request.eject(requestInterceptor);
+      axios.interceptors.response.eject(responseInterceptor);
+    };
+  }, [navigate]);
+
+  // Функция для работы с куки (для темы)
   const setCookie = (name, value, days = 365) => {
     const expires = new Date();
     expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
@@ -50,13 +176,11 @@ const HomePage = () => {
 
   // Функция для загрузки CSS файла
   const loadCSS = (filename) => {
-    // Удаляем предыдущий CSS файл если есть
     const existingLink = document.getElementById('homepage-theme-css');
     if (existingLink) {
       existingLink.remove();
     }
 
-    // Создаем новый link элемент
     const link = document.createElement('link');
     link.id = 'homepage-theme-css';
     link.rel = 'stylesheet';
@@ -70,10 +194,10 @@ const HomePage = () => {
     const savedTheme = getCookie('theme');
     if (savedTheme === 'dark') {
       setIsDarkTheme(true);
-      loadCSS('HomePage.css'); // Темная тема
+      loadCSS('HomePage.css');
     } else {
       setIsDarkTheme(false);
-      loadCSS('HomePage1.css'); // Светлая тема
+      loadCSS('HomePage1.css');
     }
   }, []);
 
@@ -83,11 +207,10 @@ const HomePage = () => {
     setIsDarkTheme(newTheme);
     setCookie('theme', newTheme ? 'dark' : 'light');
     
-    // Загружаем соответствующий CSS файл
     if (newTheme) {
-      loadCSS('HomePage.css'); // Темная тема
+      loadCSS('HomePage.css');
     } else {
-      loadCSS('HomePage1.css'); // Светлая тема
+      loadCSS('HomePage1.css');
     }
   };
 
@@ -97,22 +220,54 @@ const HomePage = () => {
     return profile._id === user._id || profile._id === user.id;
   };
 
-  // Получаем текущего пользователя
-  useEffect(() => { 
-    axios.get('https://server-1-vr19.onrender.com/api/me', { withCredentials: true })
-      .then(res => {
+  // Получаем текущего пользователя при загрузке
+  useEffect(() => {
+    const checkAuth = async () => {
+      if (!isAuthenticated()) {
+        navigate('/');
+        return;
+      }
+
+      try {
+        // Сначала пробуем получить пользователя из localStorage
+        const savedUser = localStorage.getItem('user');
+        if (savedUser) {
+          setUser(JSON.parse(savedUser));
+        }
+
+        // Затем проверяем актуальные данные с сервера
+        const res = await axios.get('https://server-1-vr19.onrender.com/api/me');
         console.log('Current user data:', res.data.user);
         setUser(res.data.user);
-      })
-      .catch(() => navigate('/'));
+        localStorage.setItem('user', JSON.stringify(res.data.user));
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        clearTokens();
+        navigate('/');
+      }
+    };
+
+    checkAuth();
   }, [navigate]);
 
   // Получаем посты при загрузке пользователя
   useEffect(() => {
     if (user) {
       loadPosts();
+      loadSuggestions(); // Загружаем рекомендации
     }
   }, [user]);
+
+  // Функция загрузки рекомендаций
+  const loadSuggestions = async () => {
+    try {
+      const res = await axios.get('https://server-1-vr19.onrender.com/api/users/suggestions');
+      setSuggestions(res.data.slice(0, 5)); // Ограничиваем до 5 рекомендаций
+    } catch (err) {
+      console.error('Ошибка загрузки рекомендаций:', err);
+      setSuggestions([]);
+    }
+  };
 
   // Функция загрузки постов
   const loadPosts = async (pageNum = 1, append = false) => {
@@ -122,8 +277,7 @@ const HomePage = () => {
     console.log('Loading posts, page:', pageNum);
     
     try {
-      const res = await axios.get('https://server-1-vr19.onrender.com/api/posts', { 
-        withCredentials: true,
+      const res = await axios.get('https://server-1-vr19.onrender.com/api/posts', {
         params: {
           page: pageNum,
           limit: 10
@@ -132,7 +286,6 @@ const HomePage = () => {
       
       console.log('Posts API response:', res.data);
       
-      // Проверяем формат ответа
       let postsData = [];
       if (Array.isArray(res.data)) {
         postsData = res.data;
@@ -195,7 +348,7 @@ const HomePage = () => {
 
   const fetchComments = async (postId) => {
     try {
-      const res = await axios.get(`https://server-1-vr19.onrender.com/api/posts/${postId}/comments`, { withCredentials: true });
+      const res = await axios.get(`https://server-1-vr19.onrender.com/api/posts/${postId}/comments`);
       setComments(prev => ({ ...prev, [postId]: res.data }));
     } catch (err) {
       console.error('Ошибка загрузки комментариев:', err);
@@ -214,14 +367,25 @@ const HomePage = () => {
   };
 
   const handleLogout = async () => {
-    await axios.post('https://server-1-vr19.onrender.com/api/auth/logout', {}, { withCredentials: true });
-    navigate('/');
+    try {
+      const { refreshToken } = getTokens();
+      await axios.post('https://server-1-vr19.onrender.com/api/auth/logout', {
+        refreshToken
+      });
+    } catch (error) {
+      console.warn('Logout request failed:', error);
+    } finally {
+      clearTokens();
+      navigate('/');
+    }
   };
 
   const handleCreatePost = async () => {
     if (postText.trim()) {
       try {
-        const res = await axios.post('https://server-1-vr19.onrender.com/api/posts', { content: postText }, { withCredentials: true });
+        const res = await axios.post('https://server-1-vr19.onrender.com/api/posts', { 
+          content: postText 
+        });
         console.log('New post response:', res.data);
         
         const newPost = {
@@ -251,7 +415,7 @@ const HomePage = () => {
 
   const handleLikePost = async (postId) => {
     try {
-      const res = await axios.post(`https://server-1-vr19.onrender.com/api/posts/${postId}/like`, {}, { withCredentials: true });
+      const res = await axios.post(`https://server-1-vr19.onrender.com/api/posts/${postId}/like`);
       
       setPosts(prev => prev.map(post => 
         post._id === postId ? { 
@@ -277,7 +441,7 @@ const HomePage = () => {
 
   const handleRepost = async (postId) => {
     try {
-      const res = await axios.post(`https://server-1-vr19.onrender.com/api/posts/${postId}/repost`, {}, { withCredentials: true });
+      const res = await axios.post(`https://server-1-vr19.onrender.com/api/posts/${postId}/repost`);
       loadPosts();
     } catch (err) {
       console.error('Ошибка репоста:', err);
@@ -289,7 +453,7 @@ const HomePage = () => {
     setSearchQuery(query);
     if (query.trim()) {
       try {
-        const res = await axios.get(`https://server-1-vr19.onrender.com/api/users/search?query=${query}`, { withCredentials: true });
+        const res = await axios.get(`https://server-1-vr19.onrender.com/api/users/search?query=${query}`);
         setSearchResults(res.data);
       } catch (err) {
         console.error('Ошибка поиска пользователей:', err);
@@ -316,14 +480,14 @@ const HomePage = () => {
     }
     
     try {
-      const res = await axios.get(`https://server-1-vr19.onrender.com/api/users/${userId}`, { withCredentials: true });
+      const res = await axios.get(`https://server-1-vr19.onrender.com/api/users/${userId}`);
       console.log('Profile response:', res.data);
       setProfile(res.data);
       
       setFollowers(res.data.followersCount || 0);
       setFollowing(res.data.followingCount || 0);
       
-      const postsRes = await axios.get(`https://server-1-vr19.onrender.com/api/users/${userId}/posts`, { withCredentials: true });
+      const postsRes = await axios.get(`https://server-1-vr19.onrender.com/api/users/${userId}/posts`);
       console.log('Profile posts response:', postsRes.data);
       
       const formattedProfilePosts = postsRes.data.map(post => ({
@@ -355,10 +519,15 @@ const HomePage = () => {
 
   const toggleFollow = async (userId) => {
     try {
-      const res = await axios.post(`https://server-1-vr19.onrender.com/api/follow/${userId}`, {}, { withCredentials: true });
-      if (userId === profile._id) {
+      const res = await axios.post(`https://server-1-vr19.onrender.com/api/follow/${userId}`);
+      
+      // Обновляем профиль если это текущий просматриваемый профиль
+      if (userId === profile?._id) {
         loadUserProfile(profile._id);
       }
+      
+      // Обновляем рекомендации
+      loadSuggestions();
     } catch (err) {
       console.error('Ошибка подписки/отписки:', err);
     }
@@ -370,8 +539,7 @@ const HomePage = () => {
     
     try {
       const res = await axios.post(`https://server-1-vr19.onrender.com/api/posts/${postId}/comment`, 
-        { content: commentText }, 
-        { withCredentials: true }
+        { content: commentText }
       );
       setComments(prev => ({
         ...prev,
@@ -506,6 +674,23 @@ const HomePage = () => {
     });
   };
 
+  // Показываем загрузку если пользователь еще не загружен
+  if (!user) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        color: 'white',
+        fontSize: '18px'
+      }}>
+        Загрузка...
+      </div>
+    );
+  }
+
   return (
     <div className="home-container">
       <header className="header">
@@ -514,7 +699,6 @@ const HomePage = () => {
           <div className="user-info">
             <span>Привет, {user?.username}!</span>
             
-            {/* Красивая кнопка переключения темы */}
             <button onClick={toggleTheme} className="theme-toggle">
               <div className="theme-icon">
                 {isDarkTheme ? <Sun size={18} /> : <Moon size={18} />}
@@ -726,11 +910,21 @@ const HomePage = () => {
         <div className="suggestions">
           <h3><Users size={18} /> Рекомендации</h3>
           {suggestions.length > 0 ? (
-            suggestions.map(u => (
-              <div key={u._id} className="user-suggestion">
+            suggestions.map(suggestionUser => (
+              <div key={suggestionUser._id} className="user-suggestion">
                 <div className="suggestion-info">
-                  <span>@{u.username}</span>
-                  <button onClick={() => toggleFollow(u._id)}>Подписаться</button>
+                  <div className="suggestion-user-details">
+                    <span className="suggestion-username">@{suggestionUser.username}</span>
+                    <span className="suggestion-stats">
+                      {suggestionUser.followersCount || 0} подписчиков
+                    </span>
+                  </div>
+                  <button 
+                    onClick={() => toggleFollow(suggestionUser._id)}
+                    className="suggestion-follow-btn"
+                  >
+                    <Users size={14} /> Подписаться
+                  </button>
                 </div>
               </div>
             ))
