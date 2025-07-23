@@ -9,7 +9,7 @@ dotenv.config();
 const app = express();
 
 app.use(cors({
-  origin: 'https://server-1-vr19.onrender.com', // Укажите конкретный домен
+  origin: 'https://social-space-3pce.vercel.app', // Укажите конкретный домен
   credentials: true
 }));
 
