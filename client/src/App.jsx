@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import AuthPage from './pages/AuthPage';
 import HomePage from './pages/HomePage';
+import ProtectedRoute from './pages/ProtectedRoute';
 import axios from 'axios';
 
 function AppRouter() {
@@ -17,7 +18,11 @@ function AppRouter() {
       })
       .catch(() => navigate('/'));
   }, [navigate]);
-
+<Route path="/home" element={
+  <ProtectedRoute>
+    <HomePage />
+  </ProtectedRoute>
+} />
   return (
     <Routes>
       <Route path="/" element={<AuthPage />} />

@@ -33,6 +33,68 @@ const AuthPage = () => {
   const isValidEmail = (email) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
+  // Функция для сохранения токенов
+  const saveTokens = (accessToken, refreshToken, user) => {
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('refreshToken', refreshToken);
+    localStorage.setItem('user', JSON.stringify(user));
+  };
+
+  // Функция для настройки axios с токеном
+  const setupAxiosInterceptors = () => {
+    // Interceptor для добавления токена к запросам
+    axios.interceptors.request.use(
+      (config) => {
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+      },
+      (error) => Promise.reject(error)
+    );
+
+    // Interceptor для обработки истекших токенов
+    axios.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        const originalRequest = error.config;
+
+        if (error.response?.status === 401 && !originalRequest._retry) {
+          originalRequest._retry = true;
+
+          try {
+            const refreshToken = localStorage.getItem('refreshToken');
+            if (!refreshToken) {
+              throw new Error('No refresh token');
+            }
+
+            const response = await axios.post(
+              'https://server-1-vr19.onrender.com/api/auth/refresh',
+              { refreshToken }
+            );
+
+            const { accessToken, refreshToken: newRefreshToken, user } = response.data;
+            saveTokens(accessToken, newRefreshToken, user);
+
+            // Повторяем оригинальный запрос с новым токеном
+            originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+            return axios(originalRequest);
+          } catch (refreshError) {
+            // Refresh не удался - выходим из системы
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('user');
+            navigate('/');
+            return Promise.reject(refreshError);
+          }
+        }
+
+        return Promise.reject(error);
+      }
+    );
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -52,17 +114,30 @@ const AuthPage = () => {
         ? { email: data.identifier, password: data.password }
         : { username: data.username, email: data.identifier, password: data.password };
 
-      const res = await axios.post(url, payload, { withCredentials: true });
+      console.log('Отправляем запрос:', url, payload);
+
+      const res = await axios.post(url, payload);
+
+      console.log('Ответ сервера:', res.data);
+
+      // Сохраняем токены и пользователя
+      const { accessToken, refreshToken, user } = res.data;
+      saveTokens(accessToken, refreshToken, user);
+
+      // Настраиваем interceptors для будущих запросов
+      setupAxiosInterceptors();
 
       showMessage(
-        `${isLogin ? 'Добро пожаловать' : 'Регистрация прошла успешно'}: ${res.data.user?.username || data.username}`,
+        `${isLogin ? 'Добро пожаловать' : 'Регистрация прошла успешно'}: ${user.username}`,
         'success'
       );
 
       setTimeout(() => navigate('/home'), 1000);
     } catch (err) {
+      console.error('Ошибка авторизации:', err);
       showMessage(
-        isLogin ? 'Неверный email/ник или пароль' : 'Ошибка регистрации. Попробуйте еще раз'
+        err.response?.data?.message || 
+        (isLogin ? 'Неверный email/ник или пароль' : 'Ошибка регистрации. Попробуйте еще раз')
       );
     } finally {
       setIsLoading(false);
