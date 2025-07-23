@@ -9,7 +9,7 @@ dotenv.config();
 const app = express();
 
 app.use(cors({
-  origin: 'http://26.4.118.244:3000', // Замените на реальный IP вашего клиента
+  origin: '*',
   credentials: true
 }));
 
