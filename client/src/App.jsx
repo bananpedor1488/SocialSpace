@@ -8,7 +8,7 @@ function AppRouter() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get('http://26.4.118.244:5000/api/me', { withCredentials: true })
+    axios.get('https://social-space-jr3l.vercel.app/api/me', { withCredentials: true })
       .then(res => {
         if (res.data.user) {
           navigate('/home');

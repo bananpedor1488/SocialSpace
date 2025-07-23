@@ -45,8 +45,8 @@ const AuthPage = () => {
 
     try {
       const url = isLogin
-        ? 'http://26.4.118.244:5000/api/auth/login'
-        : 'http://26.4.118.244:5000/api/auth/register';
+        ? 'https://social-space-jr3l.vercel.app/api/auth/login'
+        : 'https://social-space-jr3l.vercel.app/api/auth/register';
 
       const payload = isLogin
         ? { email: data.identifier, password: data.password }
