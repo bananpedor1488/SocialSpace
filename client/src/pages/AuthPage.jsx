@@ -45,8 +45,8 @@ const AuthPage = () => {
 
     try {
       const url = isLogin
-        ? 'https://social-space-jr3l.vercel.app/api/auth/login'
-        : 'https://social-space-jr3l.vercel.app/api/auth/register';
+        ? 'https://2a409129-fb78-439c-8b07-c74ea3c80ade-00-26f7qu9vn3b84.riker.replit.dev/api/auth/login'
+        : 'https://2a409129-fb78-439c-8b07-c74ea3c80ade-00-26f7qu9vn3b84.riker.replit.dev/api/auth/register';
 
       const payload = isLogin
         ? { email: data.identifier, password: data.password }

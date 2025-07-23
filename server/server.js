@@ -9,20 +9,9 @@ dotenv.config();
 const app = express();
 
 app.use(cors({
-  origin: (origin, callback) => {
-    const allowedOrigins = [
-      'https://social-space-jr3l.vercel.app',
-      /\.vercel\.app$/
-    ];
-    if (!origin || allowedOrigins.some(o => typeof o === 'string' ? o === origin : o.test(origin))) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: 'https://2a409129-fb78-439c-8b07-c74ea3c80ade-00-26f7qu9vn3b84.riker.replit.dev', // Укажите конкретный домен
   credentials: true
 }));
-
 
 app.use(express.json());
 
