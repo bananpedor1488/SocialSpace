@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { apiClient, tokenManager } from './AuthPage';
+import axios from 'axios';
 
 import {
   Home, Search, MessageCircle, User, LogOut, Flame, Plus,
@@ -97,44 +97,14 @@ const HomePage = () => {
     return profile._id === user._id || profile._id === user.id;
   };
 
-  // Функция для проверки авторизации
-  const checkAuth = async () => {
-    const accessToken = tokenManager.getAccessToken();
-    const storedUser = tokenManager.getUser();
-
-    if (!accessToken) {
-      console.log('No access token found, redirecting to login');
-      navigate('/');
-      return;
-    }
-
-    if (storedUser) {
-      console.log('User loaded from localStorage:', storedUser);
-      setUser(storedUser);
-      return;
-    }
-
-    try {
-      console.log('Checking auth with server...');
-      const res = await apiClient.get('/me');
-      console.log('Auth check response:', res.data);
-      
-      if (res.data.user) {
+  // Получаем текущего пользователя
+  useEffect(() => { 
+    axios.get('https://server-1-vr19.onrender.com/api/me', { withCredentials: true })
+      .then(res => {
+        console.log('Current user data:', res.data.user);
         setUser(res.data.user);
-        tokenManager.setUser(res.data.user);
-      }
-    } catch (err) {
-      console.error('Auth check failed:', err);
-      if (err.response?.status === 401 || err.response?.status === 403) {
-        tokenManager.clearTokens();
-        navigate('/');
-      }
-    }
-  };
-
-  // Проверяем авторизацию при загрузке компонента
-  useEffect(() => {
-    checkAuth();
+      })
+      .catch(() => navigate('/'));
   }, [navigate]);
 
   // Получаем посты при загрузке пользователя
@@ -152,7 +122,8 @@ const HomePage = () => {
     console.log('Loading posts, page:', pageNum);
     
     try {
-      const res = await apiClient.get('/posts', {
+      const res = await axios.get('https://server-1-vr19.onrender.com/api/posts', { 
+        withCredentials: true,
         params: {
           page: pageNum,
           limit: 10
@@ -224,7 +195,7 @@ const HomePage = () => {
 
   const fetchComments = async (postId) => {
     try {
-      const res = await apiClient.get(`/posts/${postId}/comments`);
+      const res = await axios.get(`https://server-1-vr19.onrender.com/api/posts/${postId}/comments`, { withCredentials: true });
       setComments(prev => ({ ...prev, [postId]: res.data }));
     } catch (err) {
       console.error('Ошибка загрузки комментариев:', err);
@@ -243,22 +214,14 @@ const HomePage = () => {
   };
 
   const handleLogout = async () => {
-    try {
-      // Отправляем запрос на logout (опционально)
-      await apiClient.post('/auth/logout');
-    } catch (err) {
-      console.log('Logout request failed, but continuing...');
-    } finally {
-      // Очищаем токены и редиректим
-      tokenManager.clearTokens();
-      navigate('/');
-    }
+    await axios.post('https://server-1-vr19.onrender.com/api/auth/logout', {}, { withCredentials: true });
+    navigate('/');
   };
 
   const handleCreatePost = async () => {
     if (postText.trim()) {
       try {
-        const res = await apiClient.post('/posts', { content: postText });
+        const res = await axios.post('https://server-1-vr19.onrender.com/api/posts', { content: postText }, { withCredentials: true });
         console.log('New post response:', res.data);
         
         const newPost = {
@@ -288,7 +251,7 @@ const HomePage = () => {
 
   const handleLikePost = async (postId) => {
     try {
-      const res = await apiClient.post(`/posts/${postId}/like`);
+      const res = await axios.post(`https://server-1-vr19.onrender.com/api/posts/${postId}/like`, {}, { withCredentials: true });
       
       setPosts(prev => prev.map(post => 
         post._id === postId ? { 
@@ -314,7 +277,7 @@ const HomePage = () => {
 
   const handleRepost = async (postId) => {
     try {
-      const res = await apiClient.post(`/posts/${postId}/repost`);
+      const res = await axios.post(`https://server-1-vr19.onrender.com/api/posts/${postId}/repost`, {}, { withCredentials: true });
       loadPosts();
     } catch (err) {
       console.error('Ошибка репоста:', err);
@@ -326,7 +289,7 @@ const HomePage = () => {
     setSearchQuery(query);
     if (query.trim()) {
       try {
-        const res = await apiClient.get(`/users/search?query=${query}`);
+        const res = await axios.get(`https://server-1-vr19.onrender.com/api/users/search?query=${query}`, { withCredentials: true });
         setSearchResults(res.data);
       } catch (err) {
         console.error('Ошибка поиска пользователей:', err);
@@ -353,14 +316,14 @@ const HomePage = () => {
     }
     
     try {
-      const res = await apiClient.get(`/users/${userId}`);
+      const res = await axios.get(`https://server-1-vr19.onrender.com/api/users/${userId}`, { withCredentials: true });
       console.log('Profile response:', res.data);
       setProfile(res.data);
       
       setFollowers(res.data.followersCount || 0);
       setFollowing(res.data.followingCount || 0);
       
-      const postsRes = await apiClient.get(`/users/${userId}/posts`);
+      const postsRes = await axios.get(`https://server-1-vr19.onrender.com/api/users/${userId}/posts`, { withCredentials: true });
       console.log('Profile posts response:', postsRes.data);
       
       const formattedProfilePosts = postsRes.data.map(post => ({
@@ -392,7 +355,7 @@ const HomePage = () => {
 
   const toggleFollow = async (userId) => {
     try {
-      const res = await apiClient.post(`/follow/${userId}`);
+      const res = await axios.post(`https://server-1-vr19.onrender.com/api/follow/${userId}`, {}, { withCredentials: true });
       if (userId === profile._id) {
         loadUserProfile(profile._id);
       }
@@ -406,7 +369,10 @@ const HomePage = () => {
     if (!commentText?.trim()) return;
     
     try {
-      const res = await apiClient.post(`/posts/${postId}/comment`, { content: commentText });
+      const res = await axios.post(`https://server-1-vr19.onrender.com/api/posts/${postId}/comment`, 
+        { content: commentText }, 
+        { withCredentials: true }
+      );
       setComments(prev => ({
         ...prev,
         [postId]: [...(prev[postId] || []), res.data],
@@ -539,18 +505,6 @@ const HomePage = () => {
       );
     });
   };
-
-  // Защита от неавторизованного доступа
-  if (!user) {
-    return (
-      <div className="loading-container">
-        <div className="loading-spinner">
-          <Flame size={32} />
-          <p>Загрузка...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="home-container">
