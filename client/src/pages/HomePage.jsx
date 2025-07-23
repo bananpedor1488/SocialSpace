@@ -99,7 +99,7 @@ const HomePage = () => {
 
   // Получаем текущего пользователя
   useEffect(() => { 
-    axios.get('https://2a409129-fb78-439c-8b07-c74ea3c80ade-00-26f7qu9vn3b84.riker.replit.dev/api/me', { withCredentials: true })
+    axios.get('https://server-1-vr19.onrender.com/api/me', { withCredentials: true })
       .then(res => {
         console.log('Current user data:', res.data.user);
         setUser(res.data.user);
@@ -122,7 +122,7 @@ const HomePage = () => {
     console.log('Loading posts, page:', pageNum);
     
     try {
-      const res = await axios.get('https://2a409129-fb78-439c-8b07-c74ea3c80ade-00-26f7qu9vn3b84.riker.replit.dev/api/posts', { 
+      const res = await axios.get('https://server-1-vr19.onrender.com/api/posts', { 
         withCredentials: true,
         params: {
           page: pageNum,
@@ -195,7 +195,7 @@ const HomePage = () => {
 
   const fetchComments = async (postId) => {
     try {
-      const res = await axios.get(`https://2a409129-fb78-439c-8b07-c74ea3c80ade-00-26f7qu9vn3b84.riker.replit.dev/api/posts/${postId}/comments`, { withCredentials: true });
+      const res = await axios.get(`https://server-1-vr19.onrender.com/api/posts/${postId}/comments`, { withCredentials: true });
       setComments(prev => ({ ...prev, [postId]: res.data }));
     } catch (err) {
       console.error('Ошибка загрузки комментариев:', err);
@@ -214,14 +214,14 @@ const HomePage = () => {
   };
 
   const handleLogout = async () => {
-    await axios.post('https://2a409129-fb78-439c-8b07-c74ea3c80ade-00-26f7qu9vn3b84.riker.replit.dev/api/auth/logout', {}, { withCredentials: true });
+    await axios.post('https://server-1-vr19.onrender.com/api/auth/logout', {}, { withCredentials: true });
     navigate('/');
   };
 
   const handleCreatePost = async () => {
     if (postText.trim()) {
       try {
-        const res = await axios.post('https://2a409129-fb78-439c-8b07-c74ea3c80ade-00-26f7qu9vn3b84.riker.replit.dev/api/posts', { content: postText }, { withCredentials: true });
+        const res = await axios.post('https://server-1-vr19.onrender.com/api/posts', { content: postText }, { withCredentials: true });
         console.log('New post response:', res.data);
         
         const newPost = {
@@ -251,7 +251,7 @@ const HomePage = () => {
 
   const handleLikePost = async (postId) => {
     try {
-      const res = await axios.post(`https://2a409129-fb78-439c-8b07-c74ea3c80ade-00-26f7qu9vn3b84.riker.replit.dev/api/posts/${postId}/like`, {}, { withCredentials: true });
+      const res = await axios.post(`https://server-1-vr19.onrender.com/api/posts/${postId}/like`, {}, { withCredentials: true });
       
       setPosts(prev => prev.map(post => 
         post._id === postId ? { 
@@ -277,7 +277,7 @@ const HomePage = () => {
 
   const handleRepost = async (postId) => {
     try {
-      const res = await axios.post(`https://2a409129-fb78-439c-8b07-c74ea3c80ade-00-26f7qu9vn3b84.riker.replit.dev/api/posts/${postId}/repost`, {}, { withCredentials: true });
+      const res = await axios.post(`https://server-1-vr19.onrender.com/api/posts/${postId}/repost`, {}, { withCredentials: true });
       loadPosts();
     } catch (err) {
       console.error('Ошибка репоста:', err);
@@ -289,7 +289,7 @@ const HomePage = () => {
     setSearchQuery(query);
     if (query.trim()) {
       try {
-        const res = await axios.get(`https://2a409129-fb78-439c-8b07-c74ea3c80ade-00-26f7qu9vn3b84.riker.replit.dev/api/users/search?query=${query}`, { withCredentials: true });
+        const res = await axios.get(`https://server-1-vr19.onrender.com/api/users/search?query=${query}`, { withCredentials: true });
         setSearchResults(res.data);
       } catch (err) {
         console.error('Ошибка поиска пользователей:', err);
@@ -316,14 +316,14 @@ const HomePage = () => {
     }
     
     try {
-      const res = await axios.get(`https://2a409129-fb78-439c-8b07-c74ea3c80ade-00-26f7qu9vn3b84.riker.replit.dev/api/users/${userId}`, { withCredentials: true });
+      const res = await axios.get(`https://server-1-vr19.onrender.com/api/users/${userId}`, { withCredentials: true });
       console.log('Profile response:', res.data);
       setProfile(res.data);
       
       setFollowers(res.data.followersCount || 0);
       setFollowing(res.data.followingCount || 0);
       
-      const postsRes = await axios.get(`https://2a409129-fb78-439c-8b07-c74ea3c80ade-00-26f7qu9vn3b84.riker.replit.dev/api/users/${userId}/posts`, { withCredentials: true });
+      const postsRes = await axios.get(`https://server-1-vr19.onrender.com/api/users/${userId}/posts`, { withCredentials: true });
       console.log('Profile posts response:', postsRes.data);
       
       const formattedProfilePosts = postsRes.data.map(post => ({
@@ -355,7 +355,7 @@ const HomePage = () => {
 
   const toggleFollow = async (userId) => {
     try {
-      const res = await axios.post(`https://2a409129-fb78-439c-8b07-c74ea3c80ade-00-26f7qu9vn3b84.riker.replit.dev/api/follow/${userId}`, {}, { withCredentials: true });
+      const res = await axios.post(`https://server-1-vr19.onrender.com/api/follow/${userId}`, {}, { withCredentials: true });
       if (userId === profile._id) {
         loadUserProfile(profile._id);
       }
@@ -369,7 +369,7 @@ const HomePage = () => {
     if (!commentText?.trim()) return;
     
     try {
-      const res = await axios.post(`https://2a409129-fb78-439c-8b07-c74ea3c80ade-00-26f7qu9vn3b84.riker.replit.dev/api/posts/${postId}/comment`, 
+      const res = await axios.post(`https://server-1-vr19.onrender.com/api/posts/${postId}/comment`, 
         { content: commentText }, 
         { withCredentials: true }
       );

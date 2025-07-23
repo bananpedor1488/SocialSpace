@@ -9,7 +9,7 @@ dotenv.config();
 const app = express();
 
 app.use(cors({
-  origin: 'https://2a409129-fb78-439c-8b07-c74ea3c80ade-00-26f7qu9vn3b84.riker.replit.dev', // Укажите конкретный домен
+  origin: 'https://server-1-vr19.onrender.com', // Укажите конкретный домен
   credentials: true
 }));
 
