@@ -51,10 +51,9 @@ body {
   margin-top: 8px;
   max-height: 300px;
   overflow-y: auto;
-  z-index: 1000;
+  z-index: 9999;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
-
 .header-search-result {
   padding: 12px 20px;
   cursor: pointer;
