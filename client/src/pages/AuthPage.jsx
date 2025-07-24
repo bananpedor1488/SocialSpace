@@ -33,6 +33,38 @@ const AuthPage = () => {
   const isValidEmail = (email) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
+  // Функция для безопасного сохранения в localStorage
+  const safeSetLocalStorage = (key, value) => {
+    try {
+      localStorage.setItem(key, value);
+      console.log(`✅ Saved to localStorage: ${key}`);
+      return true;
+    } catch (error) {
+      console.error(`❌ Failed to save to localStorage: ${key}`, error);
+      return false;
+    }
+  };
+
+  // Функция для проверки сохранения токенов
+  const verifyTokensSaved = () => {
+    try {
+      const accessToken = localStorage.getItem('accessToken');
+      const refreshToken = localStorage.getItem('refreshToken');
+      const user = localStorage.getItem('user');
+      
+      console.log('Token verification:', {
+        hasAccessToken: !!accessToken,
+        hasRefreshToken: !!refreshToken,
+        hasUser: !!user
+      });
+      
+      return !!(accessToken && refreshToken && user);
+    } catch (error) {
+      console.error('Error verifying tokens:', error);
+      return false;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -80,19 +112,43 @@ const AuthPage = () => {
       const { accessToken, refreshToken, user } = response.data;
       
       if (accessToken && refreshToken && user) {
-        localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('refreshToken', refreshToken);
-        localStorage.setItem('user', JSON.stringify(user));
+        // Сохраняем токены с проверкой
+        const tokensSaved = (
+          safeSetLocalStorage('accessToken', accessToken) &&
+          safeSetLocalStorage('refreshToken', refreshToken) &&
+          safeSetLocalStorage('user', JSON.stringify(user))
+        );
+
+        if (!tokensSaved) {
+          throw new Error('Не удалось сохранить токены в localStorage');
+        }
+
+        // Дополнительная проверка что токены сохранились
+        setTimeout(() => {
+          const verified = verifyTokensSaved();
+          console.log('Tokens verified after save:', verified);
+          
+          if (!verified) {
+            console.error('Tokens verification failed - trying to save again');
+            // Повторная попытка сохранения
+            safeSetLocalStorage('accessToken', accessToken);
+            safeSetLocalStorage('refreshToken', refreshToken);
+            safeSetLocalStorage('user', JSON.stringify(user));
+          }
+        }, 100);
 
         showMessage(
           `${isLogin ? 'Добро пожаловать' : 'Регистрация прошла успешно'}: ${user.username}`,
           'success'
         );
 
-        // Перенаправляем на главную страницу
+        // Перенаправляем на главную страницу БЕЗ перезагрузки
         setTimeout(() => {
-          navigate('/home');
-          window.location.reload(); // Обновляем страницу для применения токенов
+          console.log('Navigating to /home...');
+          navigate('/home', { replace: true }); // replace: true предотвращает возврат назад
+          
+          // Убираем window.location.reload() - это может быть причиной проблемы на мобильных
+          // window.location.reload();
         }, 1000);
       } else {
         throw new Error('Не получены токены от сервера');
