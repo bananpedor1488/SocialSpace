@@ -27,6 +27,7 @@ const HomePage = () => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isDarkTheme, setIsDarkTheme] = useState(false);
+  const [authCheckComplete, setAuthCheckComplete] = useState(false);
 
   const navigate = useNavigate();
 
@@ -44,14 +45,10 @@ const HomePage = () => {
   };
 
   const clearTokens = () => {
+    console.log('Clearing all tokens and user data');
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
-  };
-
-  const isAuthenticated = () => {
-    const { accessToken } = getTokens();
-    return !!accessToken;
   };
 
   // Функция для декодирования JWT токена (проверка на истечение)
@@ -61,8 +58,10 @@ const HomePage = () => {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       const currentTime = Date.now() / 1000;
-      return payload.exp < currentTime;
+      // Добавляем буферное время 30 секунд для предотвращения проблем с синхронизацией времени
+      return payload.exp < (currentTime + 30);
     } catch (error) {
+      console.error('Error decoding token:', error);
       return true;
     }
   };
@@ -71,29 +70,86 @@ const HomePage = () => {
   const refreshAccessToken = async () => {
     const { refreshToken } = getTokens();
     
-    if (!refreshToken || isTokenExpired(refreshToken)) {
+    if (!refreshToken) {
+      throw new Error('No refresh token available');
+    }
+
+    // Проверяем срок действия refresh токена
+    if (isTokenExpired(refreshToken)) {
       throw new Error('Refresh token expired');
     }
 
     try {
+      console.log('Refreshing access token...');
       const response = await axios.post('https://server-1-vr19.onrender.com/api/auth/refresh', {
         refreshToken: refreshToken
       });
       
       const { accessToken, refreshToken: newRefreshToken } = response.data;
+      
+      console.log('Token refreshed successfully');
       setTokens(accessToken, newRefreshToken || refreshToken);
       
       return accessToken;
     } catch (error) {
+      console.error('Token refresh failed:', error);
       clearTokens();
       throw error;
     }
   };
 
-  // Настройка axios interceptors для JWT
+  // Функция для безопасных API запросов с повторными попытками
+  const makeAuthenticatedRequest = async (requestFn, maxRetries = 2) => {
+    let lastError;
+    
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        // Проверяем токены перед каждой попыткой
+        const { refreshToken } = getTokens();
+        
+        if (!refreshToken || isTokenExpired(refreshToken)) {
+          console.log('No valid refresh token available');
+          clearTokens();
+          setUser(null);
+          navigate('/');
+          throw new Error('Authentication expired');
+        }
+
+        return await requestFn();
+      } catch (error) {
+        lastError = error;
+        
+        if (error.response?.status === 401 && attempt < maxRetries) {
+          console.log(`Request failed with 401, attempt ${attempt + 1}/${maxRetries + 1}, trying to refresh token...`);
+          
+          try {
+            await refreshAccessToken();
+            console.log('Token refreshed successfully, retrying request...');
+            continue; // Повторяем запрос
+          } catch (refreshError) {
+            console.error('Token refresh failed:', refreshError);
+            clearTokens();
+            setUser(null);
+            navigate('/');
+            throw refreshError;
+          }
+        } else {
+          // Если это не 401 или превышено количество попыток
+          throw error;
+        }
+      }
+    }
+    
+    throw lastError;
+  };
+
+  // Настройка axios interceptors для JWT с мобильной поддержкой
   useEffect(() => {
     const requestInterceptor = axios.interceptors.request.use(
       async (config) => {
+        // Добавляем таймауты для мобильных устройств
+        config.timeout = 30000; // 30 секунд
+        
         // Пропускаем добавление токена для публичных эндпоинтов
         const publicEndpoints = ['/auth/login', '/auth/register', '/auth/refresh'];
         const isPublicEndpoint = publicEndpoints.some(endpoint => 
@@ -104,13 +160,13 @@ const HomePage = () => {
           let { accessToken } = getTokens();
           
           // Проверяем, не истек ли токен
-          if (accessToken && isTokenExpired(accessToken)) {
+          if (!accessToken || isTokenExpired(accessToken)) {
             try {
+              console.log('Access token expired, refreshing...');
               accessToken = await refreshAccessToken();
             } catch (error) {
-              clearTokens();
-              navigate('/');
-              return Promise.reject(error);
+              console.error('Token refresh failed in request interceptor:', error);
+              return config;
             }
           }
           
@@ -119,8 +175,6 @@ const HomePage = () => {
           }
         }
         
-        // Убираем withCredentials для JWT
-        delete config.withCredentials;
         return config;
       },
       (error) => Promise.reject(error)
@@ -135,12 +189,17 @@ const HomePage = () => {
           originalRequest._retry = true;
           
           try {
+            console.log('401 error, attempting token refresh...');
             const newAccessToken = await refreshAccessToken();
             originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+            console.log('Retrying original request with new token');
             return axios(originalRequest);
           } catch (refreshError) {
+            console.error('Token refresh failed in response interceptor:', refreshError);
             clearTokens();
-            navigate('/');
+            if (window.location.pathname !== '/') {
+              navigate('/');
+            }
             return Promise.reject(refreshError);
           }
         }
@@ -149,7 +208,6 @@ const HomePage = () => {
       }
     );
 
-    // Очистка interceptors при размонтировании
     return () => {
       axios.interceptors.request.eject(requestInterceptor);
       axios.interceptors.response.eject(responseInterceptor);
@@ -223,7 +281,15 @@ const HomePage = () => {
   // Получаем текущего пользователя при загрузке
   useEffect(() => {
     const checkAuth = async () => {
-      if (!isAuthenticated()) {
+      console.log('Starting auth check...');
+      setAuthCheckComplete(false);
+      
+      const { accessToken, refreshToken } = getTokens();
+      
+      // Если нет токенов вообще, сразу перенаправляем
+      if (!accessToken && !refreshToken) {
+        console.log('No tokens found, redirecting to login');
+        setAuthCheckComplete(true);
         navigate('/');
         return;
       }
@@ -232,17 +298,75 @@ const HomePage = () => {
         // Сначала пробуем получить пользователя из localStorage
         const savedUser = localStorage.getItem('user');
         if (savedUser) {
+          console.log('Loading user from localStorage');
           setUser(JSON.parse(savedUser));
         }
 
-        // Затем проверяем актуальные данные с сервера
-        const res = await axios.get('https://server-1-vr19.onrender.com/api/me');
-        console.log('Current user data:', res.data.user);
+        // Проверяем и обновляем токены если нужно
+        let currentAccessToken = accessToken;
+        
+        if (!currentAccessToken || isTokenExpired(currentAccessToken)) {
+          if (refreshToken && !isTokenExpired(refreshToken)) {
+            try {
+              console.log('Refreshing expired access token...');
+              currentAccessToken = await refreshAccessToken();
+            } catch (refreshError) {
+              console.error('Token refresh failed during init:', refreshError);
+              clearTokens();
+              setUser(null);
+              setAuthCheckComplete(true);
+              navigate('/');
+              return;
+            }
+          } else {
+            console.log('Both tokens expired, redirecting to login');
+            clearTokens();
+            setUser(null);
+            setAuthCheckComplete(true);
+            navigate('/');
+            return;
+          }
+        }
+
+        // Получаем актуальные данные пользователя с сервера
+        console.log('Fetching current user data from server...');
+        const res = await axios.get('https://server-1-vr19.onrender.com/api/me', {
+          headers: {
+            Authorization: `Bearer ${currentAccessToken}`
+          }
+        });
+        console.log('User data received:', res.data.user);
+        
         setUser(res.data.user);
         localStorage.setItem('user', JSON.stringify(res.data.user));
+        setAuthCheckComplete(true);
+        
       } catch (error) {
         console.error('Auth check failed:', error);
+        
+        // Если ошибка 401, пробуем обновить токен
+        if (error.response?.status === 401 && refreshToken && !isTokenExpired(refreshToken)) {
+          try {
+            console.log('Retrying with token refresh after 401...');
+            const newAccessToken = await refreshAccessToken();
+            const res = await axios.get('https://server-1-vr19.onrender.com/api/me', {
+              headers: {
+                Authorization: `Bearer ${newAccessToken}`
+              }
+            });
+            setUser(res.data.user);
+            localStorage.setItem('user', JSON.stringify(res.data.user));
+            setAuthCheckComplete(true);
+            return;
+          } catch (refreshError) {
+            console.error('Token refresh retry failed:', refreshError);
+          }
+        }
+        
+        console.log('Auth check completely failed, clearing tokens');
         clearTokens();
+        setUser(null);
+        setAuthCheckComplete(true);
         navigate('/');
       }
     };
@@ -250,11 +374,129 @@ const HomePage = () => {
     checkAuth();
   }, [navigate]);
 
+  // Периодическая проверка токенов с адаптацией для мобильных устройств
+  useEffect(() => {
+    if (!user || !authCheckComplete) return;
+
+    const checkTokensPeriodically = async () => {
+      const { accessToken, refreshToken } = getTokens();
+      
+      // Если нет refresh токена, выходим
+      if (!refreshToken) {
+        console.log('No refresh token found during periodic check, logging out');
+        clearTokens();
+        setUser(null);
+        navigate('/');
+        return;
+      }
+
+      // Если refresh токен истек, выходим
+      if (isTokenExpired(refreshToken)) {
+        console.log('Refresh token expired during periodic check, logging out');
+        clearTokens();
+        setUser(null);
+        navigate('/');
+        return;
+      }
+
+      // Если access токен истек или истекает в ближайшие 5 минут, обновляем
+      if (!accessToken || isTokenExpired(accessToken)) {
+        console.log('Access token needs refresh during periodic check');
+        try {
+          await refreshAccessToken();
+          console.log('Periodic token refresh successful');
+        } catch (error) {
+          console.error('Periodic token refresh failed:', error);
+          clearTokens();
+          setUser(null);
+          navigate('/');
+        }
+      }
+    };
+
+    // Проверяем токены сразу
+    checkTokensPeriodically();
+
+    // Устанавливаем интервал проверки каждые 3 минуты
+    const interval = setInterval(checkTokensPeriodically, 3 * 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, [user, authCheckComplete, navigate]);
+
+  // Обработка событий видимости страницы (важно для мобильных устройств)
+  useEffect(() => {
+    if (!user || !authCheckComplete) return;
+
+    const handleVisibilityChange = async () => {
+      if (!document.hidden) {
+        console.log('App became visible, checking tokens...');
+        const { accessToken, refreshToken } = getTokens();
+        
+        if (!refreshToken || isTokenExpired(refreshToken)) {
+          console.log('Tokens expired while app was in background');
+          clearTokens();
+          setUser(null);
+          navigate('/');
+          return;
+        }
+
+        // Если access токен истек, обновляем его
+        if (!accessToken || isTokenExpired(accessToken)) {
+          try {
+            console.log('Refreshing token after app became visible');
+            await refreshAccessToken();
+          } catch (error) {
+            console.error('Token refresh on visibility change failed:', error);
+            clearTokens();
+            setUser(null);
+            navigate('/');
+          }
+        }
+      }
+    };
+
+    // Также проверяем при изменении фокуса окна
+    const handleFocus = async () => {
+      if (user && authCheckComplete) {
+        const { refreshToken } = getTokens();
+        if (!refreshToken || isTokenExpired(refreshToken)) {
+          console.log('Session expired, logging out');
+          clearTokens();
+          setUser(null);
+          navigate('/');
+        }
+      }
+    };
+
+    // Обработка событий для мобильных устройств
+    const handlePageShow = async () => {
+      if (user && authCheckComplete) {
+        console.log('Page show event, checking auth...');
+        const { refreshToken } = getTokens();
+        if (!refreshToken || isTokenExpired(refreshToken)) {
+          clearTokens();
+          setUser(null);
+          navigate('/');
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('pageshow', handlePageShow);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('pageshow', handlePageShow);
+    };
+  }, [user, authCheckComplete, navigate]);
+
   // Получаем посты при загрузке пользователя
   useEffect(() => {
     if (user) {
       loadPosts();
-      loadSuggestions(); // Загружаем рекомендации
+      loadSuggestions();
     }
   }, [user]);
 
@@ -262,7 +504,7 @@ const HomePage = () => {
   const loadSuggestions = async () => {
     try {
       const res = await axios.get('https://server-1-vr19.onrender.com/api/users/suggestions');
-      setSuggestions(res.data.slice(0, 5)); // Ограничиваем до 5 рекомендаций
+      setSuggestions(res.data.slice(0, 5));
     } catch (err) {
       console.error('Ошибка загрузки рекомендаций:', err);
       setSuggestions([]);
@@ -367,15 +609,24 @@ const HomePage = () => {
   };
 
   const handleLogout = async () => {
+    console.log('Starting logout process...');
+    
     try {
       const { refreshToken } = getTokens();
-      await axios.post('https://server-1-vr19.onrender.com/api/auth/logout', {
-        refreshToken
-      });
+      if (refreshToken) {
+        console.log('Sending logout request to server...');
+        await axios.post('https://server-1-vr19.onrender.com/api/auth/logout', {
+          refreshToken
+        });
+        console.log('Server logout successful');
+      }
     } catch (error) {
-      console.warn('Logout request failed:', error);
+      console.warn('Server logout request failed:', error);
     } finally {
+      console.log('Clearing local tokens and redirecting...');
       clearTokens();
+      setUser(null);
+      setAuthCheckComplete(false);
       navigate('/');
     }
   };
@@ -674,7 +925,29 @@ const HomePage = () => {
     });
   };
 
-  // Показываем загрузку если пользователь еще не загружен
+  // Показываем загрузку если проверка авторизации не завершена
+  if (!authCheckComplete) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        color: 'white',
+        fontSize: '18px',
+        padding: '20px',
+        textAlign: 'center'
+      }}>
+        <div>
+          <div style={{ marginBottom: '20px', fontSize: '32px' }}>🔐</div>
+          <div>Проверяем авторизацию...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Показываем загрузку если пользователь еще не загружен, но авторизация проверена
   if (!user) {
     return (
       <div style={{ 
@@ -684,9 +957,14 @@ const HomePage = () => {
         height: '100vh',
         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         color: 'white',
-        fontSize: '18px'
+        fontSize: '18px',
+        padding: '20px',
+        textAlign: 'center'
       }}>
-        Загрузка...
+        <div>
+          <div style={{ marginBottom: '20px', fontSize: '32px' }}>⏳</div>
+          <div>Загружаем данные пользователя...</div>
+        </div>
       </div>
     );
   }
@@ -697,7 +975,7 @@ const HomePage = () => {
         <div className="header-content">
           <div className="logo"><h1><Flame size={24} /> SocialSpace</h1></div>
           <div className="user-info">
-            <span>Привет, {user?.username}!</span>
+            <span className="user-greeting">Привет, {user?.username}!</span>
             
             <button onClick={toggleTheme} className="theme-toggle">
               <div className="theme-icon">
@@ -709,7 +987,8 @@ const HomePage = () => {
             </button>
             
             <button onClick={handleLogout} className="logout-btn">
-              <LogOut size={16} /> Выйти
+              <LogOut size={16} /> 
+              <span className="logout-text">Выйти</span>
             </button>
           </div>
         </div>
@@ -717,9 +996,36 @@ const HomePage = () => {
 
       <nav className="sidebar">
         <ul className="nav-menu">
-          <li><button className={getNavItemClass('home')} onClick={() => setActiveTab('home')}><Home size={18} /> Главная</button></li>
-          <li><button className={getNavItemClass('search')} onClick={() => setActiveTab('search')}><Search size={18} /> Поиск</button></li>
-          <li><button className={getNavItemClass('profile')} onClick={() => { setActiveTab('profile'); if(user) loadUserProfile(user._id || user.id); }}><User size={18} /> Профиль</button></li>
+          <li>
+            <button 
+              className={getNavItemClass('home')} 
+              onClick={() => setActiveTab('home')}
+            >
+              <Home size={18} /> 
+              <span className="nav-text">Главная</span>
+            </button>
+          </li>
+          <li>
+            <button 
+              className={getNavItemClass('search')} 
+              onClick={() => setActiveTab('search')}
+            >
+              <Search size={18} /> 
+              <span className="nav-text">Поиск</span>
+            </button>
+          </li>
+          <li>
+            <button 
+              className={getNavItemClass('profile')} 
+              onClick={() => { 
+                setActiveTab('profile'); 
+                if(user) loadUserProfile(user._id || user.id); 
+              }}
+            >
+              <User size={18} /> 
+              <span className="nav-text">Профиль</span>
+            </button>
+          </li>
         </ul>
       </nav>
 
@@ -749,7 +1055,8 @@ const HomePage = () => {
                     disabled={!postText.trim() || postText.length > 280}
                     className="publish-btn"
                   >
-                    <Plus size={18} /> Опубликовать
+                    <Plus size={18} /> 
+                    <span className="publish-text">Опубликовать</span>
                   </button>
                 </div>
               </div>
@@ -770,7 +1077,7 @@ const HomePage = () => {
                     ) : (
                       <>
                         <ChevronDown size={18} />
-                        Показать ещё
+                        <span>Показать ещё</span>
                       </>
                     )}
                   </button>
@@ -825,7 +1132,8 @@ const HomePage = () => {
                       {profile.username}
                       {isOwnProfile() && (
                         <span className="own-profile-badge">
-                          <UserCheck size={16} /> Ваш профиль
+                          <UserCheck size={16} /> 
+                          <span className="badge-text">Ваш профиль</span>
                         </span>
                       )}
                     </h2>
@@ -854,11 +1162,13 @@ const HomePage = () => {
                         >
                           {profile.followed ? (
                             <>
-                              <UserCheck size={16} /> Отписаться
+                              <UserCheck size={16} /> 
+                              <span>Отписаться</span>
                             </>
                           ) : (
                             <>
-                              <Users size={16} /> Подписаться
+                              <Users size={16} /> 
+                              <span>Подписаться</span>
                             </>
                           )}
                         </button>
@@ -872,7 +1182,7 @@ const HomePage = () => {
             <div className="profile-posts-header">
               <h3>
                 <Pencil size={18} /> 
-                Посты {isOwnProfile() ? '(ваши)' : ''}
+                <span>Посты {isOwnProfile() ? '(ваши)' : ''}</span>
               </h3>
               {profilePosts.length > 0 && (
                 <span className="posts-count">{profilePosts.length} постов</span>
@@ -897,18 +1207,33 @@ const HomePage = () => {
 
       <aside className="right-sidebar">
         <div className="trending">
-          <h3><Flame size={18} /> В тренде</h3>
+          <h3><Flame size={18} /> <span>В тренде</span></h3>
           <ul>
-            <li><span>#JavaScript</span><small>1,234 постов</small></li>
-            <li><span>#React</span><small>987 постов</small></li>
-            <li><span>#WebDev</span><small>856 постов</small></li>
-            <li><span>#CSS</span><small>643 постов</small></li>
-            <li><span>#Node</span><small>521 постов</small></li>
+            <li>
+              <span className="trend-tag">#JavaScript</span>
+              <small>1,234 постов</small>
+            </li>
+            <li>
+              <span className="trend-tag">#React</span>
+              <small>987 постов</small>
+            </li>
+            <li>
+              <span className="trend-tag">#WebDev</span>
+              <small>856 постов</small>
+            </li>
+            <li>
+              <span className="trend-tag">#CSS</span>
+              <small>643 постов</small>
+            </li>
+            <li>
+              <span className="trend-tag">#Node</span>
+              <small>521 постов</small>
+            </li>
           </ul>
         </div>
 
         <div className="suggestions">
-          <h3><Users size={18} /> Рекомендации</h3>
+          <h3><Users size={18} /> <span>Рекомендации</span></h3>
           {suggestions.length > 0 ? (
             suggestions.map(suggestionUser => (
               <div key={suggestionUser._id} className="user-suggestion">
@@ -923,7 +1248,8 @@ const HomePage = () => {
                     onClick={() => toggleFollow(suggestionUser._id)}
                     className="suggestion-follow-btn"
                   >
-                    <Users size={14} /> Подписаться
+                    <Users size={14} /> 
+                    <span>Подписаться</span>
                   </button>
                 </div>
               </div>
@@ -933,6 +1259,34 @@ const HomePage = () => {
           )}
         </div>
       </aside>
+
+      {/* Мобильная навигация внизу */}
+      <nav className="mobile-nav">
+        <button 
+          className={getNavItemClass('home')} 
+          onClick={() => setActiveTab('home')}
+        >
+          <Home size={24} />
+          <span>Главная</span>
+        </button>
+        <button 
+          className={getNavItemClass('search')} 
+          onClick={() => setActiveTab('search')}
+        >
+          <Search size={24} />
+          <span>Поиск</span>
+        </button>
+        <button 
+          className={getNavItemClass('profile')} 
+          onClick={() => { 
+            setActiveTab('profile'); 
+            if(user) loadUserProfile(user._id || user.id); 
+          }}
+        >
+          <User size={24} />
+          <span>Профиль</span>
+        </button>
+      </nav>
     </div>
   );
 };

@@ -1,15 +1,11 @@
-// utils/auth.js
-import axios from 'axios';
+// authUtils.js - Утилиты для управления JWT токенами
 
-const API_BASE_URL = 'https://server-1-vr19.onrender.com/api';
-
-// Класс для управления токенами
 class AuthManager {
   constructor() {
-    this.setupAxiosInterceptors();
+    this.baseURL = 'https://server-1-vr19.onrender.com/api';
   }
 
-  // Получить токены из localStorage
+  // Получение токенов из localStorage
   getTokens() {
     return {
       accessToken: localStorage.getItem('accessToken'),
@@ -17,190 +13,182 @@ class AuthManager {
     };
   }
 
-  // Сохранить токены в localStorage
-  setTokens(tokens) {
-    if (tokens.accessToken) {
-      localStorage.setItem('accessToken', tokens.accessToken);
+  // Сохранение токенов в localStorage
+  setTokens(accessToken, refreshToken) {
+    if (accessToken) {
+      localStorage.setItem('accessToken', accessToken);
+      console.log('Access token saved');
     }
-    if (tokens.refreshToken) {
-      localStorage.setItem('refreshToken', tokens.refreshToken);
+    if (refreshToken) {
+      localStorage.setItem('refreshToken', refreshToken);
+      console.log('Refresh token saved');
     }
   }
 
-  // Очистить токены
+  // Очистка всех токенов и данных пользователя
   clearTokens() {
+    console.log('Clearing all authentication data');
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
   }
 
-  // Получить информацию о пользователе
-  getUser() {
-    const userStr = localStorage.getItem('user');
-    return userStr ? JSON.parse(userStr) : null;
-  }
-
-  // Сохранить информацию о пользователе
-  setUser(user) {
-    localStorage.setItem('user', JSON.stringify(user));
-  }
-
-  // Проверить, авторизован ли пользователь
+  // Проверка, авторизован ли пользователь
   isAuthenticated() {
-    const { accessToken } = this.getTokens();
-    return !!accessToken;
+    const { accessToken, refreshToken } = this.getTokens();
+    return !!(accessToken || refreshToken);
   }
 
-  // Проверить, истек ли токен
+  // Проверка истечения срока действия токена
   isTokenExpired(token) {
     if (!token) return true;
     
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.exp * 1000 < Date.now();
+      const currentTime = Date.now() / 1000;
+      // Добавляем буферное время 30 секунд
+      return payload.exp < (currentTime + 30);
     } catch (error) {
+      console.error('Error decoding token:', error);
       return true;
     }
   }
 
-  // Обновить токены
-  async refreshTokens() {
+  // Получение информации из токена
+  getTokenPayload(token) {
+    if (!token) return null;
+    
+    try {
+      return JSON.parse(atob(token.split('.')[1]));
+    } catch (error) {
+      console.error('Error decoding token payload:', error);
+      return null;
+    }
+  }
+
+  // Обновление access токена
+  async refreshAccessToken() {
     const { refreshToken } = this.getTokens();
     
-    if (!refreshToken || this.isTokenExpired(refreshToken)) {
-      throw new Error('Refresh token недействителен');
+    if (!refreshToken) {
+      throw new Error('No refresh token available');
+    }
+
+    if (this.isTokenExpired(refreshToken)) {
+      throw new Error('Refresh token expired');
     }
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
-        refreshToken
+      console.log('Refreshing access token...');
+      
+      const response = await fetch(`${this.baseURL}/auth/refresh`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ refreshToken })
       });
 
-      const { accessToken, refreshToken: newRefreshToken, user } = response.data;
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const { accessToken, refreshToken: newRefreshToken } = data;
       
-      this.setTokens({ accessToken, refreshToken: newRefreshToken });
-      this.setUser(user);
+      this.setTokens(accessToken, newRefreshToken || refreshToken);
+      console.log('Token refreshed successfully');
       
-      return { accessToken, refreshToken: newRefreshToken };
+      return accessToken;
     } catch (error) {
+      console.error('Token refresh failed:', error);
       this.clearTokens();
       throw error;
     }
   }
 
-  // Настройка axios interceptors
-  setupAxiosInterceptors() {
-    // Добавляем токен к каждому запросу
-    axios.interceptors.request.use(
-      (config) => {
-        const { accessToken } = this.getTokens();
-        if (accessToken && !config.headers.Authorization) {
-          config.headers.Authorization = `Bearer ${accessToken}`;
-        }
-        return config;
-      },
-      (error) => Promise.reject(error)
-    );
-
-    // Обрабатываем ошибки авторизации
-    axios.interceptors.response.use(
-      (response) => response,
-      async (error) => {
-        const originalRequest = error.config;
-
-        if (error.response?.status === 401 && !originalRequest._retry) {
-          originalRequest._retry = true;
-          
-          try {
-            const newTokens = await this.refreshTokens();
-            originalRequest.headers.Authorization = `Bearer ${newTokens.accessToken}`;
-            return axios(originalRequest);
-          } catch (refreshError) {
-            this.clearTokens();
-            window.location.href = '/';
-            return Promise.reject(refreshError);
-          }
-        }
-        
-        return Promise.reject(error);
+  // Получение валидного access токена (с автоматическим обновлением)
+  async getValidAccessToken() {
+    let { accessToken } = this.getTokens();
+    
+    if (!accessToken || this.isTokenExpired(accessToken)) {
+      try {
+        accessToken = await this.refreshAccessToken();
+      } catch (error) {
+        console.error('Failed to get valid access token:', error);
+        throw error;
       }
-    );
-  }
-
-  // Логин
-  async login(email, password) {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/auth/login`, {
-        email,
-        password
-      });
-
-      const { accessToken, refreshToken, user } = response.data;
-      
-      this.setTokens({ accessToken, refreshToken });
-      this.setUser(user);
-      
-      return { success: true, user };
-    } catch (error) {
-      console.error('Login error:', error);
-      throw new Error(
-        error.response?.data?.message || 'Ошибка входа'
-      );
     }
+    
+    return accessToken;
   }
 
-  // Регистрация
-  async register(username, email, password) {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/auth/register`, {
-        username,
-        email,
-        password
-      });
-
-      const { accessToken, refreshToken, user } = response.data;
-      
-      this.setTokens({ accessToken, refreshToken });
-      this.setUser(user);
-      
-      return { success: true, user };
-    } catch (error) {
-      console.error('Registration error:', error);
-      throw new Error(
-        error.response?.data?.message || 'Ошибка регистрации'
-      );
-    }
-  }
-
-  // Выход
+  // Выход из системы
   async logout() {
-    try {
-      await axios.post(`${API_BASE_URL}/auth/logout`);
-    } catch (error) {
-      console.warn('Logout request failed:', error);
-    } finally {
-      this.clearTokens();
-      window.location.href = '/';
+    const { refreshToken } = this.getTokens();
+    
+    if (refreshToken) {
+      try {
+        await fetch(`${this.baseURL}/auth/logout`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ refreshToken })
+        });
+      } catch (error) {
+        console.warn('Logout request failed:', error);
+      }
     }
+    
+    this.clearTokens();
   }
 
-  // Проверить статус авторизации
-  async checkAuthStatus() {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/me`);
-      return {
-        authenticated: true,
-        user: response.data.user
-      };
-    } catch (error) {
-      if (error.response?.status === 401) {
+  // Настройка автоматической проверки токенов
+  startTokenMonitoring(onTokenExpired) {
+    // Проверка каждые 5 минут
+    const interval = setInterval(() => {
+      const { refreshToken } = this.getTokens();
+      
+      if (!refreshToken || this.isTokenExpired(refreshToken)) {
+        console.log('Refresh token expired during monitoring');
         this.clearTokens();
+        if (onTokenExpired) onTokenExpired();
+        clearInterval(interval);
       }
-      return {
-        authenticated: false,
-        user: null
-      };
-    }
+    }, 5 * 60 * 1000);
+
+    // Проверка при возвращении в приложение
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        const { refreshToken } = this.getTokens();
+        
+        if (!refreshToken || this.isTokenExpired(refreshToken)) {
+          console.log('Tokens expired while app was in background');
+          this.clearTokens();
+          if (onTokenExpired) onTokenExpired();
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Возвращаем функцию для очистки
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }
+
+  // Сохранение данных пользователя
+  setUser(userData) {
+    localStorage.setItem('user', JSON.stringify(userData));
+  }
+
+  // Получение данных пользователя
+  getUser() {
+    const userData = localStorage.getItem('user');
+    return userData ? JSON.parse(userData) : null;
   }
 }
 
@@ -208,18 +196,3 @@ class AuthManager {
 const authManager = new AuthManager();
 
 export default authManager;
-
-// Экспортируем отдельные функции для удобства
-export const {
-  getTokens,
-  setTokens,
-  clearTokens,
-  getUser,
-  setUser,
-  isAuthenticated,
-  login,
-  register,
-  logout,
-  checkAuthStatus,
-  refreshTokens
-} = authManager;
