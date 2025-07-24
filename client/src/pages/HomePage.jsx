@@ -4,9 +4,9 @@ import axios from 'axios';
 import { io } from 'socket.io-client';
 
 import {
-  Home, Search, MessageCircle, User, LogOut, Plus,
+  Home, MessageCircle, User, LogOut, Plus,
   Heart, MessageSquare, Repeat, Pencil, Trash2, Users, UserCheck, Send, X, ChevronDown,
-  Moon, Sun, Wifi, WifiOff, GitBranch, Clock
+  Moon, Sun, Wifi, WifiOff, Flame, Clock
 } from 'lucide-react';
 
 const HomePage = () => {
@@ -985,31 +985,50 @@ const HomePage = () => {
   return (
     <div className="home-container">
       <header className="header">
-        <div className="header-content">
-          <div className="logo"><h1><GitBranch size={24} /> SocialSpace</h1></div>
-          <div className="user-info">
-            <span>Привет, {user?.username}!</span>
-            
-            <button onClick={toggleTheme} className="theme-toggle">
-              <div className="theme-icon">
-                {isDarkTheme ? <Sun size={18} /> : <Moon size={18} />}
-              </div>
-              <span className="theme-text">
-                {isDarkTheme ? 'Светлая' : 'Темная'}
-              </span>
-            </button>
-            
-            <button onClick={handleLogout} className="logout-btn">
-              <LogOut size={16} /> Выйти
-            </button>
+      // Заменить весь блок header-content:
+<div className="header-content">
+  <div className="logo"><h1><Flame size={24} /> SocialSpace</h1></div>
+  <div className="header-search">
+    <input
+      type="text"
+      value={searchQuery}
+      onChange={handleSearch}
+      placeholder="Поиск пользователей..."
+      className="header-search-input"
+    />
+    {searchResults.length > 0 && (
+      <div className="header-search-results">
+        {searchResults.map(searchUser => (
+          <div key={searchUser._id} className="header-search-result" onClick={() => handleSearchClick(searchUser)}>
+            <span className="header-search-username">@{searchUser.username}</span>
           </div>
-        </div>
+        ))}
+      </div>
+    )}
+  </div>
+  <div className="user-info">
+    <span>Привет, {user?.username}!</span>
+    
+    <button onClick={toggleTheme} className="theme-toggle">
+      <div className="theme-icon">
+        {isDarkTheme ? <Sun size={18} /> : <Moon size={18} />}
+      </div>
+      <span className="theme-text">
+        {isDarkTheme ? 'Светлая' : 'Темная'}
+      </span>
+    </button>
+    
+    <button onClick={handleLogout} className="logout-btn">
+      <LogOut size={16} /> Выйти
+    </button>
+  </div>
+</div>
       </header>
 
       <nav className="sidebar">
         <ul className="nav-menu">
           <li><button className={getNavItemClass('home')} onClick={() => setActiveTab('home')}><Home size={18} /> Главная</button></li>
-          <li><button className={getNavItemClass('search')} onClick={() => setActiveTab('search')}><Search size={18} /> Поиск</button></li>
+       
           <li><button className={getNavItemClass('profile')} onClick={() => { setActiveTab('profile'); if(user) loadUserProfile(user._id || user.id); }}><User size={18} /> Профиль</button></li>
         </ul>
       </nav>
@@ -1077,34 +1096,7 @@ const HomePage = () => {
           </div>
         )}
         
-        {activeTab === 'search' && (
-          <div className="search-section">
-            <div className="search-container">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={handleSearch}
-                placeholder="Поиск пользователей..."
-                className="search-input"
-              />
-            </div>
-            
-            {searchResults.length > 0 ? (
-              <div className="search-results-list">
-                <h3>Найдено пользователей: {searchResults.length}</h3>
-                {searchResults.map(searchUser => (
-                  <div key={searchUser._id} className="search-result-item" onClick={() => handleSearchClick(searchUser)}>
-                    <div className="search-user-info">
-                      <span className="search-username">@{searchUser.username}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              searchQuery && <div className="no-results">Пользователи не найдены</div>
-            )}
-          </div>
-        )}
+       
         
         {activeTab === 'profile' && profile && (
           <div className="profile-view">
