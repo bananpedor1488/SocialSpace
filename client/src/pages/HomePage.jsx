@@ -4,9 +4,9 @@ import axios from 'axios';
 import { io } from 'socket.io-client';
 
 import {
-  Home, Search, MessageCircle, User, LogOut, Flame, Plus,
+  Home, Search, MessageCircle, User, LogOut, Plus,
   Heart, MessageSquare, Repeat, Pencil, Trash2, Users, UserCheck, Send, X, ChevronDown,
-  Moon, Sun, Wifi, WifiOff
+  Moon, Sun, Wifi, WifiOff, GitBranch, Clock
 } from 'lucide-react';
 
 const HomePage = () => {
@@ -33,6 +33,65 @@ const HomePage = () => {
 
   const navigate = useNavigate();
   const socketRef = useRef(null);
+
+  // Список изменений версий
+  const changelogData = [
+    {
+      version: '1.4',
+      date: '24 июля 2025',
+      changes: [
+        '✨ Добавлена функция репостов с отображением оригинального автора',
+        '🔄 Переработана система уведомлений в реальном времени',
+        '🎨 Улучшен дизайн комментариев и постов',
+        '🐛 Исправлены ошибки с отображением счетчиков лайков',
+        '⚡ Оптимизирована загрузка постов'
+      ]
+    },
+    {
+      version: '1.3',
+      date: '20 июля 2025',
+      changes: [
+        '💬 Добавлена система комментариев в реальном времени',
+        '🔍 Улучшен поиск пользователей',
+        '👥 Система подписок и рекомендаций',
+        '🌙 Переключатель темной/светлой темы',
+        '🐛 Исправлены проблемы с синхронизацией данных'
+      ]
+    },
+    {
+      version: '1.2',
+      date: '15 июля 2025',
+      changes: [
+        '❤️ Система лайков с анимацией',
+        '📱 Адаптивный дизайн для мобильных устройств',
+        '⚡ Socket.IO интеграция для real-time обновлений',
+        '🔐 JWT аутентификация вместо сессий',
+        '🎯 Улучшена производительность приложения'
+      ]
+    },
+    {
+      version: '1.1',
+      date: '10 июля 2025',
+      changes: [
+        '👤 Система профилей пользователей',
+        '📝 Создание и просмотр постов',
+        '🔒 Базовая система авторизации',
+        '💾 Интеграция с MongoDB',
+        '🎨 Первая версия UI/UX'
+      ]
+    },
+    {
+      version: '1.0',
+      date: '5 июля 2025',
+      changes: [
+        '🚀 Первый релиз SocialSpace',
+        '📋 Базовая регистрация и вход',
+        '🏠 Главная страница с навигацией',
+        '⚙️ Настройка сервера и базы данных',
+        '🔧 Базовая архитектура приложения'
+      ]
+    }
+  ];
 
   // JWT утилиты
   const getTokens = () => {
@@ -150,23 +209,56 @@ const HomePage = () => {
             minute: '2-digit'
           }),
           comments: newPost.comments || [],
-          commentsCount: newPost.commentsCount || 0
+          commentsCount: newPost.commentsCount || 0,
+          isRepost: newPost.isRepost || false,
+          originalPost: newPost.originalPost || null,
+          repostedBy: newPost.repostedBy || null
         };
 
         setPosts(prev => [formattedPost, ...prev]);
+      });
+
+      // Новый репост
+      socketRef.current.on('newRepost', (repostData) => {
+        console.log('New repost received:', repostData);
+        const formattedRepost = {
+          _id: repostData._id,
+          userId: repostData.repostedBy?._id || repostData.repostedBy,
+          username: repostData.repostedBy?.username || 'Unknown',
+          content: repostData.originalPost?.content || '',
+          likes: repostData.originalPost?.likes?.length || 0,
+          liked: repostData.originalPost?.likes?.includes(user._id || user.id) || false,
+          date: new Date(repostData.createdAt || Date.now()).toLocaleDateString('ru-RU', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          }),
+          comments: repostData.originalPost?.comments || [],
+          commentsCount: repostData.originalPost?.commentsCount || 0,
+          isRepost: true,
+          originalPost: {
+            _id: repostData.originalPost?._id,
+            author: repostData.originalPost?.author,
+            content: repostData.originalPost?.content,
+            createdAt: repostData.originalPost?.createdAt
+          },
+          repostedBy: repostData.repostedBy
+        };
+
+        setPosts(prev => [formattedRepost, ...prev]);
       });
 
       // Новый комментарий
       socketRef.current.on('newComment', ({ postId, comment }) => {
         console.log('New comment received:', { postId, comment });
         
-        // Обновляем комментарии для поста
         setComments(prev => ({
           ...prev,
           [postId]: [...(prev[postId] || []), comment]
         }));
 
-        // Обновляем счетчик комментариев в постах
         setPosts(prev => prev.map(post => 
           post._id === postId 
             ? { ...post, commentsCount: (post.commentsCount || 0) + 1 }
@@ -213,7 +305,6 @@ const HomePage = () => {
         setPosts(prev => prev.filter(post => post._id !== postId));
         setProfilePosts(prev => prev.filter(post => post._id !== postId));
         
-        // Очищаем комментарии удаленного поста
         setComments(prev => {
           const newComments = { ...prev };
           delete newComments[postId];
@@ -230,7 +321,6 @@ const HomePage = () => {
           [postId]: (prev[postId] || []).filter(comment => comment._id !== commentId)
         }));
 
-        // Обновляем счетчик комментариев
         setPosts(prev => prev.map(post => 
           post._id === postId 
             ? { ...post, commentsCount: Math.max(0, (post.commentsCount || 0) - 1) }
@@ -248,7 +338,6 @@ const HomePage = () => {
       socketRef.current.on('followUpdate', ({ targetUserId, followerId, followerUsername, isFollowing, followersCount }) => {
         console.log('Follow update received:', { targetUserId, followerId, followerUsername, isFollowing, followersCount });
         
-        // Обновляем профиль если это текущий просматриваемый профиль
         if (profile && profile._id === targetUserId) {
           setFollowers(followersCount);
           setProfile(prev => ({
@@ -257,7 +346,6 @@ const HomePage = () => {
           }));
         }
 
-        // Обновляем рекомендации
         setSuggestions(prev => prev.map(suggestion => 
           suggestion._id === targetUserId 
             ? { ...suggestion, followersCount }
@@ -268,7 +356,6 @@ const HomePage = () => {
       socketRef.current.on('followingUpdate', ({ userId, followingCount }) => {
         console.log('Following update received:', { userId, followingCount });
         
-        // Обновляем счетчик подписок если это наш профиль
         if (profile && profile._id === userId && isOwnProfile()) {
           setFollowing(followingCount);
         }
@@ -279,7 +366,6 @@ const HomePage = () => {
       initializeSocket();
     }
 
-    // Очистка при размонтировании
     return () => {
       if (socketRef.current) {
         console.log('Disconnecting Socket.IO...');
@@ -305,7 +391,6 @@ const HomePage = () => {
             try {
               accessToken = await refreshAccessToken();
               
-              // Переподключаем сокет с новым токеном
               if (socketRef.current && user) {
                 socketRef.current.disconnect();
                 setTimeout(() => {
@@ -468,7 +553,7 @@ const HomePage = () => {
     if (user) {
       loadPosts();
       loadSuggestions();
-    }
+    }  
   }, [user]);
 
   // Функция загрузки рекомендаций
@@ -515,7 +600,6 @@ const HomePage = () => {
         
         const username = post.author?.username || post.username || 'Unknown';
         
-        // Инициализируем комментарии для каждого поста
         if (post.comments && Array.isArray(post.comments)) {
           setComments(prev => ({
             ...prev,
@@ -537,7 +621,10 @@ const HomePage = () => {
             year: 'numeric',
             hour: '2-digit',
             minute: '2-digit'
-          })
+          }),
+          isRepost: post.isRepost || false,
+          originalPost: post.originalPost || null,
+          repostedBy: post.repostedBy || null
         };
       });
 
@@ -581,7 +668,6 @@ const HomePage = () => {
       [postId]: !prev[postId]
     }));
     
-    // Загружаем комментарии только если они еще не загружены
     if (!showComments[postId] && !comments[postId]) {
       fetchComments(postId);
     }
@@ -610,7 +696,6 @@ const HomePage = () => {
         await axios.post('https://server-1-vr19.onrender.com/api/posts', { 
           content: postText 
         });
-        // Пост появится через Socket.IO событие 'newPost'
         setPostText('');
       } catch (err) {
         console.error('Ошибка создания поста:', err);
@@ -621,7 +706,6 @@ const HomePage = () => {
   const handleLikePost = async (postId) => {
     try {
       await axios.post(`https://server-1-vr19.onrender.com/api/posts/${postId}/like`);
-      // Обновление произойдет через Socket.IO событие 'likeUpdate'
     } catch (err) {
       console.error('Ошибка лайка:', err);
     }
@@ -630,9 +714,13 @@ const HomePage = () => {
   const handleRepost = async (postId) => {
     try {
       const res = await axios.post(`https://server-1-vr19.onrender.com/api/posts/${postId}/repost`);
-      loadPosts();
+      console.log('Repost successful:', res.data);
+      // Репост появится через Socket.IO событие 'newRepost'
     } catch (err) {
       console.error('Ошибка репоста:', err);
+      if (err.response?.data?.message) {
+        alert(err.response.data.message);
+      }
     }
   };
 
@@ -692,7 +780,10 @@ const HomePage = () => {
           year: 'numeric',
           hour: '2-digit',
           minute: '2-digit'
-        })
+        }),
+        isRepost: post.isRepost || false,
+        originalPost: post.originalPost || null,
+        repostedBy: post.repostedBy || null
       }));
       
       setProfilePosts(formattedProfilePosts);
@@ -709,7 +800,6 @@ const HomePage = () => {
   const toggleFollow = async (userId) => {
     try {
       await axios.post(`https://server-1-vr19.onrender.com/api/follow/${userId}`);
-      // Обновление произойдет через Socket.IO события
     } catch (err) {
       console.error('Ошибка подписки/отписки:', err);
     }
@@ -723,7 +813,6 @@ const HomePage = () => {
       await axios.post(`https://server-1-vr19.onrender.com/api/posts/${postId}/comment`, 
         { content: commentText }
       );
-      // Комментарий появится через Socket.IO событие 'newComment'
       setNewComment(prev => ({
         ...prev,
         [postId]: ''
@@ -752,22 +841,44 @@ const HomePage = () => {
       
       return (
         <div key={post._id} className="post">
+          {post.isRepost && (
+            <div className="repost-header">
+              <Repeat size={16} />
+              <span>@{post.repostedBy?.username || post.username} репостнул(а)</span>
+            </div>
+          )}
+          
           <div className="post-header">
             <div className="post-user-info">
               <div className="user-details">
-                <span className="username">@{post.username || 'Unknown'}</span>
-                <span className="post-date">{post.date}</span>
+                <span className="username">
+                  @{post.isRepost ? post.originalPost?.author?.username || 'Unknown' : post.username || 'Unknown'}
+                </span>
+                <span className="post-date">
+                  {post.isRepost && post.originalPost?.createdAt 
+                    ? new Date(post.originalPost.createdAt).toLocaleDateString('ru-RU', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })
+                    : post.date
+                  }
+                </span>
               </div>
             </div>
           </div>
           
           <div className="post-content">
-            <p className="post-text">{post.content}</p>
+            <p className="post-text">
+              {post.isRepost ? post.originalPost?.content || post.content : post.content}
+            </p>
           </div>
           
           <div className="post-actions">
             <button 
-              onClick={() => handleLikePost(post._id)} 
+              onClick={() => handleLikePost(post.isRepost ? post.originalPost?._id || post._id : post._id)} 
               className={`action-btn like-btn ${post.liked ? 'liked' : ''}`}
             >
               <Heart size={18} fill={post.liked ? '#f87171' : 'none'} /> 
@@ -775,28 +886,29 @@ const HomePage = () => {
             </button>
             
             <button 
-              onClick={() => toggleComments(post._id)}
-              className={`action-btn comment-btn ${showComments[post._id] ? 'active' : ''}`}
+              onClick={() => toggleComments(post.isRepost ? post.originalPost?._id || post._id : post._id)}
+              className={`action-btn comment-btn ${showComments[post.isRepost ? post.originalPost?._id || post._id : post._id] ? 'active' : ''}`}
             >
               <MessageSquare size={18} />
-              <span>{post.commentsCount || comments[post._id]?.length || 0}</span>
+              <span>{post.commentsCount || comments[post.isRepost ? post.originalPost?._id || post._id : post._id]?.length || 0}</span>
             </button>
             
             <button 
-              onClick={() => handleRepost(post._id)}
+              onClick={() => handleRepost(post.isRepost ? post.originalPost?._id || post._id : post._id)}
               className="action-btn repost-btn"
+              disabled={post.isRepost && post.repostedBy?._id === (user._id || user.id)}
             >
               <Repeat size={18} />
               <span>Репост</span>
             </button>
           </div>
 
-          {showComments[post._id] && (
+          {showComments[post.isRepost ? post.originalPost?._id || post._id : post._id] && (
             <div className="comments-section">
               <div className="comments-header">
                 <h4>Комментарии</h4>
                 <button 
-                  onClick={() => toggleComments(post._id)}
+                  onClick={() => toggleComments(post.isRepost ? post.originalPost?._id || post._id : post._id)}
                   className="close-comments-btn"
                 >
                   <X size={16} />
@@ -804,7 +916,7 @@ const HomePage = () => {
               </div>
               
               <div className="comments-list">
-                {(comments[post._id] || []).map(comment => (
+                {(comments[post.isRepost ? post.originalPost?._id || post._id : post._id] || []).map(comment => (
                   <div key={comment._id} className="comment">
                     <div className="comment-header">
                       <div className="comment-info">
@@ -827,20 +939,20 @@ const HomePage = () => {
                 <div className="comment-input-wrapper">
                   <input
                     type="text"
-                    value={newComment[post._id] || ''}
-                    onChange={(e) => handleCommentInputChange(post._id, e.target.value)}
-                     placeholder="Написать комментарий..."
+                    value={newComment[post.isRepost ? post.originalPost?._id || post._id : post._id] || ''}
+                    onChange={(e) => handleCommentInputChange(post.isRepost ? post.originalPost?._id || post._id : post._id, e.target.value)}
+                    placeholder="Написать комментарий..."
                     className="comment-input"
                     onKeyPress={(e) => {
                       if (e.key === 'Enter') {
-                        handleAddComment(post._id);
+                        handleAddComment(post.isRepost ? post.originalPost?._id || post._id : post._id);
                       }
                     }}
                   />
                   <button 
-                    onClick={() => handleAddComment(post._id)}
+                    onClick={() => handleAddComment(post.isRepost ? post.originalPost?._id || post._id : post._id)}
                     className="send-comment-btn"
-                    disabled={!newComment[post._id]?.trim()}
+                    disabled={!newComment[post.isRepost ? post.originalPost?._id || post._id : post._id]?.trim()}
                   >
                     <Send size={18} />
                   </button>
@@ -874,7 +986,7 @@ const HomePage = () => {
     <div className="home-container">
       <header className="header">
         <div className="header-content">
-          <div className="logo"><h1><Flame size={24} /> SocialSpace</h1></div>
+          <div className="logo"><h1><GitBranch size={24} /> SocialSpace</h1></div>
           <div className="user-info">
             <span>Привет, {user?.username}!</span>
             
@@ -1075,15 +1187,25 @@ const HomePage = () => {
       </main>
 
       <aside className="right-sidebar">
-        <div className="trending">
-          <h3><Flame size={18} /> В тренде</h3>
-          <ul>
-            <li><span>#JavaScript</span><small>1,234 постов</small></li>
-            <li><span>#React</span><small>987 постов</small></li>
-            <li><span>#WebDev</span><small>856 постов</small></li>
-            <li><span>#CSS</span><small>643 постов</small></li>
-            <li><span>#Node</span><small>521 постов</small></li>
-          </ul>
+        <div className="changelog">
+          <h3><Clock size={18} /> Список изменений</h3>
+          <div className="changelog-content">
+            {changelogData.map((version, index) => (
+              <div key={version.version} className="version-block">
+                <div className="version-header">
+                  <span className="version-number">v{version.version}</span>
+                  <span className="version-date">{version.date}</span>
+                </div>
+                <ul className="changes-list">
+                  {version.changes.map((change, changeIndex) => (
+                    <li key={changeIndex} className="change-item">
+                      {change}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="suggestions">
