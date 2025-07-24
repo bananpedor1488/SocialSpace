@@ -910,412 +910,268 @@ body {
   display: flex;
 }
 
-/* Улучшенные стили для правой боковой панели */
-
-/* Общие стили для секций правой панели */
 .trending, .suggestions, .changelog {
-  background: rgba(30, 41, 59, 0.95);
-  border-radius: 24px;
+  background: rgba(30, 41, 59, 0.9);
+  border-radius: 20px;
   border: 1px solid rgba(71, 85, 105, 0.4);
-  padding: 24px;
-  position: relative;
-  overflow: hidden;
-  backdrop-filter: blur(20px);
-  transition: all 0.4s ease;
+  padding: 20px;
 }
 
-.trending:hover, .suggestions:hover, .changelog:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
-  border-color: rgba(100, 116, 139, 0.6);
-}
-
-/* Декоративный элемент для секций */
-.trending::before, .suggestions::before, .changelog::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4);
-  border-radius: 24px 24px 0 0;
-}
-
-/* Заголовки секций */
 .trending h3, .suggestions h3, .changelog h3 {
   color: #f1f5f9;
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 20px;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  position: relative;
-  padding-bottom: 12px;
-}
-
-.trending h3::after, .suggestions h3::after, .changelog h3::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 40px;
-  height: 2px;
-  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-  border-radius: 2px;
-}
-
-/* Специальные стили для changelog */
-.changelog {
-  max-height: 450px;
-  overflow-y: auto;
+  gap: 10px;
 }
 
 .changelog h3 {
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 2px solid rgba(59, 130, 246, 0.2);
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid rgba(59, 130, 246, 0.3);
 }
 
-.changelog h3::after {
-  width: 60px;
-  height: 3px;
-  background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4);
+.changelog {
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 .changelog-content {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
 }
 
-/* Блоки версий */
 .version-block {
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%);
-  border-radius: 20px;
-  padding: 24px;
+  background: rgba(15, 23, 42, 0.8);
+  border-radius: 16px;
+  padding: 20px;
   border: 1px solid rgba(71, 85, 105, 0.4);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
 }
 
 .version-block:hover {
-  transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-  border-color: rgba(59, 130, 246, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  border-color: rgba(59, 130, 246, 0.5);
 }
 
-/* Декоративная линия слева */
 .version-block::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
-  width: 5px;
+  width: 4px;
   height: 100%;
-  background: linear-gradient(180deg, #3b82f6, #8b5cf6, #06b6d4);
-  border-radius: 0 3px 3px 0;
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  border-radius: 0 2px 2px 0;
 }
 
-/* Декоративный блик при наведении */
-.version-block::after {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.05), transparent);
-  transform: rotate(45deg);
-  transition: all 0.6s ease;
-  opacity: 0;
-}
-
-.version-block:hover::after {
-  opacity: 1;
-  transform: rotate(45deg) translate(50%, 50%);
-}
-
-/* Заголовок версии */
 .version-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid rgba(71, 85, 105, 0.4);
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.3);
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 8px;
 }
 
 .version-number {
   background: linear-gradient(135deg, #3b82f6, #8b5cf6);
   color: white;
-  padding: 8px 16px;
-  border-radius: 25px;
-  font-weight: 800;
-  font-size: 14px;
-  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.4);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 13px;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
   white-space: nowrap;
-  position: relative;
-  overflow: hidden;
-}
-
-.version-number::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.6s ease;
-}
-
-.version-block:hover .version-number::before {
-  left: 100%;
 }
 
 .version-date {
-  color: rgba(148, 163, 184, 0.9);
-  font-size: 13px;
-  font-weight: 600;
-  background: rgba(51, 65, 85, 0.8);
-  padding: 6px 12px;
-  border-radius: 16px;
-  border: 1px solid rgba(71, 85, 105, 0.4);
+  color: rgba(148, 163, 184, 0.8);
+  font-size: 12px;
+  font-weight: 500;
+  background: rgba(51, 65, 85, 0.7);
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(71, 85, 105, 0.3);
   white-space: nowrap;
-  backdrop-filter: blur(10px);
 }
 
-/* Список изменений */
 .changes-list {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .change-item {
   color: rgba(226, 232, 240, 0.9);
   font-size: 14px;
-  line-height: 1.6;
-  padding: 12px 0 12px 32px;
+  line-height: 1.5;
+  padding: 8px 0;
   position: relative;
+  padding-left: 25px;
   transition: all 0.3s ease;
   word-wrap: break-word;
   overflow-wrap: break-word;
-  border-radius: 8px;
 }
 
 .change-item:hover {
   color: #f1f5f9;
-  background: rgba(51, 65, 85, 0.3);
-  transform: translateX(8px);
-  padding-left: 40px;
+  transform: translateX(5px);
 }
 
-/* Улучшенные маркеры для изменений */
 .change-item::before {
   content: '';
   position: absolute;
-  left: 8px;
-  top: 20px;
-  width: 8px;
-  height: 8px;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
   background: linear-gradient(135deg, #10b981, #059669);
   border-radius: 50%;
-  box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
-  transition: all 0.3s ease;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
 }
 
-.change-item:hover::before {
-  transform: scale(1.3);
-  box-shadow: 0 0 20px rgba(16, 185, 129, 0.8);
+.trending ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-/* Анимация появления маркеров */
-@keyframes pulseMarker {
-  0%, 100% { 
-    transform: scale(1); 
-    opacity: 1; 
-  }
-  50% { 
-    transform: scale(1.2); 
-    opacity: 0.8; 
-  }
+.trending li {
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.3);
 }
 
-.change-item::before {
-  animation: pulseMarker 2s ease-in-out infinite;
+.trending li:last-child {
+  border-bottom: none;
 }
 
-/* Рекомендации пользователей */
+.trending span {
+  color: #f1f5f9;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.trending small {
+  color: rgba(148, 163, 184, 0.8);
+  font-size: 12px;
+}
+
+/* Исправленные стили для рекомендаций пользователей */
 .user-suggestion {
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%);
-  border-radius: 20px;
-  padding: 20px;
-  margin-bottom: 16px;
+  background: rgba(15, 23, 42, 0.8);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
   border: 1px solid rgba(71, 85, 105, 0.4);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-  backdrop-filter: blur(10px);
 }
 
 .user-suggestion:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
-  border-color: rgba(59, 130, 246, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  border-color: rgba(100, 116, 139, 0.6);
 }
 
 .user-suggestion:last-child {
   margin-bottom: 0;
 }
 
-/* Декоративные элементы для рекомендаций */
-.user-suggestion::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4);
-  border-radius: 20px 20px 0 0;
-}
-
-.user-suggestion::after {
-  content: '';
-  position: absolute;
-  top: -50%;
-  right: -50%;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
-  transition: all 0.6s ease;
-  opacity: 0;
-}
-
-.user-suggestion:hover::after {
-  opacity: 1;
-  transform: scale(1.2);
-}
-
 .suggestion-info {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 16px;
+  gap: 15px;
   width: 100%;
-  position: relative;
-  z-index: 1;
 }
 
 .suggestion-user-details {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   min-width: 0;
   overflow: hidden;
 }
 
 .suggestion-username {
   color: #f1f5f9;
-  font-weight: 700;
-  font-size: 16px;
+  font-weight: 600;
+  font-size: 15px;
   margin: 0;
   word-wrap: break-word;
   overflow-wrap: break-word;
   line-height: 1.3;
-  transition: all 0.3s ease;
-}
-
-.user-suggestion:hover .suggestion-username {
-  color: #60a5fa;
 }
 
 .suggestion-stats {
-  color: rgba(148, 163, 184, 0.9);
+  color: rgba(148, 163, 184, 0.8);
   font-size: 12px;
-  font-weight: 600;
-  background: rgba(51, 65, 85, 0.8);
-  padding: 6px 12px;
-  border-radius: 20px;
+  font-weight: 500;
+  background: rgba(51, 65, 85, 0.7);
+  padding: 4px 8px;
+  border-radius: 12px;
   display: inline-block;
   width: fit-content;
-  border: 1px solid rgba(71, 85, 105, 0.4);
+  border: 1px solid rgba(71, 85, 105, 0.3);
   white-space: nowrap;
   margin: 0;
-  backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
-}
-
-.user-suggestion:hover .suggestion-stats {
-  background: rgba(59, 130, 246, 0.2);
-  border-color: rgba(59, 130, 246, 0.4);
-  color: #93c5fd;
 }
 
 .suggestion-follow-btn {
   background: linear-gradient(135deg, #3b82f6, #8b5cf6);
   border: none;
   color: white;
-  padding: 10px 20px;
-  border-radius: 20px;
+  padding: 8px 16px;
+  border-radius: 12px;
   cursor: pointer;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 8px;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  gap: 6px;
+  transition: all 0.3s ease;
   white-space: nowrap;
-  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
   flex-shrink: 0;
   min-width: fit-content;
-  position: relative;
-  overflow: hidden;
-}
-
-.suggestion-follow-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.6s ease;
 }
 
 .suggestion-follow-btn:hover {
-  transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 12px 32px rgba(59, 130, 246, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
   background: linear-gradient(135deg, #2563eb, #7c3aed);
 }
 
-.suggestion-follow-btn:hover::before {
-  left: 100%;
-}
-
 .suggestion-follow-btn:active {
-  transform: translateY(-1px) scale(1.02);
+  transform: translateY(0);
 }
 
-/* Состояние "нет рекомендаций" */
 .no-suggestions {
   color: rgba(148, 163, 184, 0.8);
   text-align: center;
-  padding: 40px 24px;
-  font-size: 15px;
-  background: linear-gradient(135deg, rgba(51, 65, 85, 0.6) 0%, rgba(71, 85, 105, 0.4) 100%);
+  padding: 30px 20px;
+  font-size: 14px;
+  background: rgba(51, 65, 85, 0.5);
+  border-radius: 12px;
+  border: 1px dashed rgba(71, 85, 105, 0.5);
 }
 
 /* Скроллбары */
