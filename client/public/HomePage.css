@@ -15,6 +15,7 @@ body {
   flex: 1;
   max-width: 400px;
   margin: 0 40px;
+  z-index: 1001;
 }
 
 .header-search-input {
@@ -51,7 +52,7 @@ body {
   margin-top: 8px;
   max-height: 300px;
   overflow-y: auto;
-  z-index: 9999;
+  z-index: 10000;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 .header-search-result {
@@ -93,6 +94,8 @@ body {
   margin: 20px 0;
   border: 1px solid rgba(71, 85, 105, 0.3);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  position: relative;
+  z-index: 1000;
 }
 
 .header-content {
