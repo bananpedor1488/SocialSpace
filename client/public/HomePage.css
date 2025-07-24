@@ -26,14 +26,22 @@ body {
   display: grid;
   grid-template-areas: 
     "header header header"
-    "sidebar main right-sidebar";
-  grid-template-columns: 240px 1fr 280px;
+    "sidebar main main";
+  grid-template-columns: 240px 1fr;
   grid-template-rows: auto 1fr;
   min-height: 100vh;
   gap: 0;
   padding: 0;
   width: 100vw;
   max-width: 100vw;
+}
+
+/* Показываем правую панель только на главной странице */
+.home-container.show-right-sidebar {
+  grid-template-areas: 
+    "header header header"
+    "sidebar main right-sidebar";
+  grid-template-columns: 240px 1fr 280px;
 }
 
 /* Шапка сайта */
@@ -78,7 +86,7 @@ body {
   flex: 1;
   max-width: 400px;
   min-width: 200px;
-  z-index: 1001;
+  z-index: 10001;
 }
 
 .header-search-input {
@@ -115,7 +123,7 @@ body {
   margin-top: 8px;
   max-height: 300px;
   overflow-y: auto;
-  z-index: 10000;
+  z-index: 20000;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
@@ -285,6 +293,11 @@ body {
   height: calc(100vh - 80px);
   overflow-y: auto;
   min-width: 0;
+}
+
+/* Когда правая панель скрыта, убираем правый border */
+.home-container:not(.show-right-sidebar) .main-content {
+  border-right: none;
 }
 
 /* Создание поста */
@@ -889,6 +902,16 @@ body {
   padding: 20px;
 }
 
+/* Скрываем правую панель по умолчанию */
+.right-sidebar {
+  display: none;
+}
+
+/* Показываем правую панель только когда нужно */
+.home-container.show-right-sidebar .right-sidebar {
+  display: flex;
+}
+
 .trending, .suggestions, .changelog {
   background: rgba(30, 41, 59, 0.9);
   border-radius: 20px;
@@ -1051,6 +1074,7 @@ body {
   font-size: 12px;
 }
 
+/* Исправленные стили для рекомендаций пользователей */
 .user-suggestion {
   background: rgba(15, 23, 42, 0.8);
   border-radius: 16px;
@@ -1075,25 +1099,28 @@ body {
 .suggestion-info {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   gap: 15px;
+  width: 100%;
 }
 
 .suggestion-user-details {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
   min-width: 0;
+  overflow: hidden;
 }
 
 .suggestion-username {
   color: #f1f5f9;
   font-weight: 600;
   font-size: 15px;
-  margin-bottom: 2px;
+  margin: 0;
   word-wrap: break-word;
   overflow-wrap: break-word;
+  line-height: 1.3;
 }
 
 .suggestion-stats {
@@ -1101,12 +1128,13 @@ body {
   font-size: 12px;
   font-weight: 500;
   background: rgba(51, 65, 85, 0.7);
-  padding: 2px 8px;
+  padding: 4px 8px;
   border-radius: 12px;
   display: inline-block;
   width: fit-content;
   border: 1px solid rgba(71, 85, 105, 0.3);
   white-space: nowrap;
+  margin: 0;
 }
 
 .suggestion-follow-btn {
@@ -1125,6 +1153,7 @@ body {
   white-space: nowrap;
   box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
   flex-shrink: 0;
+  min-width: fit-content;
 }
 
 .suggestion-follow-btn:hover {
@@ -1198,7 +1227,7 @@ body {
 
 /* Большие экраны (1600px+) */
 @media (min-width: 1600px) {
-  .home-container {
+  .home-container.show-right-sidebar {
     grid-template-columns: 280px 1fr 320px;
     max-width: none;
   }
@@ -1214,7 +1243,7 @@ body {
 
 /* Экраны планшетов (1024px - 1199px) */
 @media (max-width: 1199px) and (min-width: 1024px) {
-  .home-container {
+  .home-container.show-right-sidebar {
     grid-template-columns: 220px 1fr 260px;
   }
   
@@ -1229,7 +1258,8 @@ body {
 
 /* Средние планшеты (768px - 1023px) */
 @media (max-width: 1023px) and (min-width: 768px) {
-  .home-container {
+  .home-container,
+  .home-container.show-right-sidebar {
     grid-template-areas: 
       "header header"
       "sidebar main";
@@ -1239,7 +1269,7 @@ body {
   }
 
   .right-sidebar {
-    display: none;
+    display: none !important;
   }
   
   .header-search {
@@ -1254,13 +1284,15 @@ body {
   
   .main-content {
     border-left: none;
+    border-right: none;
     padding: 20px;
   }
 }
 
 /* Мобильные устройства (до 767px) */
 @media (max-width: 767px) {
-  .home-container {
+  .home-container,
+  .home-container.show-right-sidebar {
     grid-template-areas: 
       "header"
       "main";
@@ -1270,7 +1302,7 @@ body {
   }
 
   .sidebar, .right-sidebar {
-    display: none;
+    display: none !important;
   }
 
   .header {
