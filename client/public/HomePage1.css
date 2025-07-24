@@ -1297,8 +1297,10 @@ body {
   .home-container.show-right-sidebar {
     grid-template-areas: 
       "header"
-      "main";
+      "main"
+      "mobile-nav";
     grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
     gap: 0;
     padding: 0;
   }
@@ -1343,11 +1345,105 @@ body {
 
   .main-content {
     margin-top: 140px;
-    height: calc(100vh - 140px);
+    height: calc(100vh - 140px - 70px);
     border: none;
     border-radius: 0;
-    padding: 15px;
+    padding: 15px 15px 20px 15px;
     background: rgba(255, 255, 255, 0.98);
+    margin-bottom: 70px;
+  }
+
+  /* Мобильная навигация снизу */
+  .mobile-nav {
+    grid-area: mobile-nav;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);
+    z-index: 9999;
+    padding: 8px 0;
+  }
+
+  .mobile-nav-menu {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .mobile-nav-item {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+  }
+
+  .mobile-nav-button {
+    background: transparent;
+    border: none;
+    color: rgba(107, 114, 128, 0.8);
+    padding: 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    min-width: 60px;
+    position: relative;
+  }
+
+  .mobile-nav-button:hover {
+    color: #1f2937;
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  .mobile-nav-button.active {
+    color: #3b82f6;
+    background: rgba(59, 130, 246, 0.1);
+  }
+
+  .mobile-nav-button.active::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 3px;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    border-radius: 0 0 3px 3px;
+  }
+
+  .mobile-nav-icon {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2px;
+  }
+
+  .mobile-nav-text {
+    font-size: 9px;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  /* Скрываем десктопную навигацию */
+  .nav-menu {
+    display: none;
   }
 
   .profile-main-info {
@@ -1407,8 +1503,27 @@ body {
 
   .main-content {
     margin-top: 130px;
-    height: calc(100vh - 130px);
-    padding: 12px;
+    height: calc(100vh - 130px - 70px);
+    padding: 12px 12px 20px 12px;
+    margin-bottom: 70px;
+  }
+
+  .mobile-nav {
+    padding: 6px 0;
+  }
+
+  .mobile-nav-button {
+    padding: 10px 8px;
+    min-width: 50px;
+  }
+
+  .mobile-nav-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .mobile-nav-text {
+    font-size: 8px;
   }
 
   .create-post, .post {
@@ -1473,7 +1588,7 @@ body {
 @media (max-height: 500px) and (orientation: landscape) and (max-width: 767px) {
   .header-content {
     flex-direction: row;
-    padding: 10px 15px;
+    padding: 8px 15px;
   }
   
   .header-search {
@@ -1490,8 +1605,26 @@ body {
   }
   
   .main-content {
-    margin-top: 70px;
-    height: calc(100vh - 70px);
+    margin-top: 60px;
+    height: calc(100vh - 60px - 60px);
+    margin-bottom: 60px;
+  }
+
+  .mobile-nav {
+    padding: 4px 0;
+  }
+
+  .mobile-nav-button {
+    padding: 8px;
+  }
+
+  .mobile-nav-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .mobile-nav-text {
+    font-size: 7px;
   }
 }
 
