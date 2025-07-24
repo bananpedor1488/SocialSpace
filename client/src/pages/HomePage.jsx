@@ -1006,7 +1006,7 @@ const HomePage = () => {
     )}
   </div>
   <div className="user-info">
-    <span>Привет, {user?.username}!</span>
+    <span>Hello, {user?.username}!</span>
     
     <button onClick={toggleTheme} className="theme-toggle">
       <div className="theme-icon">
