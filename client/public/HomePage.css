@@ -44,7 +44,6 @@ body {
   grid-template-columns: 240px 1fr 280px;
 }
 
-/* Шапка сайта */
 .header {
   grid-area: header;
   background: rgba(15, 23, 42, 0.95);
@@ -56,11 +55,10 @@ body {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: 10000; /* Увеличиваем с 1000 до 10000 */
   width: 100%;
-  overflow: hidden;
+  overflow: visible; /* Изменяем с hidden на visible */
 }
-
 .header-content {
   display: flex;
   justify-content: space-between;
@@ -123,7 +121,7 @@ body {
   margin-top: 8px;
   max-height: 300px;
   overflow-y: auto;
-  z-index: 20000;
+  z-index: 50000;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
@@ -1305,12 +1303,13 @@ body {
     display: none !important;
   }
 
+
   .header {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    z-index: 1000;
+    z-index: 10000; /* Обновляем и для мобильной версии */
     height: auto;
     border-radius: 0;
   }
