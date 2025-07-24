@@ -55,10 +55,11 @@ body {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
   position: sticky;
   top: 0;
-  z-index: 10000; /* Увеличиваем с 1000 до 10000 */
+  z-index: 10000;
   width: 100%;
-  overflow: visible; /* Изменяем с hidden на visible */
+  overflow: visible;
 }
+
 .header-content {
   display: flex;
   justify-content: space-between;
@@ -929,25 +930,25 @@ body {
 
 .changelog h3 {
   margin-bottom: 20px;
-  padding-bottom: 10px;
+  padding-bottom: 12px;
   border-bottom: 2px solid rgba(59, 130, 246, 0.3);
 }
 
 .changelog {
-  max-height: 400px;
+  max-height: 450px;
   overflow-y: auto;
 }
 
 .changelog-content {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
 .version-block {
-  background: rgba(15, 23, 42, 0.8);
-  border-radius: 16px;
-  padding: 20px;
+  background: rgba(15, 23, 42, 0.9);
+  border-radius: 12px;
+  padding: 16px;
   border: 1px solid rgba(71, 85, 105, 0.4);
   transition: all 0.3s ease;
   position: relative;
@@ -955,8 +956,8 @@ body {
 }
 
 .version-block:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
   border-color: rgba(59, 130, 246, 0.5);
 }
 
@@ -965,7 +966,7 @@ body {
   position: absolute;
   top: 0;
   left: 0;
-  width: 4px;
+  width: 3px;
   height: 100%;
   background: linear-gradient(135deg, #3b82f6, #8b5cf6);
   border-radius: 0 2px 2px 0;
@@ -975,8 +976,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
-  padding-bottom: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
   border-bottom: 1px solid rgba(71, 85, 105, 0.3);
   flex-wrap: wrap;
   gap: 8px;
@@ -985,20 +986,20 @@ body {
 .version-number {
   background: linear-gradient(135deg, #3b82f6, #8b5cf6);
   color: white;
-  padding: 6px 12px;
-  border-radius: 20px;
+  padding: 4px 10px;
+  border-radius: 12px;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 12px;
   box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
   white-space: nowrap;
 }
 
 .version-date {
   color: rgba(148, 163, 184, 0.8);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
   background: rgba(51, 65, 85, 0.7);
-  padding: 4px 8px;
+  padding: 3px 8px;
   border-radius: 8px;
   border: 1px solid rgba(71, 85, 105, 0.3);
   white-space: nowrap;
@@ -1010,16 +1011,16 @@ body {
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .change-item {
   color: rgba(226, 232, 240, 0.9);
-  font-size: 14px;
-  line-height: 1.5;
-  padding: 8px 0;
+  font-size: 13px;
+  line-height: 1.4;
+  padding: 6px 0;
   position: relative;
-  padding-left: 25px;
+  padding-left: 20px;
   transition: all 0.3s ease;
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -1027,7 +1028,7 @@ body {
 
 .change-item:hover {
   color: #f1f5f9;
-  transform: translateX(5px);
+  transform: translateX(3px);
 }
 
 .change-item::before {
@@ -1036,11 +1037,11 @@ body {
   left: 0;
   top: 50%;
   transform: translateY(-50%);
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   background: linear-gradient(135deg, #10b981, #059669);
   border-radius: 50%;
-  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
 }
 
 .trending ul {
@@ -1075,9 +1076,9 @@ body {
 /* Исправленные стили для рекомендаций пользователей */
 .user-suggestion {
   background: rgba(15, 23, 42, 0.8);
-  border-radius: 16px;
-  padding: 16px;
-  margin-bottom: 12px;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
   border: 1px solid rgba(71, 85, 105, 0.4);
   transition: all 0.3s ease;
   position: relative;
@@ -1085,8 +1086,8 @@ body {
 }
 
 .user-suggestion:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
   border-color: rgba(100, 116, 139, 0.6);
 }
 
@@ -1097,8 +1098,8 @@ body {
 .suggestion-info {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 15px;
+  align-items: center;
+  gap: 10px;
   width: 100%;
 }
 
@@ -1106,7 +1107,7 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 3px;
   min-width: 0;
   overflow: hidden;
 }
@@ -1114,49 +1115,48 @@ body {
 .suggestion-username {
   color: #f1f5f9;
   font-weight: 600;
-  font-size: 15px;
+  font-size: 14px;
   margin: 0;
   word-wrap: break-word;
   overflow-wrap: break-word;
   line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .suggestion-stats {
-  color: rgba(148, 163, 184, 0.8);
-  font-size: 12px;
-  font-weight: 500;
-  background: rgba(51, 65, 85, 0.7);
-  padding: 4px 8px;
-  border-radius: 12px;
-  display: inline-block;
-  width: fit-content;
-  border: 1px solid rgba(71, 85, 105, 0.3);
-  white-space: nowrap;
+  color: rgba(148, 163, 184, 0.7);
+  font-size: 11px;
+  font-weight: 400;
   margin: 0;
+  padding: 0;
+  background: none;
+  border: none;
 }
 
 .suggestion-follow-btn {
   background: linear-gradient(135deg, #3b82f6, #8b5cf6);
   border: none;
   color: white;
-  padding: 8px 16px;
-  border-radius: 12px;
+  padding: 6px 12px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   transition: all 0.3s ease;
   white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
   flex-shrink: 0;
   min-width: fit-content;
 }
 
 .suggestion-follow-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.4);
   background: linear-gradient(135deg, #2563eb, #7c3aed);
 }
 
@@ -1167,8 +1167,8 @@ body {
 .no-suggestions {
   color: rgba(148, 163, 184, 0.8);
   text-align: center;
-  padding: 30px 20px;
-  font-size: 14px;
+  padding: 25px 15px;
+  font-size: 13px;
   background: rgba(51, 65, 85, 0.5);
   border-radius: 12px;
   border: 1px dashed rgba(71, 85, 105, 0.5);
@@ -1303,13 +1303,12 @@ body {
     display: none !important;
   }
 
-
   .header {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    z-index: 10000; /* Обновляем и для мобильной версии */
+    z-index: 10000;
     height: auto;
     border-radius: 0;
   }
@@ -1339,7 +1338,7 @@ body {
   }
 
   .main-content {
-    margin-top: 140px; /* Отступ для фиксированной шапки */
+    margin-top: 140px;
     height: calc(100vh - 140px);
     border: none;
     border-radius: 0;
