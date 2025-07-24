@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { io } from 'socket.io-client';
 
 import {
   Home, Search, MessageCircle, User, LogOut, Flame, Plus,
   Heart, MessageSquare, Repeat, Pencil, Trash2, Users, UserCheck, Send, X, ChevronDown,
-  Moon, Sun
+  Moon, Sun, Wifi, WifiOff
 } from 'lucide-react';
 
 const HomePage = () => {
@@ -27,8 +28,11 @@ const HomePage = () => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isDarkTheme, setIsDarkTheme] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState('Подключение...');
 
   const navigate = useNavigate();
+  const socketRef = useRef(null);
 
   // JWT утилиты
   const getTokens = () => {
@@ -90,11 +94,205 @@ const HomePage = () => {
     }
   };
 
+  // Socket.IO подключение и обработчики
+  useEffect(() => {
+    const initializeSocket = () => {
+      const { accessToken } = getTokens();
+      
+      if (!accessToken || !user) return;
+
+      console.log('Initializing Socket.IO connection...');
+      setConnectionStatus('Подключение...');
+
+      socketRef.current = io('https://server-1-vr19.onrender.com', {
+        auth: {
+          token: accessToken
+        },
+        transports: ['websocket', 'polling']
+      });
+
+      // Обработчики подключения
+      socketRef.current.on('connect', () => {
+        console.log('Socket.IO connected');
+        setIsConnected(true);
+        setConnectionStatus('Подключено');
+      });
+
+      socketRef.current.on('disconnect', () => {
+        console.log('Socket.IO disconnected');
+        setIsConnected(false);
+        setConnectionStatus('Отключено');
+      });
+
+      socketRef.current.on('connect_error', (error) => {
+        console.error('Socket.IO connection error:', error);
+        setIsConnected(false);
+        setConnectionStatus('Ошибка подключения');
+      });
+
+      // Real-time обработчики событий
+      
+      // Новый пост
+      socketRef.current.on('newPost', (newPost) => {
+        console.log('New post received:', newPost);
+        const formattedPost = {
+          _id: newPost._id,
+          userId: newPost.author?._id || newPost.author,
+          username: newPost.author?.username || 'Unknown',
+          content: newPost.content,
+          likes: newPost.likes?.length || 0,
+          liked: newPost.likes?.includes(user._id || user.id) || false,
+          date: new Date(newPost.createdAt || Date.now()).toLocaleDateString('ru-RU', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          }),
+          comments: newPost.comments || [],
+          commentsCount: newPost.commentsCount || 0
+        };
+
+        setPosts(prev => [formattedPost, ...prev]);
+      });
+
+      // Новый комментарий
+      socketRef.current.on('newComment', ({ postId, comment }) => {
+        console.log('New comment received:', { postId, comment });
+        
+        // Обновляем комментарии для поста
+        setComments(prev => ({
+          ...prev,
+          [postId]: [...(prev[postId] || []), comment]
+        }));
+
+        // Обновляем счетчик комментариев в постах
+        setPosts(prev => prev.map(post => 
+          post._id === postId 
+            ? { ...post, commentsCount: (post.commentsCount || 0) + 1 }
+            : post
+        ));
+
+        setProfilePosts(prev => prev.map(post => 
+          post._id === postId 
+            ? { ...post, commentsCount: (post.commentsCount || 0) + 1 }
+            : post
+        ));
+      });
+
+      // Обновление лайка
+      socketRef.current.on('likeUpdate', ({ postId, liked, likesCount, userId: likerUserId }) => {
+        console.log('Like update received:', { postId, liked, likesCount, likerUserId });
+        
+        const isMyLike = likerUserId === (user._id || user.id);
+        
+        setPosts(prev => prev.map(post => 
+          post._id === postId 
+            ? { 
+                ...post, 
+                likes: likesCount,
+                liked: isMyLike ? liked : post.liked
+              } 
+            : post
+        ));
+
+        setProfilePosts(prev => prev.map(post => 
+          post._id === postId 
+            ? { 
+                ...post, 
+                likes: likesCount,
+                liked: isMyLike ? liked : post.liked
+              } 
+            : post
+        ));
+      });
+
+      // Удаление поста
+      socketRef.current.on('postDeleted', ({ postId }) => {
+        console.log('Post deleted:', postId);
+        setPosts(prev => prev.filter(post => post._id !== postId));
+        setProfilePosts(prev => prev.filter(post => post._id !== postId));
+        
+        // Очищаем комментарии удаленного поста
+        setComments(prev => {
+          const newComments = { ...prev };
+          delete newComments[postId];
+          return newComments;
+        });
+      });
+
+      // Удаление комментария
+      socketRef.current.on('commentDeleted', ({ postId, commentId }) => {
+        console.log('Comment deleted:', { postId, commentId });
+        
+        setComments(prev => ({
+          ...prev,
+          [postId]: (prev[postId] || []).filter(comment => comment._id !== commentId)
+        }));
+
+        // Обновляем счетчик комментариев
+        setPosts(prev => prev.map(post => 
+          post._id === postId 
+            ? { ...post, commentsCount: Math.max(0, (post.commentsCount || 0) - 1) }
+            : post
+        ));
+
+        setProfilePosts(prev => prev.map(post => 
+          post._id === postId 
+            ? { ...post, commentsCount: Math.max(0, (post.commentsCount || 0) - 1) }
+            : post
+        ));
+      });
+
+      // Обновление подписок
+      socketRef.current.on('followUpdate', ({ targetUserId, followerId, followerUsername, isFollowing, followersCount }) => {
+        console.log('Follow update received:', { targetUserId, followerId, followerUsername, isFollowing, followersCount });
+        
+        // Обновляем профиль если это текущий просматриваемый профиль
+        if (profile && profile._id === targetUserId) {
+          setFollowers(followersCount);
+          setProfile(prev => ({
+            ...prev,
+            followed: followerId === (user._id || user.id) ? isFollowing : prev.followed
+          }));
+        }
+
+        // Обновляем рекомендации
+        setSuggestions(prev => prev.map(suggestion => 
+          suggestion._id === targetUserId 
+            ? { ...suggestion, followersCount }
+            : suggestion
+        ));
+      });
+
+      socketRef.current.on('followingUpdate', ({ userId, followingCount }) => {
+        console.log('Following update received:', { userId, followingCount });
+        
+        // Обновляем счетчик подписок если это наш профиль
+        if (profile && profile._id === userId && isOwnProfile()) {
+          setFollowing(followingCount);
+        }
+      });
+    };
+
+    if (user) {
+      initializeSocket();
+    }
+
+    // Очистка при размонтировании
+    return () => {
+      if (socketRef.current) {
+        console.log('Disconnecting Socket.IO...');
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
+    };
+  }, [user, profile]);
+
   // Настройка axios interceptors для JWT
   useEffect(() => {
     const requestInterceptor = axios.interceptors.request.use(
       async (config) => {
-        // Пропускаем добавление токена для публичных эндпоинтов
         const publicEndpoints = ['/auth/login', '/auth/register', '/auth/refresh'];
         const isPublicEndpoint = publicEndpoints.some(endpoint => 
           config.url?.includes(endpoint)
@@ -103,12 +301,28 @@ const HomePage = () => {
         if (!isPublicEndpoint) {
           let { accessToken } = getTokens();
           
-          // Проверяем, не истек ли токен
           if (accessToken && isTokenExpired(accessToken)) {
             try {
               accessToken = await refreshAccessToken();
+              
+              // Переподключаем сокет с новым токеном
+              if (socketRef.current && user) {
+                socketRef.current.disconnect();
+                setTimeout(() => {
+                  if (user) {
+                    const newSocket = io('https://server-1-vr19.onrender.com', {
+                      auth: { token: accessToken },
+                      transports: ['websocket', 'polling']
+                    });
+                    socketRef.current = newSocket;
+                  }
+                }, 100);
+              }
             } catch (error) {
               clearTokens();
+              if (socketRef.current) {
+                socketRef.current.disconnect();
+              }
               navigate('/');
               return Promise.reject(error);
             }
@@ -119,7 +333,6 @@ const HomePage = () => {
           }
         }
         
-        // Убираем withCredentials для JWT
         delete config.withCredentials;
         return config;
       },
@@ -140,6 +353,9 @@ const HomePage = () => {
             return axios(originalRequest);
           } catch (refreshError) {
             clearTokens();
+            if (socketRef.current) {
+              socketRef.current.disconnect();
+            }
             navigate('/');
             return Promise.reject(refreshError);
           }
@@ -149,12 +365,11 @@ const HomePage = () => {
       }
     );
 
-    // Очистка interceptors при размонтировании
     return () => {
       axios.interceptors.request.eject(requestInterceptor);
       axios.interceptors.response.eject(responseInterceptor);
     };
-  }, [navigate]);
+  }, [navigate, user]);
 
   // Функция для работы с куки (для темы)
   const setCookie = (name, value, days = 365) => {
@@ -229,13 +444,11 @@ const HomePage = () => {
       }
 
       try {
-        // Сначала пробуем получить пользователя из localStorage
         const savedUser = localStorage.getItem('user');
         if (savedUser) {
           setUser(JSON.parse(savedUser));
         }
 
-        // Затем проверяем актуальные данные с сервера
         const res = await axios.get('https://server-1-vr19.onrender.com/api/me');
         console.log('Current user data:', res.data.user);
         setUser(res.data.user);
@@ -254,7 +467,7 @@ const HomePage = () => {
   useEffect(() => {
     if (user) {
       loadPosts();
-      loadSuggestions(); // Загружаем рекомендации
+      loadSuggestions();
     }
   }, [user]);
 
@@ -262,14 +475,14 @@ const HomePage = () => {
   const loadSuggestions = async () => {
     try {
       const res = await axios.get('https://server-1-vr19.onrender.com/api/users/suggestions');
-      setSuggestions(res.data.slice(0, 5)); // Ограничиваем до 5 рекомендаций
+      setSuggestions(res.data.slice(0, 5));
     } catch (err) {
       console.error('Ошибка загрузки рекомендаций:', err);
       setSuggestions([]);
     }
   };
 
-  // Функция загрузки постов
+  // Функция загрузки постов с комментариями
   const loadPosts = async (pageNum = 1, append = false) => {
     if (loading) return;
     
@@ -299,10 +512,16 @@ const HomePage = () => {
       
       const formatted = postsData.map(post => {
         console.log('Processing post:', post);
-        console.log('Post author:', post.author);
         
         const username = post.author?.username || post.username || 'Unknown';
-        console.log('Extracted username:', username);
+        
+        // Инициализируем комментарии для каждого поста
+        if (post.comments && Array.isArray(post.comments)) {
+          setComments(prev => ({
+            ...prev,
+            [post._id]: post.comments
+          }));
+        }
         
         return {
           _id: post._id,
@@ -311,6 +530,7 @@ const HomePage = () => {
           content: post.content,
           likes: Array.isArray(post.likes) ? post.likes.length : (post.likes || 0),
           liked: Array.isArray(post.likes) && user ? post.likes.includes(user._id || user.id) : false,
+          commentsCount: post.commentsCount || (post.comments ? post.comments.length : 0),
           date: new Date(post.createdAt).toLocaleDateString('ru-RU', {
             day: 'numeric',
             month: 'short',
@@ -361,6 +581,7 @@ const HomePage = () => {
       [postId]: !prev[postId]
     }));
     
+    // Загружаем комментарии только если они еще не загружены
     if (!showComments[postId] && !comments[postId]) {
       fetchComments(postId);
     }
@@ -375,6 +596,9 @@ const HomePage = () => {
     } catch (error) {
       console.warn('Logout request failed:', error);
     } finally {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
       clearTokens();
       navigate('/');
     }
@@ -383,29 +607,10 @@ const HomePage = () => {
   const handleCreatePost = async () => {
     if (postText.trim()) {
       try {
-        const res = await axios.post('https://server-1-vr19.onrender.com/api/posts', { 
+        await axios.post('https://server-1-vr19.onrender.com/api/posts', { 
           content: postText 
         });
-        console.log('New post response:', res.data);
-        
-        const newPost = {
-          _id: res.data._id,
-          userId: res.data.author?._id || res.data.author,
-          username: res.data.author?.username || user?.username,
-          content: res.data.content,
-          likes: 0,
-          liked: false,
-          date: new Date().toLocaleDateString('ru-RU', {
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-          })
-        };
-        
-        console.log('New post formatted:', newPost);
-        setPosts([newPost, ...posts]);
+        // Пост появится через Socket.IO событие 'newPost'
         setPostText('');
       } catch (err) {
         console.error('Ошибка создания поста:', err);
@@ -415,25 +620,8 @@ const HomePage = () => {
 
   const handleLikePost = async (postId) => {
     try {
-      const res = await axios.post(`https://server-1-vr19.onrender.com/api/posts/${postId}/like`);
-      
-      setPosts(prev => prev.map(post => 
-        post._id === postId ? { 
-          ...post, 
-          liked: res.data.liked, 
-          likes: res.data.likes 
-        } : post
-      ));
-      
-      if (activeTab === 'profile') {
-        setProfilePosts(prev => prev.map(post => 
-          post._id === postId ? { 
-            ...post, 
-            liked: res.data.liked, 
-            likes: res.data.likes 
-          } : post
-        ));
-      }
+      await axios.post(`https://server-1-vr19.onrender.com/api/posts/${postId}/like`);
+      // Обновление произойдет через Socket.IO событие 'likeUpdate'
     } catch (err) {
       console.error('Ошибка лайка:', err);
     }
@@ -497,6 +685,7 @@ const HomePage = () => {
         content: post.content,
         likes: Array.isArray(post.likes) ? post.likes.length : (post.likes || 0),
         liked: Array.isArray(post.likes) && user ? post.likes.includes(user._id || user.id) : false,
+        commentsCount: post.commentsCount || (post.comments ? post.comments.length : 0),
         date: new Date(post.createdAt).toLocaleDateString('ru-RU', {
           day: 'numeric',
           month: 'short',
@@ -519,15 +708,8 @@ const HomePage = () => {
 
   const toggleFollow = async (userId) => {
     try {
-      const res = await axios.post(`https://server-1-vr19.onrender.com/api/follow/${userId}`);
-      
-      // Обновляем профиль если это текущий просматриваемый профиль
-      if (userId === profile?._id) {
-        loadUserProfile(profile._id);
-      }
-      
-      // Обновляем рекомендации
-      loadSuggestions();
+      await axios.post(`https://server-1-vr19.onrender.com/api/follow/${userId}`);
+      // Обновление произойдет через Socket.IO события
     } catch (err) {
       console.error('Ошибка подписки/отписки:', err);
     }
@@ -538,13 +720,10 @@ const HomePage = () => {
     if (!commentText?.trim()) return;
     
     try {
-      const res = await axios.post(`https://server-1-vr19.onrender.com/api/posts/${postId}/comment`, 
+      await axios.post(`https://server-1-vr19.onrender.com/api/posts/${postId}/comment`, 
         { content: commentText }
       );
-      setComments(prev => ({
-        ...prev,
-        [postId]: [...(prev[postId] || []), res.data],
-      }));
+      // Комментарий появится через Socket.IO событие 'newComment'
       setNewComment(prev => ({
         ...prev,
         [postId]: ''
@@ -600,7 +779,7 @@ const HomePage = () => {
               className={`action-btn comment-btn ${showComments[post._id] ? 'active' : ''}`}
             >
               <MessageSquare size={18} />
-              <span>{comments[post._id]?.length || 0}</span>
+              <span>{post.commentsCount || comments[post._id]?.length || 0}</span>
             </button>
             
             <button 
@@ -650,7 +829,7 @@ const HomePage = () => {
                     type="text"
                     value={newComment[post._id] || ''}
                     onChange={(e) => handleCommentInputChange(post._id, e.target.value)}
-                    placeholder="Написать комментарий..."
+                     placeholder="Написать комментарий..."
                     className="comment-input"
                     onKeyPress={(e) => {
                       if (e.key === 'Enter') {
