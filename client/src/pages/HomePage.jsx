@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { io } from 'socket.io-client';
-
+import ChatComponent from './ChatComponent';
 import {
   Home, MessageCircle, User, LogOut, Plus,
   Heart, MessageSquare, Repeat, Pencil, Trash2, Users, UserCheck, Send, X, ChevronDown,
@@ -30,7 +30,7 @@ const HomePage = () => {
   const [isDarkTheme, setIsDarkTheme] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState('Подключение...');
-
+ const [showChats, setShowChats] = useState(false);
   const navigate = useNavigate();
   const socketRef = useRef(null);
 
@@ -157,7 +157,18 @@ const HomePage = () => {
   useEffect(() => {
     const initializeSocket = () => {
       const { accessToken } = getTokens();
-      
+      // Чаты
+socketRef.current.on('newChat', (chat) => {
+  console.log('New chat received:', chat);
+});
+
+socketRef.current.on('newMessage', ({ chatId, message }) => {
+  console.log('New message received:', { chatId, message });
+});
+
+socketRef.current.on('messagesRead', ({ chatId, readBy }) => {
+  console.log('Messages read:', { chatId, readBy });
+});
       if (!accessToken || !user) return;
 
       console.log('Initializing Socket.IO connection...');
@@ -983,6 +994,7 @@ const HomePage = () => {
   }
 
   return (
+    
   <div className={`home-container ${activeTab === 'home' ? 'show-right-sidebar' : ''}`}>
       <header className="header">
 <div className="header-content">
@@ -1027,7 +1039,7 @@ const HomePage = () => {
       <nav className="sidebar">
         <ul className="nav-menu">
           <li><button className={getNavItemClass('home')} onClick={() => setActiveTab('home')}><Home size={18} /> Главная</button></li>
-       
+       <li><button className={getNavItemClass('chats')} onClick={() => setActiveTab('chats')}><MessageCircle size={18} /> Чаты</button></li>
           <li><button className={getNavItemClass('profile')} onClick={() => { setActiveTab('profile'); if(user) loadUserProfile(user._id || user.id); }}><User size={18} /> Профиль</button></li>
         </ul>
       </nav>
@@ -1228,5 +1240,7 @@ const HomePage = () => {
     </div>
   );
 };
-
+{activeTab === 'chats' && (
+  <ChatComponent user={user} socket={socketRef.current} />
+)}
 export default HomePage;
