@@ -1490,7 +1490,9 @@ body {
     height: calc(100vh - 70px);
   }
 }
-/* ЧАТЫ И СООБЩЕНИЯ */
+/* ИСПРАВЛЕННЫЕ И ДОПОЛНЕННЫЕ СТИЛИ ДЛЯ ЧАТОВ */
+
+/* Контейнер сообщений */
 .messages-container {
   display: grid;
   grid-template-columns: 300px 1fr;
@@ -1500,6 +1502,7 @@ body {
   overflow: hidden;
 }
 
+/* Боковая панель чатов */
 .chats-sidebar {
   background: rgba(15, 23, 42, 0.95);
   border-right: 1px solid rgba(71, 85, 105, 0.4);
@@ -1618,6 +1621,7 @@ body {
   margin: 10px;
 }
 
+/* Область чата */
 .chat-area {
   display: flex;
   flex-direction: column;
@@ -1655,6 +1659,7 @@ body {
   font-size: 14px;
 }
 
+/* Сообщения */
 .message {
   max-width: 70%;
   word-wrap: break-word;
@@ -1708,8 +1713,9 @@ body {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* ИСПРАВЛЕНИЕ: Стили для собственных и чужих сообщений */
 .message.own .message-content {
-.suggestion-follow-btn {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
   color: white;
   border-color: rgba(59, 130, 246, 0.4);
   border-radius: 16px 16px 4px 16px;
@@ -1720,6 +1726,7 @@ body {
   border-radius: 16px 16px 16px 4px;
 }
 
+/* Область ввода сообщения */
 .message-input-area {
   padding: 20px;
   border-top: 1px solid rgba(71, 85, 105, 0.3);
@@ -1755,7 +1762,7 @@ body {
 
 .send-message-btn {
   background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  border: none;
   color: white;
   padding: 12px;
   border-radius: 12px;
@@ -1782,6 +1789,7 @@ body {
   box-shadow: none;
 }
 
+/* Состояние отсутствия активного чата */
 .no-active-chat {
   display: flex;
   flex-direction: column;
@@ -1826,15 +1834,7 @@ body {
   box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
 }
 
-/* Кнопки действий для профиля */
-.profile-actions {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-top: 16px;
-}
-
-/* Кнопка "Написать" в профиле */
+/* Кнопки для отправки сообщений в разных местах */
 .message-profile-btn {
   background: linear-gradient(135deg, #10b981, #059669);
   border: none;
@@ -1858,7 +1858,6 @@ body {
   box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
 }
 
-/* Кнопка "Написать" в рекомендациях */
 .suggestion-message-btn {
   background: rgba(51, 65, 85, 0.7);
   border: 1px solid rgba(71, 85, 105, 0.5);
@@ -1883,7 +1882,6 @@ body {
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
 }
 
-/* Кнопка "Написать" в постах */
 .message-btn {
   background: rgba(51, 65, 85, 0.7);
   border: 1px solid rgba(71, 85, 105, 0.5);
@@ -1908,17 +1906,109 @@ body {
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
 }
 
-/* Исправленные стили для рекомендаций пользователей */
-.user-suggestion {
-  background: rgba(15, 23, 42, 0.8);
-  border-radius: 12px;
-  padding: 12px;
-  margin-bottom: 10px;
-  border: 1px solid rgba(71, 85, 105, 0.4);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
+/* ИСПРАВЛЕНИЕ: Удаляем дублирующиеся стили для suggestion-actions */
+.suggestion-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
+
+.suggestion-follow-btn {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+  flex-shrink: 0;
+  min-width: fit-content;
+}
+
+.suggestion-follow-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.4);
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+}
+
+/* Адаптивность для чатов */
+@media (max-width: 1023px) {
+  .messages-container {
+    grid-template-columns: 250px 1fr;
+  }
+  
+  .chats-sidebar {
+    padding: 15px 10px;
+  }
+  
+  .chats-header {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 767px) {
+  .messages-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .chats-sidebar {
+    display: none;
+  }
+  
+  .chat-area {
+    border-radius: 0;
+  }
+  
+  .message-input-area {
+    padding: 15px;
+  }
+  
+  .messages-area {
+    padding: 15px;
+  }
+  
+  .message {
+    max-width: 85%;
+  }
+}
+
+@media (max-width: 480px) {
+  .message-input-area {
+    padding: 12px;
+    gap: 8px;
+  }
+  
+  .message-input {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+  
+  .send-message-btn {
+    width: 40px;
+    height: 40px;
+    padding: 10px;
+  }
+  
+  .messages-area {
+    padding: 12px;
+    gap: 10px;
+  }
+  
+  .message {
+    max-width: 90%;
+  }
+  
+  .message-content {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
 }
 /* Высокие экраны */
 @media (min-height: 900px) {
