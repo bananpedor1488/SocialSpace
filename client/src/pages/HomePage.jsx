@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { io } from 'socket.io-client';
-import ChatComponent from './ChatComponent';
+
 import {
   Home, MessageCircle, User, LogOut, Plus,
   Heart, MessageSquare, Repeat, Pencil, Trash2, Users, UserCheck, Send, X, ChevronDown,
@@ -12,7 +12,6 @@ import {
 const HomePage = () => {
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('home');
-  const [showChats, setShowChats] = useState(false);
   const [postText, setPostText] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [posts, setPosts] = useState([]);
@@ -31,12 +30,32 @@ const HomePage = () => {
   const [isDarkTheme, setIsDarkTheme] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState('Подключение...');
-  
+
+  // НОВЫЕ СОСТОЯНИЯ ДЛЯ ЧАТОВ
+  const [chats, setChats] = useState([]);
+  const [activeChat, setActiveChat] = useState(null);
+  const [messages, setMessages] = useState({});
+  const [newMessage, setNewMessage] = useState('');
+  const [messagesLoading, setMessagesLoading] = useState(false);
+  const [totalUnread, setTotalUnread] = useState(0);
+  const messagesEndRef = useRef(null);
+
   const navigate = useNavigate();
   const socketRef = useRef(null);
 
   // Список изменений версий
   const changelogData = [
+    {
+      version: '1.5',
+      date: '30 июля 2025',
+      changes: [
+        '💬 Добавлены приватные чаты между пользователями',
+        '🔔 Уведомления о новых сообщениях в реальном времени',
+        '📱 Счетчик непрочитанных сообщений',
+        '✨ Отметка о прочтении сообщений',
+        '🎯 Улучшена навигация между разделами'
+      ]
+    },
     {
       version: '1.4',
       date: '24 июля 2025',
@@ -158,18 +177,7 @@ const HomePage = () => {
   useEffect(() => {
     const initializeSocket = () => {
       const { accessToken } = getTokens();
-      // Чаты
-socketRef.current.on('newChat', (chat) => {
-  console.log('New chat received:', chat);
-});
-
-socketRef.current.on('newMessage', ({ chatId, message }) => {
-  console.log('New message received:', { chatId, message });
-});
-
-socketRef.current.on('messagesRead', ({ chatId, readBy }) => {
-  console.log('Messages read:', { chatId, readBy });
-});
+      
       if (!accessToken || !user) return;
 
       console.log('Initializing Socket.IO connection...');
@@ -372,6 +380,53 @@ socketRef.current.on('messagesRead', ({ chatId, readBy }) => {
           setFollowing(followingCount);
         }
       });
+
+      // НОВЫЕ SOCKET ОБРАБОТЧИКИ ДЛЯ ЧАТОВ
+      socketRef.current.on('newChat', (newChat) => {
+        console.log('New chat received:', newChat);
+        setChats(prev => [newChat, ...prev]);
+      });
+
+      socketRef.current.on('newMessage', ({ chatId, message }) => {
+        console.log('New message received:', { chatId, message });
+        
+        setMessages(prev => ({
+          ...prev,
+          [chatId]: [...(prev[chatId] || []), message]
+        }));
+
+        setChats(prev => prev.map(chat => 
+          chat._id === chatId 
+            ? { ...chat, lastMessage: message, unreadCount: activeChat?._id === chatId ? 0 : chat.unreadCount + 1 }
+            : chat
+        ));
+
+        if (activeChat?._id !== chatId) {
+          setTotalUnread(prev => prev + 1);
+        }
+      });
+
+      socketRef.current.on('messagesRead', ({ chatId, readBy }) => {
+        console.log('Messages read:', { chatId, readBy });
+        
+        setMessages(prev => ({
+          ...prev,
+          [chatId]: (prev[chatId] || []).map(msg => 
+            msg.sender._id !== user._id && !msg.isRead
+              ? { ...msg, isRead: true }
+              : msg
+          )
+        }));
+      });
+
+      socketRef.current.on('messageDeleted', ({ chatId, messageId }) => {
+        console.log('Message deleted:', { chatId, messageId });
+        
+        setMessages(prev => ({
+          ...prev,
+          [chatId]: (prev[chatId] || []).filter(msg => msg._id !== messageId)
+        }));
+      });
     };
 
     if (user) {
@@ -385,7 +440,7 @@ socketRef.current.on('messagesRead', ({ chatId, readBy }) => {
         socketRef.current = null;
       }
     };
-  }, [user, profile]);
+  }, [user, profile, activeChat]);
 
   // Настройка axios interceptors для JWT
   useEffect(() => {
@@ -565,8 +620,16 @@ socketRef.current.on('messagesRead', ({ chatId, readBy }) => {
     if (user) {
       loadPosts();
       loadSuggestions();
+      loadChats();
     }  
   }, [user]);
+
+  // useEffect для автоскролла сообщений
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, activeChat]);
 
   // Функция загрузки рекомендаций
   const loadSuggestions = async () => {
@@ -576,6 +639,75 @@ socketRef.current.on('messagesRead', ({ chatId, readBy }) => {
     } catch (err) {
       console.error('Ошибка загрузки рекомендаций:', err);
       setSuggestions([]);
+    }
+  };
+
+  // НОВЫЕ ФУНКЦИИ ДЛЯ ЧАТОВ
+  const loadChats = async () => {
+    try {
+      const res = await axios.get('https://server-u9ji.onrender.com/api/messages/chats');
+      setChats(res.data);
+      
+      const unreadRes = await axios.get('https://server-u9ji.onrender.com/api/messages/unread-count');
+      setTotalUnread(unreadRes.data.totalUnread);
+    } catch (err) {
+      console.error('Ошибка загрузки чатов:', err);
+    }
+  };
+
+  const loadMessages = async (chatId) => {
+    if (messagesLoading || messages[chatId]) return;
+    
+    setMessagesLoading(true);
+    try {
+      const res = await axios.get(`https://server-u9ji.onrender.com/api/messages/chats/${chatId}/messages`);
+      setMessages(prev => ({ ...prev, [chatId]: res.data }));
+      
+      // Отмечаем как прочитанные
+      await axios.put(`https://server-u9ji.onrender.com/api/messages/chats/${chatId}/read`);
+      
+      setChats(prev => prev.map(chat => 
+        chat._id === chatId ? { ...chat, unreadCount: 0 } : chat
+      ));
+      
+      const currentChat = chats.find(chat => chat._id === chatId);
+      setTotalUnread(prev => Math.max(0, prev - (currentChat?.unreadCount || 0)));
+    } catch (err) {
+      console.error('Ошибка загрузки сообщений:', err);
+    } finally {
+      setMessagesLoading(false);
+    }
+  };
+
+  const sendMessage = async () => {
+    if (!newMessage.trim() || !activeChat) return;
+    
+    try {
+      await axios.post(`https://server-u9ji.onrender.com/api/messages/chats/${activeChat._id}/messages`, {
+        content: newMessage
+      });
+      setNewMessage('');
+    } catch (err) {
+      console.error('Ошибка отправки сообщения:', err);
+    }
+  };
+
+  const startChat = async (userId) => {
+    try {
+      const res = await axios.post('https://server-u9ji.onrender.com/api/messages/chats', {
+        participantId: userId
+      });
+      
+      const existingChat = chats.find(chat => chat._id === res.data._id);
+      if (!existingChat) {
+        setChats(prev => [res.data, ...prev]);
+      }
+      
+      setActiveChat(res.data);
+      setActiveTab('messages');
+      loadMessages(res.data._id);
+    } catch (err) {
+      console.error('Ошибка создания чата:', err);
     }
   };
 
@@ -913,6 +1045,16 @@ socketRef.current.on('messagesRead', ({ chatId, readBy }) => {
               <Repeat size={18} />
               <span>Репост</span>
             </button>
+
+            {post.userId !== (user._id || user.id) && (
+              <button 
+                onClick={() => startChat(post.userId)}
+                className="action-btn message-btn"
+              >
+                <MessageCircle size={18} />
+                <span>Написать</span>
+              </button>
+            )}
           </div>
 
           {showComments[post.isRepost ? post.originalPost?._id || post._id : post._id] && (
@@ -995,52 +1137,55 @@ socketRef.current.on('messagesRead', ({ chatId, readBy }) => {
   }
 
   return (
-    
-  <div className={`home-container ${activeTab === 'home' ? 'show-right-sidebar' : ''}`}>
+    <div className={`home-container ${activeTab === 'home' ? 'show-right-sidebar' : ''}`}>
       <header className="header">
-<div className="header-content">
-  <div className="logo"><h1><Flame size={24} /> SocialSpace</h1></div>
-  <div className="header-search">
-    <input
-      type="text"
-      value={searchQuery}
-      onChange={handleSearch}
-      placeholder="Поиск пользователей..."
-      className="header-search-input"
-    />
-    {searchResults.length > 0 && (
-      <div className="header-search-results">
-        {searchResults.map(searchUser => (
-          <div key={searchUser._id} className="header-search-result" onClick={() => handleSearchClick(searchUser)}>
-            <span className="header-search-username">@{searchUser.username}</span>
+        <div className="header-content">
+          <div className="logo"><h1><Flame size={24} /> SocialSpace</h1></div>
+          <div className="header-search">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={handleSearch}
+              placeholder="Поиск пользователей..."
+              className="header-search-input"
+            />
+            {searchResults.length > 0 && (
+              <div className="header-search-results">
+                {searchResults.map(searchUser => (
+                  <div key={searchUser._id} className="header-search-result" onClick={() => handleSearchClick(searchUser)}>
+                    <span className="header-search-username">@{searchUser.username}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        ))}
-      </div>
-    )}
-  </div>
-  <div className="user-info">
-    <span>Hello, {user?.username}!</span>
-    
-    <button onClick={toggleTheme} className="theme-toggle">
-      <div className="theme-icon">
-        {isDarkTheme ? <Sun size={18} /> : <Moon size={18} />}
-      </div>
-      <span className="theme-text">
-        {isDarkTheme ? 'Светлая' : 'Темная'}
-      </span>
-    </button>
-    
-    <button onClick={handleLogout} className="logout-btn">
-      <LogOut size={16} /> Выйти
-    </button>
-  </div>
-</div>
+          <div className="user-info">
+            <span>Hello, {user?.username}!</span>
+            
+            <button onClick={toggleTheme} className="theme-toggle">
+              <div className="theme-icon">
+                {isDarkTheme ? <Sun size={18} /> : <Moon size={18} />}
+              </div>
+              <span className="theme-text">
+                {isDarkTheme ? 'Светлая' : 'Темная'}
+              </span>
+            </button>
+            
+            <button onClick={handleLogout} className="logout-btn">
+              <LogOut size={16} /> Выйти
+            </button>
+          </div>
+        </div>
       </header>
 
       <nav className="sidebar">
         <ul className="nav-menu">
           <li><button className={getNavItemClass('home')} onClick={() => setActiveTab('home')}><Home size={18} /> Главная</button></li>
-       <li><button className={getNavItemClass('chats')} onClick={() => setActiveTab('chats')}><MessageCircle size={18} /> Чаты</button></li>
+          <li><button className={getNavItemClass('messages')} onClick={() => { setActiveTab('messages'); loadChats(); }}>
+            <MessageCircle size={18} /> 
+            Сообщения
+            {totalUnread > 0 && <span className="unread-badge">{totalUnread}</span>}
+          </button></li>
           <li><button className={getNavItemClass('profile')} onClick={() => { setActiveTab('profile'); if(user) loadUserProfile(user._id || user.id); }}><User size={18} /> Профиль</button></li>
         </ul>
       </nav>
@@ -1108,7 +1253,102 @@ socketRef.current.on('messagesRead', ({ chatId, readBy }) => {
           </div>
         )}
         
-       
+        {activeTab === 'messages' && (
+          <div className="messages-container">
+            <div className="chats-sidebar">
+              <div className="chats-header">
+                <h3>Чаты</h3>
+                {totalUnread > 0 && <span className="total-unread">{totalUnread}</span>}
+              </div>
+              
+              <div className="chats-list">
+                {chats.length > 0 ? (
+                  chats.map(chat => (
+                    <div 
+                      key={chat._id} 
+                      className={`chat-item ${activeChat?._id === chat._id ? 'active' : ''}`}
+                      onClick={() => { setActiveChat(chat); loadMessages(chat._id); }}
+                    >
+                      <div className="chat-info">
+                        <div className="chat-name">{chat.name}</div>
+                        {chat.lastMessage && (
+                          <div className="chat-last-message">
+                            {chat.lastMessage.sender.username}: {chat.lastMessage.content.substring(0, 30)}...
+                          </div>
+                        )}
+                      </div>
+                      {chat.unreadCount > 0 && (
+                        <span className="chat-unread">{chat.unreadCount}</span>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <div className="no-chats">Чатов пока нет</div>
+                )}
+              </div>
+            </div>
+            
+            <div className="chat-area">
+              {activeChat ? (
+                <>
+                  <div className="chat-header">
+                    <h3>{activeChat.name}</h3>
+                  </div>
+                  
+                  <div className="messages-area">
+                    {messagesLoading ? (
+                      <div className="messages-loading">Загрузка сообщений...</div>
+                    ) : (
+                      <>
+                        {(messages[activeChat._id] || []).map(message => (
+                          <div 
+                            key={message._id} 
+                            className={`message ${message.sender._id === (user._id || user.id) ? 'own' : 'other'}`}
+                          >
+                            <div className="message-header">
+                              <span className="message-sender">{message.sender.username}</span>
+                              <span className="message-time">
+                                {new Date(message.createdAt).toLocaleTimeString('ru-RU', {
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </span>
+                            </div>
+                            <div className="message-content">{message.content}</div>
+                          </div>
+                        ))}
+                        <div ref={messagesEndRef} />
+                      </>
+                    )}
+                  </div>
+                  
+                  <div className="message-input-area">
+                    <input
+                      type="text"
+                      value={newMessage}
+                      onChange={(e) => setNewMessage(e.target.value)}
+                      placeholder="Написать сообщение..."
+                      className="message-input"
+                      onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                    />
+                    <button 
+                      onClick={sendMessage} 
+                      className="send-message-btn"
+                      disabled={!newMessage.trim()}
+                    >
+                      <Send size={18} />
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="no-active-chat">
+                  <h3>Выберите чат для начала общения</h3>
+                  <p>Вы можете начать новый чат, нажав "Написать" под постом пользователя</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
         
         {activeTab === 'profile' && profile && (
           <div className="profile-view">
@@ -1156,6 +1396,12 @@ socketRef.current.on('messagesRead', ({ chatId, readBy }) => {
                               <Users size={16} /> Подписаться
                             </>
                           )}
+                        </button>
+                        <button 
+                          onClick={() => startChat(profile._id)}
+                          className="message-profile-btn"
+                        >
+                          <MessageCircle size={16} /> Написать
                         </button>
                       </div>
                     )}
@@ -1224,12 +1470,20 @@ socketRef.current.on('messagesRead', ({ chatId, readBy }) => {
                       {suggestionUser.followersCount || 0} подписчиков
                     </span>
                   </div>
-                  <button 
-                    onClick={() => toggleFollow(suggestionUser._id)}
-                    className="suggestion-follow-btn"
-                  >
-                    <Users size={14} /> Подписаться
-                  </button>
+                  <div className="suggestion-actions">
+                    <button 
+                      onClick={() => toggleFollow(suggestionUser._id)}
+                      className="suggestion-follow-btn"
+                    >
+                      <Users size={14} /> Подписаться
+                    </button>
+                    <button 
+                      onClick={() => startChat(suggestionUser._id)}
+                      className="suggestion-message-btn"
+                    >
+                      <MessageCircle size={14} /> Написать
+                    </button>
+                  </div>
                 </div>
               </div>
             ))
@@ -1241,7 +1495,5 @@ socketRef.current.on('messagesRead', ({ chatId, readBy }) => {
     </div>
   );
 };
-{activeTab === 'chats' && (
-  <ChatComponent user={user} socket={socketRef.current} />
-)}
+
 export default HomePage;
