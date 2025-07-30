@@ -30,7 +30,7 @@ const HomePage = () => {
   const [isDarkTheme, setIsDarkTheme] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState('Подключение...');
-
+  const [typingUsers, setTypingUsers] = useState({});
   // НОВЫЕ СОСТОЯНИЯ ДЛЯ ЧАТОВ
   const [chats, setChats] = useState([]);
   const [activeChat, setActiveChat] = useState(null);
@@ -196,7 +196,13 @@ const HomePage = () => {
         setIsConnected(true);
         setConnectionStatus('Подключено');
       });
-
+socketRef.current.on('unreadCountUpdated', ({ chatId, unreadCount, totalUnreadDecrement }) => {
+  console.log('Unread count updated:', { chatId, unreadCount, totalUnreadDecrement });
+  setChats(prev => prev.map(chat =>
+    chat._id === chatId ? { ...chat, unreadCount } : chat
+  ));
+  setTotalUnread(prev => Math.max(0, prev - totalUnreadDecrement));
+});
       socketRef.current.on('disconnect', () => {
         console.log('Socket.IO disconnected');
         setIsConnected(false);
@@ -208,7 +214,13 @@ const HomePage = () => {
         setIsConnected(false);
         setConnectionStatus('Ошибка подключения');
       });
-
+    socketRef.current.on('userTyping', ({ chatId, userId, username, isTyping }) => {
+      console.log('Typing status received:', { chatId, userId, username, isTyping });
+      setTypingUsers(prev => ({
+        ...prev,
+        [chatId]: isTyping ? { userId, username } : null
+      }));
+    });
       // Real-time обработчики событий
       
       // Новый пост
@@ -691,7 +703,13 @@ const HomePage = () => {
       console.error('Ошибка отправки сообщения:', err);
     }
   };
-
+const deleteMessage = async (messageId) => {
+  try {
+    await axios.delete(`https://server-u9ji.onrender.com/api/messages/messages/${messageId}`);
+  } catch (err) {
+    console.error('Ошибка удаления сообщения:', err);
+  }
+};
   const startChat = async (userId) => {
     try {
       const res = await axios.post('https://server-u9ji.onrender.com/api/messages/chats', {
@@ -1291,6 +1309,13 @@ const HomePage = () => {
             <div className="chat-area">
               {activeChat ? (
                 <>
+                <div className="connection-status">
+  {isConnected ? (
+    <><Wifi size={16} /> {connectionStatus}</>
+  ) : (
+    <><WifiOff size={16} /> {connectionStatus}</>
+  )}
+</div>
                   <div className="chat-header">
                     <h3>{activeChat.name}</h3>
                   </div>
@@ -1300,37 +1325,58 @@ const HomePage = () => {
                       <div className="messages-loading">Загрузка сообщений...</div>
                     ) : (
                       <>
-                        {(messages[activeChat._id] || []).map(message => (
-                          <div 
-                            key={message._id} 
-                            className={`message ${message.sender._id === (user._id || user.id) ? 'own' : 'other'}`}
-                          >
-                            <div className="message-header">
-                              <span className="message-sender">{message.sender.username}</span>
-                              <span className="message-time">
-                                {new Date(message.createdAt).toLocaleTimeString('ru-RU', {
-                                  hour: '2-digit',
-                                  minute: '2-digit'
-                                })}
-                              </span>
-                            </div>
-                            <div className="message-content">{message.content}</div>
-                          </div>
-                        ))}
+                     {(messages[activeChat._id] || []).map(message => (
+  <div 
+    key={message._id} 
+    className={`message ${message.sender._id === (user._id || user.id) ? 'own' : 'other'}`}
+  >
+    <div className="message-header">
+      <span className="message-sender">{message.sender.username}</span>
+      <span className="message-time">
+        {new Date(message.createdAt).toLocaleTimeString('ru-RU', {
+          hour: '2-digit',
+          minute: '2-digit'
+        })}
+      </span>
+      {message.sender._id === (user._id || user.id) && (
+        <button 
+          onClick={() => deleteMessage(message._id)}
+          className="delete-message-btn"
+        >
+          <Trash2 size={14} />
+        </button>
+      )}
+    </div>
+    <div className="message-content">{message.content}</div>
+  </div>
+))}
+                        {typingUsers[activeChat?._id] && (
+                        <div className="typing-indicator">
+                          {typingUsers[activeChat._id].username} печатает...
+                        </div>
+                      )}
                         <div ref={messagesEndRef} />
                       </>
                     )}
                   </div>
                   
                   <div className="message-input-area">
-                    <input
-                      type="text"
-                      value={newMessage}
-                      onChange={(e) => setNewMessage(e.target.value)}
-                      placeholder="Написать сообщение..."
-                      className="message-input"
-                      onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                    />
+                   <input
+                    type="text"
+                    value={newMessage}
+                    onChange={(e) => {
+                      setNewMessage(e.target.value);
+                      if (activeChat) {
+                        socketRef.current.emit('typing', {
+                          chatId: activeChat._id,
+                          isTyping: e.target.value.length > 0
+                        });
+                      }
+                    }}
+                    placeholder="Написать сообщение..."
+                    className="message-input"
+                    onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                  />
                     <button 
                       onClick={sendMessage} 
                       className="send-message-btn"
