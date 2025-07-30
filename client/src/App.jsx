@@ -30,7 +30,7 @@ const setupAxiosInterceptors = () => {
         const refreshToken = localStorage.getItem('refreshToken');
         if (refreshToken) {
           try {
-            const response = await axios.post('https://server-1-vr19.onrender.com/api/auth/refresh', {
+            const response = await axios.post('https://server-u9ji.onrender.com/api/auth/refresh', {
               refreshToken: refreshToken
             });
             
@@ -80,7 +80,7 @@ function AppRouter() {
     }
 
     try {
-      const response = await axios.get('https://server-1-vr19.onrender.com/api/me');
+      const response = await axios.get('https://server-u9ji.onrender.com/api/me');
       if (response.data.user) {
         setIsAuthenticated(true);
         navigate('/home');

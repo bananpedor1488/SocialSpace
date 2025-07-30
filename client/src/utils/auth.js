@@ -2,7 +2,7 @@
 
 class AuthManager {
   constructor() {
-    this.baseURL = 'https://server-1-vr19.onrender.com/api';
+    this.baseURL = 'https://server-u9ji.onrender.com/api';
   }
 
   // Получение токенов из localStorage

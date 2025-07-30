@@ -139,7 +139,7 @@ const HomePage = () => {
     }
 
     try {
-      const response = await axios.post('https://server-1-vr19.onrender.com/api/auth/refresh', {
+      const response = await axios.post('https://server-u9ji.onrender.com/api/auth/refresh', {
         refreshToken: refreshToken
       });
       
@@ -534,7 +534,7 @@ const HomePage = () => {
           setUser(JSON.parse(savedUser));
         }
 
-        const res = await axios.get('https://server-1-vr19.onrender.com/api/me');
+        const res = await axios.get('https://server-u9ji.onrender.com/api/me');
         console.log('Current user data:', res.data.user);
         setUser(res.data.user);
         localStorage.setItem('user', JSON.stringify(res.data.user));
@@ -559,7 +559,7 @@ const HomePage = () => {
   // Функция загрузки рекомендаций
   const loadSuggestions = async () => {
     try {
-      const res = await axios.get('https://server-1-vr19.onrender.com/api/users/suggestions');
+      const res = await axios.get('https://server-u9ji.onrender.com/api/users/suggestions');
       setSuggestions(res.data.slice(0, 5));
     } catch (err) {
       console.error('Ошибка загрузки рекомендаций:', err);
@@ -575,7 +575,7 @@ const HomePage = () => {
     console.log('Loading posts, page:', pageNum);
     
     try {
-      const res = await axios.get('https://server-1-vr19.onrender.com/api/posts', {
+      const res = await axios.get('https://server-u9ji.onrender.com/api/posts', {
         params: {
           page: pageNum,
           limit: 10
@@ -655,7 +655,7 @@ const HomePage = () => {
 
   const fetchComments = async (postId) => {
     try {
-      const res = await axios.get(`https://server-1-vr19.onrender.com/api/posts/${postId}/comments`);
+      const res = await axios.get(`https://server-u9ji.onrender.com/api/posts/${postId}/comments`);
       setComments(prev => ({ ...prev, [postId]: res.data }));
     } catch (err) {
       console.error('Ошибка загрузки комментариев:', err);
@@ -676,7 +676,7 @@ const HomePage = () => {
   const handleLogout = async () => {
     try {
       const { refreshToken } = getTokens();
-      await axios.post('https://server-1-vr19.onrender.com/api/auth/logout', {
+      await axios.post('https://server-u9ji.onrender.com/api/auth/logout', {
         refreshToken
       });
     } catch (error) {
@@ -693,7 +693,7 @@ const HomePage = () => {
   const handleCreatePost = async () => {
     if (postText.trim()) {
       try {
-        await axios.post('https://server-1-vr19.onrender.com/api/posts', { 
+        await axios.post('https://server-u9ji.onrender.com/api/posts', { 
           content: postText 
         });
         setPostText('');
@@ -705,7 +705,7 @@ const HomePage = () => {
 
   const handleLikePost = async (postId) => {
     try {
-      await axios.post(`https://server-1-vr19.onrender.com/api/posts/${postId}/like`);
+      await axios.post(`https://server-u9ji.onrender.com/api/posts/${postId}/like`);
     } catch (err) {
       console.error('Ошибка лайка:', err);
     }
@@ -713,7 +713,7 @@ const HomePage = () => {
 
   const handleRepost = async (postId) => {
     try {
-      const res = await axios.post(`https://server-1-vr19.onrender.com/api/posts/${postId}/repost`);
+      const res = await axios.post(`https://server-u9ji.onrender.com/api/posts/${postId}/repost`);
       console.log('Repost successful:', res.data);
       // Репост появится через Socket.IO событие 'newRepost'
     } catch (err) {
@@ -729,7 +729,7 @@ const HomePage = () => {
     setSearchQuery(query);
     if (query.trim()) {
       try {
-        const res = await axios.get(`https://server-1-vr19.onrender.com/api/users/search?query=${query}`);
+        const res = await axios.get(`https://server-u9ji.onrender.com/api/users/search?query=${query}`);
         setSearchResults(res.data);
       } catch (err) {
         console.error('Ошибка поиска пользователей:', err);
@@ -756,14 +756,14 @@ const HomePage = () => {
     }
     
     try {
-      const res = await axios.get(`https://server-1-vr19.onrender.com/api/users/${userId}`);
+      const res = await axios.get(`https://server-u9ji.onrender.com/api/users/${userId}`);
       console.log('Profile response:', res.data);
       setProfile(res.data);
       
       setFollowers(res.data.followersCount || 0);
       setFollowing(res.data.followingCount || 0);
       
-      const postsRes = await axios.get(`https://server-1-vr19.onrender.com/api/users/${userId}/posts`);
+      const postsRes = await axios.get(`https://server-u9ji.onrender.com/api/users/${userId}/posts`);
       console.log('Profile posts response:', postsRes.data);
       
       const formattedProfilePosts = postsRes.data.map(post => ({
@@ -799,7 +799,7 @@ const HomePage = () => {
 
   const toggleFollow = async (userId) => {
     try {
-      await axios.post(`https://server-1-vr19.onrender.com/api/follow/${userId}`);
+      await axios.post(`https://server-u9ji.onrender.com/api/follow/${userId}`);
     } catch (err) {
       console.error('Ошибка подписки/отписки:', err);
     }
@@ -810,7 +810,7 @@ const HomePage = () => {
     if (!commentText?.trim()) return;
     
     try {
-      await axios.post(`https://server-1-vr19.onrender.com/api/posts/${postId}/comment`, 
+      await axios.post(`https://server-u9ji.onrender.com/api/posts/${postId}/comment`, 
         { content: commentText }
       );
       setNewComment(prev => ({
