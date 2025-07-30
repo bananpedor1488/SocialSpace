@@ -163,7 +163,7 @@ const HomePage = () => {
       console.log('Initializing Socket.IO connection...');
       setConnectionStatus('Подключение...');
 
-      socketRef.current = io('https://server-1-vr19.onrender.com', {
+      socketRef.current = io('https://server-u9ji.onrender.com', {
         auth: {
           token: accessToken
         },
@@ -395,7 +395,7 @@ const HomePage = () => {
                 socketRef.current.disconnect();
                 setTimeout(() => {
                   if (user) {
-                    const newSocket = io('https://server-1-vr19.onrender.com', {
+                    const newSocket = io('https://server-u9ji.onrender.com', {
                       auth: { token: accessToken },
                       transports: ['websocket', 'polling']
                     });
