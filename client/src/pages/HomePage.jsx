@@ -12,6 +12,7 @@ import {
 const HomePage = () => {
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('home');
+  const [showChats, setShowChats] = useState(false);
   const [postText, setPostText] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [posts, setPosts] = useState([]);
@@ -30,7 +31,7 @@ const HomePage = () => {
   const [isDarkTheme, setIsDarkTheme] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState('Подключение...');
- const [showChats, setShowChats] = useState(false);
+  
   const navigate = useNavigate();
   const socketRef = useRef(null);
 
