@@ -761,7 +761,12 @@ const HomePage = () => {
       console.error('Ошибка инициации звонка:', err);
       
       if (err.response?.status === 409) {
-        alert('Пользователь уже участвует в звонке. Попробуйте позже.');
+        const shouldCleanup = window.confirm(
+          'Система думает что вы уже в звонке. Очистить все звонки принудительно?'
+        );
+        if (shouldCleanup) {
+          emergencyCleanup();
+        }
       } else if (err.response?.status === 400) {
         alert('Нельзя позвонить самому себе.');
       } else {
@@ -810,6 +815,21 @@ const HomePage = () => {
       setCurrentCall(null);
       setIsIncomingCall(false);
       console.log('Local call state cleared');
+    }
+  };
+
+  // Экстренная очистка всех звонков
+  const emergencyCleanup = async () => {
+    console.log('Emergency cleanup started...');
+    try {
+      await axios.post('https://server-u9ji.onrender.com/api/calls/cleanup');
+      setCurrentCall(null);
+      setIsIncomingCall(false);
+      alert('Все звонки очищены! Теперь можно звонить снова.');
+      console.log('Emergency cleanup completed');
+    } catch (err) {
+      console.error('Emergency cleanup failed:', err);
+      alert('Не удалось очистить звонки. Обновите страницу (F5).');
     }
   };
 
