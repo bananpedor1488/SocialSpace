@@ -17,6 +17,7 @@ const CallInterface = ({
   
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
+  const remoteAudioRef = useRef(null);
   const localStreamRef = useRef(null);
   const peerConnectionRef = useRef(null);
   const callStartTimeRef = useRef(null);
@@ -150,19 +151,47 @@ const CallInterface = ({
 
     peerConnectionRef.current.onicecandidate = (event) => {
       if (event.candidate) {
+        const targetUserId = getTargetUserId();
+        console.log('Sending ICE candidate to:', targetUserId);
         socket.emit('webrtc-ice-candidate', {
           callId: call._id,
           candidate: event.candidate,
-          targetUserId: getTargetUserId()
+          targetUserId: targetUserId
         });
       }
     };
 
     peerConnectionRef.current.ontrack = (event) => {
       console.log('Received remote track:', event.track.kind, event.streams[0]);
-      if (remoteVideoRef.current && event.streams[0]) {
-        remoteVideoRef.current.srcObject = event.streams[0];
-        console.log('Remote video assigned');
+      console.log('Track enabled:', event.track.enabled);
+      console.log('Track readyState:', event.track.readyState);
+      
+      if (event.streams[0]) {
+        console.log('Stream has audio tracks:', event.streams[0].getAudioTracks().length);
+        console.log('Stream has video tracks:', event.streams[0].getVideoTracks().length);
+        
+        // Для видео звонков
+        if (call?.type === 'video' && remoteVideoRef.current) {
+          remoteVideoRef.current.srcObject = event.streams[0];
+          console.log('Remote video assigned');
+          
+          // Принудительно включаем воспроизведение
+          remoteVideoRef.current.play().catch(e => {
+            console.log('Video autoplay prevented, user interaction required');
+          });
+        }
+        
+        // Для аудио (всегда, включая видео звонки)
+        if (remoteAudioRef.current) {
+          remoteAudioRef.current.srcObject = event.streams[0];
+          remoteAudioRef.current.volume = 1.0;
+          console.log('Remote audio assigned');
+          
+          // Принудительно включаем воспроизведение звука
+          remoteAudioRef.current.play().catch(e => {
+            console.log('Audio autoplay prevented, user interaction required');
+          });
+        }
       }
     };
   };
@@ -186,8 +215,15 @@ const CallInterface = ({
       if (localVideoRef.current && call?.type === 'video') {
         localVideoRef.current.srcObject = stream;
         localVideoRef.current.muted = true; // Важно для локального видео
+        localVideoRef.current.play().catch(e => console.log('Local video autoplay prevented'));
         console.log('Local video assigned');
       }
+      
+      // Проверяем треки
+      stream.getAudioTracks().forEach(track => {
+        console.log('Audio track enabled:', track.enabled);
+        console.log('Audio track muted:', track.muted);
+      });
 
       return stream;
     } catch (error) {
@@ -200,7 +236,21 @@ const CallInterface = ({
   const getTargetUserId = () => {
     const user = JSON.parse(localStorage.getItem('user'));
     const currentUserId = user?._id || user?.id;
-    return call?.caller?._id === currentUserId ? call?.callee?._id : call?.caller?._id;
+    
+    console.log('Current user ID:', currentUserId);
+    console.log('Call data:', call);
+    console.log('Caller ID:', call?.caller?._id);
+    console.log('Callee ID:', call?.callee?._id);
+    
+    let targetUserId;
+    if (call?.caller?._id === currentUserId) {
+      targetUserId = call?.callee?._id;
+    } else {
+      targetUserId = call?.caller?._id;
+    }
+    
+    console.log('Target user ID:', targetUserId);
+    return targetUserId;
   };
 
   const startCall = async () => {
@@ -287,12 +337,15 @@ const CallInterface = ({
       durationIntervalRef.current = null;
     }
     
-    // Очищаем видео элементы
+    // Очищаем видео и аудио элементы
     if (localVideoRef.current) {
       localVideoRef.current.srcObject = null;
     }
     if (remoteVideoRef.current) {
       remoteVideoRef.current.srcObject = null;
+    }
+    if (remoteAudioRef.current) {
+      remoteAudioRef.current.srcObject = null;
     }
     
     console.log('Call cleanup completed');
@@ -386,6 +439,13 @@ const CallInterface = ({
           )}
         </div>
 
+        {/* Аудио элемент для звука (всегда присутствует) */}
+        <audio
+          ref={remoteAudioRef}
+          autoPlay
+          style={{ display: 'none' }}
+        />
+
         {call.type === 'video' && callStatus === 'accepted' && (
           <div className="video-container">
             <video
@@ -425,6 +485,7 @@ const CallInterface = ({
               <button 
                 onClick={toggleAudio}
                 className={`call-control-btn ${isAudioEnabled ? 'active' : 'inactive'}`}
+                title={isAudioEnabled ? 'Выключить микрофон' : 'Включить микрофон'}
               >
                 {isAudioEnabled ? <Mic size={20} /> : <MicOff size={20} />}
               </button>
@@ -433,14 +494,29 @@ const CallInterface = ({
                 <button 
                   onClick={toggleVideo}
                   className={`call-control-btn ${isVideoEnabled ? 'active' : 'inactive'}`}
+                  title={isVideoEnabled ? 'Выключить камеру' : 'Включить камеру'}
                 >
                   {isVideoEnabled ? <Video size={20} /> : <VideoOff size={20} />}
                 </button>
               )}
               
+              {/* Кнопка для принудительного включения звука */}
+              <button 
+                onClick={() => {
+                  if (remoteAudioRef.current) {
+                    remoteAudioRef.current.play().catch(e => console.log('Manual play failed:', e));
+                  }
+                }}
+                className="call-control-btn active"
+                title="Включить звук принудительно"
+              >
+                <Volume2 size={20} />
+              </button>
+              
               <button 
                 onClick={endCall}
                 className="call-control-btn end-call-btn"
+                title="Завершить звонок"
               >
                 <PhoneOff size={24} />
               </button>

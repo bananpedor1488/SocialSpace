@@ -479,13 +479,37 @@ const HomePage = () => {
       // ОБРАБОТЧИКИ СОБЫТИЙ ЗВОНКОВ
       socketRef.current.on('incomingCall', (callData) => {
         console.log('Incoming call received:', callData);
-        setCurrentCall(callData);
+        
+        // Создаем правильный объект с callId
+        const formattedCall = {
+          _id: callData.callId,
+          callId: callData.callId,
+          caller: callData.caller,
+          callee: callData.callee || { _id: user._id, username: user.username },
+          type: callData.type,
+          status: 'pending'
+        };
+        
+        console.log('Formatted incoming call data:', formattedCall);
+        setCurrentCall(formattedCall);
         setIsIncomingCall(true);
       });
 
       socketRef.current.on('callInitiated', (callData) => {
         console.log('Call initiated:', callData);
-        setCurrentCall(callData);
+        
+        // Создаем правильный объект с callId
+        const formattedCall = {
+          _id: callData.callId,
+          callId: callData.callId,
+          caller: callData.caller || { _id: user._id, username: user.username },
+          callee: callData.callee,
+          type: callData.type,
+          status: 'pending'
+        };
+        
+        console.log('Formatted call data:', formattedCall);
+        setCurrentCall(formattedCall);
         setIsIncomingCall(false);
       });
 
