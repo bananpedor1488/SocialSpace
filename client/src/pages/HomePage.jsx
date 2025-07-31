@@ -739,7 +739,14 @@ const HomePage = () => {
       console.log('Call initiated successfully:', response.data);
     } catch (err) {
       console.error('Ошибка инициации звонка:', err);
-      alert('Не удалось начать звонок');
+      
+      if (err.response?.status === 409) {
+        alert('Пользователь уже участвует в звонке. Попробуйте позже.');
+      } else if (err.response?.status === 400) {
+        alert('Нельзя позвонить самому себе.');
+      } else {
+        alert('Не удалось начать звонок. Проверьте подключение.');
+      }
     }
   };
 
