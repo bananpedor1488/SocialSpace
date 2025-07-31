@@ -522,7 +522,7 @@ const HomePage = () => {
 
       socketRef.current.on('callDeclined', ({ callId }) => {
         console.log('Call declined:', callId);
-        if (currentCall?._id === callId) {
+        if (currentCall?._id === callId || currentCall?.callId === callId) {
           setCurrentCall(null);
           setIsIncomingCall(false);
         }
@@ -530,15 +530,22 @@ const HomePage = () => {
 
       socketRef.current.on('callEnded', ({ callId }) => {
         console.log('Call ended:', callId);
-        if (currentCall?._id === callId) {
+        if (currentCall?._id === callId || currentCall?.callId === callId) {
           setCurrentCall(null);
           setIsIncomingCall(false);
+          
+          // Дополнительная очистка медиа устройств
+          navigator.mediaDevices.getUserMedia({ audio: false, video: false }).catch(() => {
+            console.log('Media cleanup attempt');
+          });
         }
       });
     };
 
     if (user) {
       initializeSocket();
+      // Очищаем зависшие звонки при загрузке страницы (тихо)
+      emergencyCleanup(true);
     }
 
     return () => {
@@ -843,17 +850,29 @@ const HomePage = () => {
   };
 
   // Экстренная очистка всех звонков
-  const emergencyCleanup = async () => {
-    console.log('Emergency cleanup started...');
+  const emergencyCleanup = async (silent = false) => {
+    if (!silent) console.log('Emergency cleanup started...');
     try {
-      await axios.post('https://server-u9ji.onrender.com/api/calls/cleanup');
+      const response = await axios.post('https://server-u9ji.onrender.com/api/calls/cleanup');
+      
+      // Сбрасываем состояние звонков
       setCurrentCall(null);
       setIsIncomingCall(false);
-      alert('Все звонки очищены! Теперь можно звонить снова.');
-      console.log('Emergency cleanup completed');
+      
+      if (!silent && response.data.cleanedCount > 0) {
+        console.log(`Cleaned up ${response.data.cleanedCount} calls`);
+        alert(`Очищено ${response.data.cleanedCount} зависших звонков! Теперь можно звонить снова.`);
+      } else if (!silent) {
+        console.log('No stuck calls found - all good!');
+      }
+      
+      return true;
     } catch (err) {
-      console.error('Emergency cleanup failed:', err);
-      alert('Не удалось очистить звонки. Обновите страницу (F5).');
+      if (!silent) {
+        console.error('Emergency cleanup failed:', err);
+        alert('Не удалось очистить звонки. Обновите страницу (F5).');
+      }
+      return false;
     }
   };
 

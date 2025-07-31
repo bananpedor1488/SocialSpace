@@ -57,6 +57,14 @@ const CallInterface = ({
     }
   }, [call, isIncoming, socket, callStatus]);
 
+  // Очистка при размонтировании компонента
+  useEffect(() => {
+    return () => {
+      console.log('CallInterface unmounting - cleanup');
+      cleanupCall();
+    };
+  }, []);
+
   useEffect(() => {
     if (!socket || !call) return;
 
@@ -137,13 +145,20 @@ const CallInterface = ({
   };
 
   const handleCallDeclined = () => {
+    console.log('Call declined via socket');
     setCallStatus('declined');
     cleanupCall();
   };
 
   const handleCallEnded = () => {
+    console.log('Call ended via socket');
     setCallStatus('ended');
     cleanupCall();
+    
+    // Дополнительная очистка через 1 секунду на всякий случай
+    setTimeout(() => {
+      cleanupCall();
+    }, 1000);
   };
 
   const createPeerConnection = async () => {
@@ -316,13 +331,31 @@ const CallInterface = ({
   const cleanupCall = () => {
     console.log('Cleaning up call...');
     
-    // Останавливаем все медиа треки
+    // ПРИНУДИТЕЛЬНО останавливаем ВСЕ медиа треки
     if (localStreamRef.current) {
       localStreamRef.current.getTracks().forEach(track => {
-        console.log('Stopping track:', track.kind);
-        track.stop();
+        console.log('Stopping track:', track.kind, track.enabled);
+        track.stop(); // Останавливаем трек
+        track.enabled = false; // Выключаем трек
       });
       localStreamRef.current = null;
+    }
+    
+    // Останавливаем удаленные треки тоже
+    if (remoteVideoRef.current && remoteVideoRef.current.srcObject) {
+      const remoteStream = remoteVideoRef.current.srcObject;
+      remoteStream.getTracks().forEach(track => {
+        console.log('Stopping remote track:', track.kind);
+        track.stop();
+      });
+    }
+    
+    if (remoteAudioRef.current && remoteAudioRef.current.srcObject) {
+      const remoteAudioStream = remoteAudioRef.current.srcObject;
+      remoteAudioStream.getTracks().forEach(track => {
+        console.log('Stopping remote audio track:', track.kind);
+        track.stop();
+      });
     }
     
     // Закрываем peer connection
@@ -340,15 +373,23 @@ const CallInterface = ({
     // Очищаем видео и аудио элементы
     if (localVideoRef.current) {
       localVideoRef.current.srcObject = null;
+      localVideoRef.current.pause();
     }
     if (remoteVideoRef.current) {
       remoteVideoRef.current.srcObject = null;
+      remoteVideoRef.current.pause();
     }
     if (remoteAudioRef.current) {
       remoteAudioRef.current.srcObject = null;
+      remoteAudioRef.current.pause();
     }
     
-    console.log('Call cleanup completed');
+    // Сбрасываем состояния кнопок
+    setIsAudioEnabled(true);
+    setIsVideoEnabled(call?.type === 'video');
+    setCallStatus('ended');
+    
+    console.log('Call cleanup completed - ALL TRACKS STOPPED');
   };
 
   const toggleAudio = () => {
@@ -514,7 +555,13 @@ const CallInterface = ({
               </button>
               
               <button 
-                onClick={endCall}
+                onClick={async () => {
+                  console.log('FORCE END CALL - stopping everything');
+                  // Принудительно очищаем всё локально
+                  cleanupCall();
+                  // Затем вызываем API
+                  await endCall();
+                }}
                 className="call-control-btn end-call-btn"
                 title="Завершить звонок"
               >
@@ -524,7 +571,11 @@ const CallInterface = ({
           ) : (
             <div className="call-ended-controls">
               <button 
-                onClick={() => window.location.reload()}
+                onClick={() => {
+                  console.log('Closing call interface');
+                  cleanupCall(); // Дополнительная очистка
+                  window.location.reload(); // Принудительная перезагрузка
+                }}
                 className="call-control-btn"
               >
                 Закрыть
