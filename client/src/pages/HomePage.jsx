@@ -1490,7 +1490,6 @@ const HomePage = () => {
                         <button 
                           onClick={() => startChat(profile._id)}
                           className="follow-btn"
-                          style={{ marginLeft: '12px' }}
                         >
                           <MessageCircle size={16} /> Написать
                         </button>

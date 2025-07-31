@@ -2642,3 +2642,11 @@ body {
     font-size: 13px;
   }
 }
+
+/* Контейнер для кнопок профиля */
+.profile-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 15px;
+}
