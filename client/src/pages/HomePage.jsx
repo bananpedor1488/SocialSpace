@@ -2,8 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { io } from 'socket.io-client';
+
 import {
-  Home, MessageCircle, User, LogOut, Plus, Heart, MessageSquare, Repeat, Pencil, Trash2, Users, UserCheck, Send, X, ChevronDown, Moon, Sun, Wifi, WifiOff, Flame, Clock, Phone
+  Home, MessageCircle, User, LogOut, Plus,
+  Heart, MessageSquare, Repeat, Pencil, Trash2, Users, UserCheck, Send, X, ChevronDown,
+  Moon, Sun, Wifi, WifiOff, Flame, Clock
 } from 'lucide-react';
 
 const HomePage = () => {
@@ -28,37 +31,20 @@ const HomePage = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState('Подключение...');
   const [typingUsers, setTypingUsers] = useState({});
+  // НОВЫЕ СОСТОЯНИЯ ДЛЯ ЧАТОВ
   const [chats, setChats] = useState([]);
   const [activeChat, setActiveChat] = useState(null);
   const [messages, setMessages] = useState({});
   const [newMessage, setNewMessage] = useState('');
   const [messagesLoading, setMessagesLoading] = useState(false);
   const [totalUnread, setTotalUnread] = useState(0);
-  // New states for WebRTC calls
-  const [callState, setCallState] = useState(null); // null, 'initiating', 'ringing', 'in-call', 'ended'
-  const [remoteUser, setRemoteUser] = useState(null);
-  const [localStream, setLocalStream] = useState(null);
-  const [remoteStream, setRemoteStream] = useState(null);
-  const localAudioRef = useRef(null);
-  const remoteAudioRef = useRef(null);
-  const peerConnectionRef = useRef(null);
+  const messagesEndRef = useRef(null);
 
   const navigate = useNavigate();
   const socketRef = useRef(null);
-  const messagesEndRef = useRef(null);
 
+  // Список изменений версий
   const changelogData = [
-    {
-      version: '1.6',
-      date: '31 июля 2025',
-      changes: [
-        '📞 Добавлена поддержка голосовых звонков через WebRTC',
-        '🎙 Реализована система инициации и управления звонками в чатах',
-        '🔔 Уведомления о входящих звонках',
-        '🔄 Оптимизирована работа с медиа-потоками',
-        '🐛 Исправлены мелкие ошибки в интерфейсе чатов'
-      ]
-    },
     {
       version: '1.5',
       date: '30 июля 2025',
@@ -127,7 +113,7 @@ const HomePage = () => {
     }
   ];
 
-  // JWT utilities
+  // JWT утилиты
   const getTokens = () => {
     return {
       accessToken: localStorage.getItem('accessToken'),
@@ -151,8 +137,10 @@ const HomePage = () => {
     return !!accessToken;
   };
 
+  // Функция для декодирования JWT токена (проверка на истечение)
   const isTokenExpired = (token) => {
     if (!token) return true;
+    
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       const currentTime = Date.now() / 1000;
@@ -162,17 +150,22 @@ const HomePage = () => {
     }
   };
 
+  // Функция обновления токена
   const refreshAccessToken = async () => {
     const { refreshToken } = getTokens();
+    
     if (!refreshToken || isTokenExpired(refreshToken)) {
       throw new Error('Refresh token expired');
     }
+
     try {
       const response = await axios.post('https://server-u9ji.onrender.com/api/auth/refresh', {
         refreshToken: refreshToken
       });
+      
       const { accessToken, refreshToken: newRefreshToken } = response.data;
       setTokens(accessToken, newRefreshToken || refreshToken);
+      
       return accessToken;
     } catch (error) {
       clearTokens();
@@ -180,152 +173,24 @@ const HomePage = () => {
     }
   };
 
-  // WebRTC setup
-  const initializePeerConnection = () => {
-    const configuration = {
-      iceServers: [
-        { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' }
-      ]
-    };
-    peerConnectionRef.current = new RTCPeerConnection(configuration);
-
-    peerConnectionRef.current.onicecandidate = (event) => {
-      if (event.candidate && activeChat) {
-        socketRef.current.emit('ice-candidate', {
-          chatId: activeChat._id,
-          candidate: event.candidate,
-          toUserId: activeChat.otherParticipant._id
-        });
-      }
-    };
-
-    peerConnectionRef.current.ontrack = (event) => {
-      if (event.streams[0]) {
-        setRemoteStream(event.streams[0]);
-        if (remoteAudioRef.current) {
-          remoteAudioRef.current.srcObject = event.streams[0];
-        }
-      }
-    };
-
-    peerConnectionRef.current.oniceconnectionstatechange = () => {
-      console.log('ICE Connection State:', peerConnectionRef.current.iceConnectionState);
-      if (peerConnectionRef.current.iceConnectionState === 'disconnected' || 
-          peerConnectionRef.current.iceConnectionState === 'closed') {
-        endCall();
-      }
-    };
-  };
-
-  const startCall = async () => {
-    if (!activeChat) return;
-    setCallState('initiating');
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-      setLocalStream(stream);
-      if (localAudioRef.current) {
-        localAudioRef.current.srcObject = stream;
-      }
-
-      initializePeerConnection();
-      stream.getTracks().forEach(track => peerConnectionRef.current.addTrack(track, stream));
-
-      const offer = await peerConnectionRef.current.createOffer();
-      await peerConnectionRef.current.setLocalDescription(offer);
-
-      socketRef.current.emit('call-offer', {
-        chatId: activeChat._id,
-        offer,
-        toUserId: activeChat.otherParticipant._id,
-        fromUserId: user._id || user.id,
-        fromUsername: user.username
-      });
-      setCallState('ringing');
-      setRemoteUser(activeChat.otherParticipant);
-    } catch (error) {
-      console.error('Error starting call:', error);
-      setCallState(null);
-      alert('Не удалось начать звонок. Проверьте доступ к микрофону.');
-    }
-  };
-
-  const acceptCall = async (offer) => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-      setLocalStream(stream);
-      if (localAudioRef.current) {
-        localAudioRef.current.srcObject = stream;
-      }
-
-      initializePeerConnection();
-      stream.getTracks().forEach(track => peerConnectionRef.current.addTrack(track, stream));
-
-      await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(offer));
-      const answer = await peerConnectionRef.current.createAnswer();
-      await peerConnectionRef.current.setLocalDescription(answer);
-
-      socketRef.current.emit('call-answer', {
-        chatId: activeChat._id,
-        answer,
-        toUserId: remoteUser._id,
-        fromUserId: user._id || user.id
-      });
-      setCallState('in-call');
-    } catch (error) {
-      console.error('Error accepting call:', error);
-      alert('Не удалось принять звонок.');
-      endCall();
-    }
-  };
-
-  const rejectCall = () => {
-    if (callState === 'ringing' && remoteUser) {
-      socketRef.current.emit('call-rejected', {
-        chatId: activeChat._id,
-        toUserId: remoteUser._id,
-        fromUserId: user._id || user.id
-      });
-    }
-    endCall();
-  };
-
-  const endCall = () => {
-    if (peerConnectionRef.current) {
-      peerConnectionRef.current.close();
-      peerConnectionRef.current = null;
-    }
-    if (localStream) {
-      localStream.getTracks().forEach(track => track.stop());
-      setLocalStream(null);
-    }
-    setRemoteStream(null);
-    setRemoteUser(null);
-    setCallState('ended');
-    setTimeout(() => setCallState(null), 2000);
-
-    if (activeChat && socketRef.current) {
-      socketRef.current.emit('call-ended', {
-        chatId: activeChat._id,
-        toUserId: activeChat.otherParticipant?._id
-      });
-    }
-  };
-
-  // Socket.IO setup and handlers
+  // Socket.IO подключение и обработчики
   useEffect(() => {
     const initializeSocket = () => {
       const { accessToken } = getTokens();
+      
       if (!accessToken || !user) return;
 
       console.log('Initializing Socket.IO connection...');
       setConnectionStatus('Подключение...');
 
       socketRef.current = io('https://server-u9ji.onrender.com', {
-        auth: { token: accessToken },
+        auth: {
+          token: accessToken
+        },
         transports: ['websocket', 'polling']
       });
 
+      // Обработчики подключения
       socketRef.current.on('connect', () => {
         console.log('Socket.IO connected');
         setIsConnected(true);
@@ -344,14 +209,12 @@ const HomePage = () => {
         console.log('Socket.IO disconnected');
         setIsConnected(false);
         setConnectionStatus('Отключено');
-        endCall();
       });
 
       socketRef.current.on('connect_error', (error) => {
         console.error('Socket.IO connection error:', error);
         setIsConnected(false);
         setConnectionStatus('Ошибка подключения');
-        endCall();
       });
 
       socketRef.current.on('userTyping', ({ chatId, userId, username, isTyping }) => {
@@ -362,45 +225,9 @@ const HomePage = () => {
         }));
       });
 
-      // WebRTC call handlers
-      socketRef.current.on('call-offer', ({ chatId, offer, fromUserId, fromUsername }) => {
-        if (activeChat?._id === chatId && !callState) {
-          setCallState('ringing');
-          setRemoteUser({ _id: fromUserId, username: fromUsername });
-          // Auto-reject after 30 seconds if no response
-          setTimeout(() => {
-            if (callState === 'ringing') rejectCall();
-          }, 30000);
-        }
-      });
-
-      socketRef.current.on('call-answer', ({ chatId, answer, fromUserId }) => {
-        if (activeChat?._id === chatId && callState === 'ringing' && peerConnectionRef.current) {
-          peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(answer));
-          setCallState('in-call');
-        }
-      });
-
-      socketRef.current.on('ice-candidate', ({ chatId, candidate }) => {
-        if (activeChat?._id === chatId && peerConnectionRef.current) {
-          peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(candidate));
-        }
-      });
-
-      socketRef.current.on('call-rejected', ({ chatId }) => {
-        if (activeChat?._id === chatId && callState === 'ringing') {
-          alert('Звонок отклонен');
-          endCall();
-        }
-      });
-
-      socketRef.current.on('call-ended', ({ chatId }) => {
-        if (activeChat?._id === chatId && callState) {
-          endCall();
-        }
-      });
-
-      // Existing post and chat handlers
+      // Real-time обработчики событий
+      
+      // Новый пост
       socketRef.current.on('newPost', (newPost) => {
         console.log('New post received:', newPost);
         const formattedPost = {
@@ -423,9 +250,11 @@ const HomePage = () => {
           originalPost: newPost.originalPost || null,
           repostedBy: newPost.repostedBy || null
         };
+
         setPosts(prev => [formattedPost, ...prev]);
       });
 
+      // Новый репост
       socketRef.current.on('newRepost', (repostData) => {
         console.log('New repost received:', repostData);
         const formattedRepost = {
@@ -453,20 +282,25 @@ const HomePage = () => {
           },
           repostedBy: repostData.repostedBy
         };
+
         setPosts(prev => [formattedRepost, ...prev]);
       });
 
+      // Новый комментарий
       socketRef.current.on('newComment', ({ postId, comment }) => {
         console.log('New comment received:', { postId, comment });
+        
         setComments(prev => ({
           ...prev,
           [postId]: [...(prev[postId] || []), comment]
         }));
+
         setPosts(prev => prev.map(post => 
           post._id === postId 
             ? { ...post, commentsCount: (post.commentsCount || 0) + 1 }
             : post
         ));
+
         setProfilePosts(prev => prev.map(post => 
           post._id === postId 
             ? { ...post, commentsCount: (post.commentsCount || 0) + 1 }
@@ -474,25 +308,39 @@ const HomePage = () => {
         ));
       });
 
+      // Обновление лайка
       socketRef.current.on('likeUpdate', ({ postId, liked, likesCount, userId: likerUserId }) => {
         console.log('Like update received:', { postId, liked, likesCount, likerUserId });
+        
         const isMyLike = likerUserId === (user._id || user.id);
+        
         setPosts(prev => prev.map(post => 
           post._id === postId 
-            ? { ...post, likes: likesCount, liked: isMyLike ? liked : post.liked } 
+            ? { 
+                ...post, 
+                likes: likesCount,
+                liked: isMyLike ? liked : post.liked
+              } 
             : post
         ));
+
         setProfilePosts(prev => prev.map(post => 
           post._id === postId 
-            ? { ...post, likes: likesCount, liked: isMyLike ? liked : post.liked } 
+            ? { 
+                ...post, 
+                likes: likesCount,
+                liked: isMyLike ? liked : post.liked
+              } 
             : post
         ));
       });
 
+      // Удаление поста
       socketRef.current.on('postDeleted', ({ postId }) => {
         console.log('Post deleted:', postId);
         setPosts(prev => prev.filter(post => post._id !== postId));
         setProfilePosts(prev => prev.filter(post => post._id !== postId));
+        
         setComments(prev => {
           const newComments = { ...prev };
           delete newComments[postId];
@@ -500,17 +348,21 @@ const HomePage = () => {
         });
       });
 
+      // Удаление комментария
       socketRef.current.on('commentDeleted', ({ postId, commentId }) => {
         console.log('Comment deleted:', { postId, commentId });
+        
         setComments(prev => ({
           ...prev,
           [postId]: (prev[postId] || []).filter(comment => comment._id !== commentId)
         }));
+
         setPosts(prev => prev.map(post => 
           post._id === postId 
             ? { ...post, commentsCount: Math.max(0, (post.commentsCount || 0) - 1) }
             : post
         ));
+
         setProfilePosts(prev => prev.map(post => 
           post._id === postId 
             ? { ...post, commentsCount: Math.max(0, (post.commentsCount || 0) - 1) }
@@ -518,8 +370,10 @@ const HomePage = () => {
         ));
       });
 
+      // Обновление подписок
       socketRef.current.on('followUpdate', ({ targetUserId, followerId, followerUsername, isFollowing, followersCount }) => {
         console.log('Follow update received:', { targetUserId, followerId, followerUsername, isFollowing, followersCount });
+        
         if (profile && profile._id === targetUserId) {
           setFollowers(followersCount);
           setProfile(prev => ({
@@ -527,6 +381,7 @@ const HomePage = () => {
             followed: followerId === (user._id || user.id) ? isFollowing : prev.followed
           }));
         }
+
         setSuggestions(prev => prev.map(suggestion => 
           suggestion._id === targetUserId 
             ? { ...suggestion, followersCount }
@@ -536,11 +391,13 @@ const HomePage = () => {
 
       socketRef.current.on('followingUpdate', ({ userId, followingCount }) => {
         console.log('Following update received:', { userId, followingCount });
+        
         if (profile && profile._id === userId && isOwnProfile()) {
           setFollowing(followingCount);
         }
       });
 
+      // ИСПРАВЛЕННЫЕ SOCKET ОБРАБОТЧИКИ ДЛЯ ЧАТОВ
       socketRef.current.on('newChat', (newChat) => {
         console.log('New chat received:', newChat);
         setChats(prev => {
@@ -552,12 +409,17 @@ const HomePage = () => {
         });
       });
 
+      // ИСПРАВЛЕН обработчик newMessage
       socketRef.current.on('newMessage', ({ chatId, message }) => {
         console.log('New message received:', { chatId, message });
+        
+        // Обновляем сообщения в реальном времени
         setMessages(prev => ({
           ...prev,
           [chatId]: [...(prev[chatId] || []), message]
         }));
+
+        // Обновляем чаты
         setChats(prev => prev.map(chat => {
           if (chat._id === chatId) {
             return {
@@ -568,6 +430,8 @@ const HomePage = () => {
           }
           return chat;
         }));
+
+        // Обновляем общий счетчик непрочитанных только если это не активный чат
         if (activeChat?._id !== chatId) {
           setTotalUnread(prev => prev + 1);
         }
@@ -575,6 +439,7 @@ const HomePage = () => {
 
       socketRef.current.on('messagesRead', ({ chatId, readBy }) => {
         console.log('Messages read:', { chatId, readBy });
+        
         setMessages(prev => ({
           ...prev,
           [chatId]: (prev[chatId] || []).map(msg => 
@@ -587,6 +452,7 @@ const HomePage = () => {
 
       socketRef.current.on('messageDeleted', ({ chatId, messageId }) => {
         console.log('Message deleted:', { chatId, messageId });
+        
         setMessages(prev => ({
           ...prev,
           [chatId]: (prev[chatId] || []).filter(msg => msg._id !== messageId)
@@ -604,11 +470,10 @@ const HomePage = () => {
         socketRef.current.disconnect();
         socketRef.current = null;
       }
-      endCall();
     };
   }, [user, profile, activeChat]);
 
-  // Axios interceptors for JWT
+  // Настройка axios interceptors для JWT
   useEffect(() => {
     const requestInterceptor = axios.interceptors.request.use(
       async (config) => {
@@ -619,9 +484,11 @@ const HomePage = () => {
 
         if (!isPublicEndpoint) {
           let { accessToken } = getTokens();
+          
           if (accessToken && isTokenExpired(accessToken)) {
             try {
               accessToken = await refreshAccessToken();
+              
               if (socketRef.current && user) {
                 socketRef.current.disconnect();
                 setTimeout(() => {
@@ -643,10 +510,12 @@ const HomePage = () => {
               return Promise.reject(error);
             }
           }
+          
           if (accessToken) {
             config.headers.Authorization = `Bearer ${accessToken}`;
           }
         }
+        
         delete config.withCredentials;
         return config;
       },
@@ -657,8 +526,10 @@ const HomePage = () => {
       (response) => response,
       async (error) => {
         const originalRequest = error.config;
+
         if (error.response?.status === 401 && !originalRequest._retry) {
           originalRequest._retry = true;
+          
           try {
             const newAccessToken = await refreshAccessToken();
             originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
@@ -672,6 +543,7 @@ const HomePage = () => {
             return Promise.reject(refreshError);
           }
         }
+        
         return Promise.reject(error);
       }
     );
@@ -682,7 +554,7 @@ const HomePage = () => {
     };
   }, [navigate, user]);
 
-  // Theme management
+  // Функция для работы с куки (для темы)
   const setCookie = (name, value, days = 365) => {
     const expires = new Date();
     expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
@@ -700,11 +572,13 @@ const HomePage = () => {
     return null;
   };
 
+  // Функция для загрузки CSS файла
   const loadCSS = (filename) => {
     const existingLink = document.getElementById('homepage-theme-css');
     if (existingLink) {
       existingLink.remove();
     }
+
     const link = document.createElement('link');
     link.id = 'homepage-theme-css';
     link.rel = 'stylesheet';
@@ -713,6 +587,7 @@ const HomePage = () => {
     document.head.appendChild(link);
   };
 
+  // Инициализация темы из куки
   useEffect(() => {
     const savedTheme = getCookie('theme');
     if (savedTheme === 'dark') {
@@ -724,10 +599,12 @@ const HomePage = () => {
     }
   }, []);
 
+  // Переключение темы
   const toggleTheme = () => {
     const newTheme = !isDarkTheme;
     setIsDarkTheme(newTheme);
     setCookie('theme', newTheme ? 'dark' : 'light');
+    
     if (newTheme) {
       loadCSS('HomePage.css');
     } else {
@@ -735,22 +612,26 @@ const HomePage = () => {
     }
   };
 
+  // Проверяем, является ли профиль собственным
   const isOwnProfile = () => {
     if (!user || !profile) return false;
     return profile._id === user._id || profile._id === user.id;
   };
 
+  // Получаем текущего пользователя при загрузке
   useEffect(() => {
     const checkAuth = async () => {
       if (!isAuthenticated()) {
         navigate('/');
         return;
       }
+
       try {
         const savedUser = localStorage.getItem('user');
         if (savedUser) {
           setUser(JSON.parse(savedUser));
         }
+
         const res = await axios.get('https://server-u9ji.onrender.com/api/me');
         console.log('Current user data:', res.data.user);
         setUser(res.data.user);
@@ -761,23 +642,27 @@ const HomePage = () => {
         navigate('/');
       }
     };
+
     checkAuth();
   }, [navigate]);
 
+  // Получаем посты при загрузке пользователя
   useEffect(() => {
     if (user) {
       loadPosts();
       loadSuggestions();
       loadChats();
-    }
+    }  
   }, [user]);
 
+  // useEffect для автоскролла сообщений
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, activeChat]);
 
+  // Функция загрузки рекомендаций
   const loadSuggestions = async () => {
     try {
       const res = await axios.get('https://server-u9ji.onrender.com/api/users/suggestions');
@@ -788,10 +673,12 @@ const HomePage = () => {
     }
   };
 
+  // ФУНКЦИИ ДЛЯ ЧАТОВ
   const loadChats = async () => {
     try {
       const res = await axios.get('https://server-u9ji.onrender.com/api/messages/chats');
       setChats(res.data);
+      
       const unreadRes = await axios.get('https://server-u9ji.onrender.com/api/messages/unread-count');
       setTotalUnread(unreadRes.data.totalUnread);
     } catch (err) {
@@ -801,14 +688,19 @@ const HomePage = () => {
 
   const loadMessages = async (chatId) => {
     if (messagesLoading || messages[chatId]) return;
+    
     setMessagesLoading(true);
     try {
       const res = await axios.get(`https://server-u9ji.onrender.com/api/messages/chats/${chatId}/messages`);
       setMessages(prev => ({ ...prev, [chatId]: res.data }));
+      
+      // Отмечаем как прочитанные
       await axios.put(`https://server-u9ji.onrender.com/api/messages/chats/${chatId}/read`);
+      
       setChats(prev => prev.map(chat => 
         chat._id === chatId ? { ...chat, unreadCount: 0 } : chat
       ));
+      
       const currentChat = chats.find(chat => chat._id === chatId);
       setTotalUnread(prev => Math.max(0, prev - (currentChat?.unreadCount || 0)));
     } catch (err) {
@@ -818,14 +710,19 @@ const HomePage = () => {
     }
   };
 
+  // ИСПРАВЛЕНА функция отправки сообщения
   const sendMessage = async () => {
     if (!newMessage.trim() || !activeChat) return;
+    
     const messageContent = newMessage.trim();
-    setNewMessage('');
+    setNewMessage(''); // Сразу очищаем поле ввода
+    
     try {
       const response = await axios.post(`https://server-u9ji.onrender.com/api/messages/chats/${activeChat._id}/messages`, {
         content: messageContent
       });
+      
+      // Добавляем сообщение локально (оно также придет через Socket.IO, но так быстрее)
       const newMsg = {
         _id: response.data._id || Date.now().toString(),
         content: messageContent,
@@ -836,12 +733,15 @@ const HomePage = () => {
         createdAt: new Date().toISOString(),
         isRead: false
       };
+      
       setMessages(prev => ({
         ...prev,
         [activeChat._id]: [...(prev[activeChat._id] || []), newMsg]
       }));
+      
     } catch (err) {
       console.error('Ошибка отправки сообщения:', err);
+      // В случае ошибки возвращаем текст обратно
       setNewMessage(messageContent);
     }
   };
@@ -859,10 +759,12 @@ const HomePage = () => {
       const res = await axios.post('https://server-u9ji.onrender.com/api/messages/chats', {
         participantId: userId
       });
+      
       const existingChat = chats.find(chat => chat._id === res.data._id);
       if (!existingChat) {
         setChats(prev => [res.data, ...prev]);
       }
+      
       setActiveChat(res.data);
       setActiveTab('messages');
       loadMessages(res.data._id);
@@ -871,14 +773,23 @@ const HomePage = () => {
     }
   };
 
+  // Функция загрузки постов с комментариями
   const loadPosts = async (pageNum = 1, append = false) => {
     if (loading) return;
+    
     setLoading(true);
     console.log('Loading posts, page:', pageNum);
+    
     try {
       const res = await axios.get('https://server-u9ji.onrender.com/api/posts', {
-        params: { page: pageNum, limit: 10 }
+        params: {
+          page: pageNum,
+          limit: 10
+        }
       });
+      
+      console.log('Posts API response:', res.data);
+      
       let postsData = [];
       if (Array.isArray(res.data)) {
         postsData = res.data;
@@ -887,16 +798,21 @@ const HomePage = () => {
       } else if (res.data.data && Array.isArray(res.data.data)) {
         postsData = res.data.data;
       }
+      
       console.log('Posts data:', postsData);
+      
       const formatted = postsData.map(post => {
         console.log('Processing post:', post);
+        
         const username = post.author?.username || post.username || 'Unknown';
+        
         if (post.comments && Array.isArray(post.comments)) {
           setComments(prev => ({
             ...prev,
             [post._id]: post.comments
           }));
         }
+        
         return {
           _id: post._id,
           userId: post.author?._id || post.userId || post.author,
@@ -917,14 +833,18 @@ const HomePage = () => {
           repostedBy: post.repostedBy || null
         };
       });
+
       console.log('Formatted posts:', formatted);
+
       if (append) {
         setPosts(prev => [...prev, ...formatted]);
       } else {
         setPosts(formatted);
       }
+      
       setHasMore(formatted.length === 10);
       setPage(pageNum);
+      
     } catch (err) {
       console.error('Ошибка загрузки постов:', err);
     } finally {
@@ -932,6 +852,7 @@ const HomePage = () => {
     }
   };
 
+  // Функция для загрузки следующей страницы
   const loadMorePosts = () => {
     if (!loading && hasMore) {
       loadPosts(page + 1, true);
@@ -952,6 +873,7 @@ const HomePage = () => {
       ...prev,
       [postId]: !prev[postId]
     }));
+    
     if (!showComments[postId] && !comments[postId]) {
       fetchComments(postId);
     }
@@ -999,6 +921,7 @@ const HomePage = () => {
     try {
       const res = await axios.post(`https://server-u9ji.onrender.com/api/posts/${postId}/repost`);
       console.log('Repost successful:', res.data);
+      // Репост появится через Socket.IO событие 'newRepost'
     } catch (err) {
       console.error('Ошибка репоста:', err);
       if (err.response?.data?.message) {
@@ -1032,18 +955,23 @@ const HomePage = () => {
 
   const loadUserProfile = async (userId) => {
     console.log('Loading profile for userId:', userId);
+    
     if (!userId) {
       console.error('userId is undefined or null');
       return;
     }
+    
     try {
       const res = await axios.get(`https://server-u9ji.onrender.com/api/users/${userId}`);
       console.log('Profile response:', res.data);
       setProfile(res.data);
+      
       setFollowers(res.data.followersCount || 0);
       setFollowing(res.data.followingCount || 0);
+      
       const postsRes = await axios.get(`https://server-u9ji.onrender.com/api/users/${userId}/posts`);
       console.log('Profile posts response:', postsRes.data);
+      
       const formattedProfilePosts = postsRes.data.map(post => ({
         _id: post._id,
         userId: post.author?._id || post.author,
@@ -1063,7 +991,9 @@ const HomePage = () => {
         originalPost: post.originalPost || null,
         repostedBy: post.repostedBy || null
       }));
+      
       setProfilePosts(formattedProfilePosts);
+      
     } catch (err) {
       console.error('Ошибка загрузки профиля:', err);
       setProfile(null);
@@ -1084,6 +1014,7 @@ const HomePage = () => {
   const handleAddComment = async (postId) => {
     const commentText = newComment[postId];
     if (!commentText?.trim()) return;
+    
     try {
       await axios.post(`https://server-u9ji.onrender.com/api/posts/${postId}/comment`, 
         { content: commentText }
@@ -1110,132 +1041,147 @@ const HomePage = () => {
     if (!postsToRender || postsToRender.length === 0) {
       return <div className="no-posts">Постов пока нет</div>;
     }
-    return postsToRender.map(post => (
-      <div key={post._id} className="post">
-        {post.isRepost && (
-          <div className="repost-header">
-            <Repeat size={16} />
-            <span>@{post.repostedBy?.username || post.username} репостнул(а)</span>
-          </div>
-        )}
-        <div className="post-header">
-          <div className="post-user-info">
-            <div className="user-details">
-              <span className="username">
-                @{post.isRepost ? post.originalPost?.author?.username || 'Unknown' : post.username || 'Unknown'}
-              </span>
-              <span className="post-date">
-                {post.isRepost && post.originalPost?.createdAt 
-                  ? new Date(post.originalPost.createdAt).toLocaleDateString('ru-RU', {
-                      day: 'numeric',
-                      month: 'short',
-                      year: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })
-                  : post.date
-                }
-              </span>
+
+    return postsToRender.map(post => {
+      console.log('Rendering post:', post);
+      
+      return (
+        <div key={post._id} className="post">
+          {post.isRepost && (
+            <div className="repost-header">
+              <Repeat size={16} />
+              <span>@{post.repostedBy?.username || post.username} репостнул(а)</span>
             </div>
-          </div>
-        </div>
-        <div className="post-content">
-          <p className="post-text">
-            {post.isRepost ? post.originalPost?.content || post.content : post.content}
-          </p>
-        </div>
-        <div className="post-actions">
-          <button 
-            onClick={() => handleLikePost(post.isRepost ? post.originalPost?._id || post._id : post._id)} 
-            className={`action-btn like-btn ${post.liked ? 'liked' : ''}`}
-          >
-            <Heart size={18} fill={post.liked ? '#f87171' : 'none'} /> 
-            <span>{post.likes}</span>
-          </button>
-          <button 
-            onClick={() => toggleComments(post.isRepost ? post.originalPost?._id || post._id : post._id)}
-            className={`action-btn comment-btn ${showComments[post.isRepost ? post.originalPost?._id || post._id : post._id] ? 'active' : ''}`}
-          >
-            <MessageSquare size={18} />
-            <span>{post.commentsCount || comments[post.isRepost ? post.originalPost?._id || post._id : post._id]?.length || 0}</span>
-          </button>
-          <button 
-            onClick={() => handleRepost(post.isRepost ? post.originalPost?._id || post._id : post._id)}
-            className="action-btn repost-btn"
-            disabled={post.isRepost && post.repostedBy?._id === (user._id || user.id)}
-          >
-            <Repeat size={18} />
-            <span>Репост</span>
-          </button>
-          {post.userId !== (user._id || user.id) && (
-            <button 
-              onClick={() => startChat(post.userId)}
-              className="action-btn message-btn"
-            >
-              <MessageCircle size={18} />
-              <span>Написать</span>
-            </button>
           )}
-        </div>
-        {showComments[post.isRepost ? post.originalPost?._id || post._id : post._id] && (
-          <div className="comments-section">
-            <div className="comments-header">
-              <h4>Комментарии</h4>
-              <button 
-                onClick={() => toggleComments(post.isRepost ? post.originalPost?._id || post._id : post._id)}
-                className="close-comments-btn"
-              >
-                <X size={16} />
-              </button>
-            </div>
-            <div className="comments-list">
-              {(comments[post.isRepost ? post.originalPost?._id || post._id : post._id] || []).map(comment => (
-                <div key={comment._id} className="comment">
-                  <div className="comment-header">
-                    <div className="comment-info">
-                      <span className="comment-username">
-                        @{comment.author?.username || 'Unknown'}
-                      </span>
-                      <span className="comment-date">
-                        {new Date(comment.createdAt).toLocaleDateString('ru-RU')}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="comment-content">
-                    {comment.content}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="add-comment">
-              <div className="comment-input-wrapper">
-                <input
-                  type="text"
-                  value={newComment[post.isRepost ? post.originalPost?._id || post._id : post._id] || ''}
-                  onChange={(e) => handleCommentInputChange(post.isRepost ? post.originalPost?._id || post._id : post._id, e.target.value)}
-                  placeholder="Написать комментарий..."
-                  className="comment-input"
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      handleAddComment(post.isRepost ? post.originalPost?._id || post._id : post._id);
-                    }
-                  }}
-                />
-                <button 
-                  onClick={() => handleAddComment(post.isRepost ? post.originalPost?._id || post._id : post._id)}
-                  className="send-comment-btn"
-                  disabled={!newComment[post.isRepost ? post.originalPost?._id || post._id : post._id]?.trim()}
-                >
-                  <Send size={18} />
-                </button>
+          
+          <div className="post-header">
+            <div className="post-user-info">
+              <div className="user-details">
+                <span className="username">
+                  @{post.isRepost ? post.originalPost?.author?.username || 'Unknown' : post.username || 'Unknown'}
+                </span>
+                <span className="post-date">
+                  {post.isRepost && post.originalPost?.createdAt 
+                    ? new Date(post.originalPost.createdAt).toLocaleDateString('ru-RU', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })
+                    : post.date
+                  }
+                </span>
               </div>
             </div>
           </div>
-        )}
-      </div>
-    ));
+          
+          <div className="post-content">
+            <p className="post-text">
+              {post.isRepost ? post.originalPost?.content || post.content : post.content}
+            </p>
+          </div>
+          
+          <div className="post-actions">
+            <button 
+              onClick={() => handleLikePost(post.isRepost ? post.originalPost?._id || post._id : post._id)} 
+              className={`action-btn like-btn ${post.liked ? 'liked' : ''}`}
+            >
+              <Heart size={18} fill={post.liked ? '#f87171' : 'none'} /> 
+              <span>{post.likes}</span>
+            </button>
+            
+            <button 
+              onClick={() => toggleComments(post.isRepost ? post.originalPost?._id || post._id : post._id)}
+              className={`action-btn comment-btn ${showComments[post.isRepost ? post.originalPost?._id || post._id : post._id] ? 'active' : ''}`}
+            >
+              <MessageSquare size={18} />
+              <span>{post.commentsCount || comments[post.isRepost ? post.originalPost?._id || post._id : post._id]?.length || 0}</span>
+            </button>
+            
+            <button 
+              onClick={() => handleRepost(post.isRepost ? post.originalPost?._id || post._id : post._id)}
+              className="action-btn repost-btn"
+              disabled={post.isRepost && post.repostedBy?._id === (user._id || user.id)}
+            >
+              <Repeat size={18} />
+              <span>Репост</span>
+            </button>
+
+            {post.userId !== (user._id || user.id) && (
+              <button 
+                onClick={() => startChat(post.userId)}
+                className="action-btn message-btn"
+              >
+                <MessageCircle size={18} />
+                <span>Написать</span>
+              </button>
+            )}
+          </div>
+
+          {showComments[post.isRepost ? post.originalPost?._id || post._id : post._id] && (
+            <div className="comments-section">
+              <div className="comments-header">
+                <h4>Комментарии</h4>
+                <button 
+                  onClick={() => toggleComments(post.isRepost ? post.originalPost?._id || post._id : post._id)}
+                  className="close-comments-btn"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+              
+              <div className="comments-list">
+                {(comments[post.isRepost ? post.originalPost?._id || post._id : post._id] || []).map(comment => (
+                  <div key={comment._id} className="comment">
+                    <div className="comment-header">
+                      <div className="comment-info">
+                        <span className="comment-username">
+                          @{comment.author?.username || 'Unknown'}
+                        </span>
+                        <span className="comment-date">
+                          {new Date(comment.createdAt).toLocaleDateString('ru-RU')}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="comment-content">
+                      {comment.content}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="add-comment">
+                <div className="comment-input-wrapper">
+                  <input
+                    type="text"
+                    value={newComment[post.isRepost ? post.originalPost?._id || post._id : post._id] || ''}
+                    onChange={(e) => handleCommentInputChange(post.isRepost ? post.originalPost?._id || post._id : post._id, e.target.value)}
+                    placeholder="Написать комментарий..."
+                    className="comment-input"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        handleAddComment(post.isRepost ? post.originalPost?._id || post._id : post._id);
+                      }
+                    }}
+                  />
+                  <button 
+                    onClick={() => handleAddComment(post.isRepost ? post.originalPost?._id || post._id : post._id)}
+                    className="send-comment-btn"
+                    disabled={!newComment[post.isRepost ? post.originalPost?._id || post._id : post._id]?.trim()}
+                  >
+                    <Send size={18} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    });
   };
 
+  // Показываем загрузку если пользователь еще не загружен
   if (!user) {
     return (
       <div style={{ 
@@ -1277,6 +1223,7 @@ const HomePage = () => {
           </div>
           <div className="user-info">
             <span>Hello, {user?.username}!</span>
+            
             <button onClick={toggleTheme} className="theme-toggle">
               <div className="theme-icon">
                 {isDarkTheme ? <Sun size={18} /> : <Moon size={18} />}
@@ -1285,6 +1232,7 @@ const HomePage = () => {
                 {isDarkTheme ? 'Светлая' : 'Темная'}
               </span>
             </button>
+            
             <button onClick={handleLogout} className="logout-btn">
               <LogOut size={16} /> Выйти
             </button>
@@ -1335,8 +1283,10 @@ const HomePage = () => {
                 </div>
               </div>
             </div>
+            
             <div className="posts-feed">
               {renderPosts(posts)}
+              
               {hasMore && posts.length > 0 && (
                 <div className="load-more-section">
                   <button 
@@ -1355,6 +1305,7 @@ const HomePage = () => {
                   </button>
                 </div>
               )}
+              
               {!hasMore && posts.length > 0 && (
                 <div className="end-of-feed">
                   <p>Больше постов нет</p>
@@ -1363,6 +1314,7 @@ const HomePage = () => {
             </div>
           </div>
         )}
+        
         {activeTab === 'messages' && (
           <div className="messages-container">
             <div className="chats-sidebar">
@@ -1370,6 +1322,7 @@ const HomePage = () => {
                 <h3>Чаты</h3>
                 {totalUnread > 0 && <span className="total-unread">{totalUnread}</span>}
               </div>
+              
               <div className="chats-list">
                 {chats.length > 0 ? (
                   chats.map(chat => (
@@ -1396,6 +1349,7 @@ const HomePage = () => {
                 )}
               </div>
             </div>
+            
             <div className="chat-area">
               {activeChat ? (
                 <>
@@ -1408,35 +1362,8 @@ const HomePage = () => {
                   </div>
                   <div className="chat-header">
                     <h3>{activeChat.name}</h3>
-                    {callState ? (
-                      <div className="call-controls">
-                        {callState === 'ringing' && remoteUser && (
-                          <>
-                            <span>{remoteUser._id === (user._id || user.id) ? 'Звоним...' : `Входящий звонок от @${remoteUser.username}`}</span>
-                            {remoteUser._id !== (user._id || user.id) && (
-                              <>
-                                <button onClick={() => acceptCall()} className="call-btn accept">Принять</button>
-                                <button onClick={rejectCall} className="call-btn reject">Отклонить</button>
-                              </>
-                            )}
-                          </>
-                        )}
-                        {callState === 'in-call' && (
-                          <>
-                            <span>В звонке с @{remoteUser?.username}</span>
-                            <button onClick={endCall} className="call-btn end">Завершить</button>
-                          </>
-                        )}
-                        {callState === 'ended' && (
-                          <span>Звонок завершен</span>
-                        )}
-                      </div>
-                    ) : (
-                      <button onClick={startCall} className="call-btn start">
-                        <Phone size={18} /> Позвонить
-                      </button>
-                    )}
                   </div>
+                  
                   <div className="messages-area">
                     {messagesLoading ? (
                       <div className="messages-loading">Загрузка сообщений...</div>
@@ -1476,6 +1403,7 @@ const HomePage = () => {
                       </>
                     )}
                   </div>
+                  
                   <div className="message-input-area">
                     <input
                       type="text"
@@ -1492,22 +1420,15 @@ const HomePage = () => {
                       placeholder="Написать сообщение..."
                       className="message-input"
                       onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                      disabled={callState === 'in-call'}
                     />
                     <button 
                       onClick={sendMessage} 
                       className="send-message-btn"
-                      disabled={!newMessage.trim() || callState === 'in-call'}
+                      disabled={!newMessage.trim()}
                     >
                       <Send size={18} />
                     </button>
                   </div>
-                  {callState && (
-                    <div className="audio-controls">
-                      <audio ref={localAudioRef} autoPlay muted />
-                      <audio ref={remoteAudioRef} autoPlay />
-                    </div>
-                  )}
                 </>
               ) : (
                 <div className="no-active-chat">
@@ -1518,6 +1439,7 @@ const HomePage = () => {
             </div>
           </div>
         )}
+        
         {activeTab === 'profile' && profile && (
           <div className="profile-view">
             <div className="profile-header">
@@ -1533,6 +1455,7 @@ const HomePage = () => {
                       )}
                     </h2>
                     <p className="profile-handle">@{profile.username}</p>
+                    
                     <div className="profile-stats">
                       <div className="profile-stat">
                         <span className="stat-number">{followers}</span>
@@ -1547,6 +1470,7 @@ const HomePage = () => {
                         <span className="stat-label">Постов</span>
                       </div>
                     </div>
+                    
                     {!isOwnProfile() && (
                       <div className="profile-actions">
                         <button 
@@ -1576,6 +1500,7 @@ const HomePage = () => {
                 </div>
               </div>
             </div>
+
             <div className="profile-posts-header">
               <h3>
                 <Pencil size={18} /> 
@@ -1585,6 +1510,7 @@ const HomePage = () => {
                 <span className="posts-count">{profilePosts.length} постов</span>
               )}
             </div>
+
             {profilePosts.length > 0 ? (
               <div className="posts-feed">
                 {renderPosts(profilePosts)}
@@ -1622,6 +1548,7 @@ const HomePage = () => {
             ))}
           </div>
         </div>
+
         <div className="suggestions">
           <h3><Users size={18} /> Рекомендации</h3>
           {suggestions.length > 0 ? (
