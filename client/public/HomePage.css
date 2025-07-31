@@ -1174,41 +1174,6 @@ body {
   border: 1px dashed rgba(71, 85, 105, 0.5);
 }
 
-/* Скроллбары */
-.main-content::-webkit-scrollbar,
-.changelog::-webkit-scrollbar,
-.right-sidebar::-webkit-scrollbar,
-.sidebar::-webkit-scrollbar,
-.header-search-results::-webkit-scrollbar {
-  width: 6px;
-}
-
-.main-content::-webkit-scrollbar-track,
-.changelog::-webkit-scrollbar-track,
-.right-sidebar::-webkit-scrollbar-track,
-.sidebar::-webkit-scrollbar-track,
-.header-search-results::-webkit-scrollbar-track {
-  background: rgba(51, 65, 85, 0.5);
-  border-radius: 3px;
-}
-
-.main-content::-webkit-scrollbar-thumb,
-.changelog::-webkit-scrollbar-thumb,
-.right-sidebar::-webkit-scrollbar-thumb,
-.sidebar::-webkit-scrollbar-thumb,
-.header-search-results::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, 0.8);
-  border-radius: 3px;
-}
-
-.main-content::-webkit-scrollbar-thumb:hover,
-.changelog::-webkit-scrollbar-thumb:hover,
-.right-sidebar::-webkit-scrollbar-thumb:hover,
-.sidebar::-webkit-scrollbar-thumb:hover,
-.header-search-results::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.9);
-}
-
 /* Анимации */
 @keyframes fadeIn {
   from {
@@ -1388,6 +1353,99 @@ body {
     border-radius: 15px;
     padding: 20px;
   }
+
+  /* Мобильная навигация снизу */
+  .mobile-nav {
+    grid-area: mobile-nav;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(71, 85, 105, 0.4);
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+    padding: 8px 0;
+  }
+
+  .mobile-nav-menu {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .mobile-nav-item {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+  }
+
+  .mobile-nav-button {
+    background: transparent;
+    border: none;
+    color: rgba(148, 163, 184, 0.8);
+    padding: 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    min-width: 60px;
+    position: relative;
+  }
+
+  .mobile-nav-button:hover {
+    color: #f1f5f9;
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .mobile-nav-button.active {
+    color: #3b82f6;
+    background: rgba(59, 130, 246, 0.2);
+  }
+
+  .mobile-nav-button.active::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 3px;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    border-radius: 0 0 3px 3px;
+  }
+
+  .mobile-nav-icon {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2px;
+  }
+
+  .mobile-nav-text {
+    font-size: 9px;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  /* Скрываем десктопную навигацию */
+  .nav-menu {
+    display: none;
+  }
 }
 
 /* Очень маленькие мобильные (до 480px) */
@@ -1463,6 +1521,25 @@ body {
     align-self: flex-end;
     width: fit-content;
   }
+
+  .mobile-nav {
+    padding: 6px 0;
+  }
+
+  .mobile-nav-button {
+    padding: 10px;
+    min-width: 50px;
+    font-size: 9px;
+  }
+
+  .mobile-nav-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .mobile-nav-text {
+    font-size: 8px;
+  }
 }
 
 /* Поддержка безопасной зоны для мобильных браузеров */
@@ -1509,6 +1586,25 @@ body {
     height: calc(100vh - 70px);
     padding: 0;
     overflow: hidden;
+  }
+
+  .mobile-nav {
+    padding: 4px 0;
+  }
+
+  .mobile-nav-button {
+    padding: 8px;
+    min-width: 45px;
+    font-size: 8px;
+  }
+
+  .mobile-nav-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .mobile-nav-text {
+    font-size: 7px;
   }
 }
 /* ИСПРАВЛЕННЫЕ И ДОПОЛНЕННЫЕ СТИЛИ ДЛЯ ЧАТОВ */
@@ -2142,4 +2238,47 @@ body {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Стили скроллбара для чатов */
+.main-content::-webkit-scrollbar,
+.changelog::-webkit-scrollbar,
+.right-sidebar::-webkit-scrollbar,
+.sidebar::-webkit-scrollbar,
+.header-search-results::-webkit-scrollbar,
+.messages-area::-webkit-scrollbar,
+.chats-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.main-content::-webkit-scrollbar-track,
+.changelog::-webkit-scrollbar-track,
+.right-sidebar::-webkit-scrollbar-track,
+.sidebar::-webkit-scrollbar-track,
+.header-search-results::-webkit-scrollbar-track,
+.messages-area::-webkit-scrollbar-track,
+.chats-sidebar::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 3px;
+}
+
+.main-content::-webkit-scrollbar-thumb,
+.changelog::-webkit-scrollbar-thumb,
+.right-sidebar::-webkit-scrollbar-thumb,
+.sidebar::-webkit-scrollbar-thumb,
+.header-search-results::-webkit-scrollbar-thumb,
+.messages-area::-webkit-scrollbar-thumb,
+.chats-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(71, 85, 105, 0.8);
+  border-radius: 3px;
+}
+
+.main-content::-webkit-scrollbar-thumb:hover,
+.changelog::-webkit-scrollbar-thumb:hover,
+.right-sidebar::-webkit-scrollbar-thumb:hover,
+.sidebar::-webkit-scrollbar-thumb:hover,
+.header-search-results::-webkit-scrollbar-thumb:hover,
+.messages-area::-webkit-scrollbar-thumb:hover,
+.chats-sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.9);
 }
