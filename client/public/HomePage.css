@@ -1345,6 +1345,13 @@ body {
     padding: 15px;
     background: rgba(15, 23, 42, 0.98);
   }
+  
+  .main-content.messages-active {
+    margin-top: 140px;
+    height: calc(100vh - 140px);
+    padding: 0;
+    overflow: hidden;
+  }
 
   .profile-main-info {
     flex-direction: column;
@@ -1405,6 +1412,13 @@ body {
     margin-top: 130px;
     height: calc(100vh - 130px);
     padding: 12px;
+  }
+  
+  .main-content.messages-active {
+    margin-top: 130px;
+    height: calc(100vh - 130px);
+    padding: 0;
+    overflow: hidden;
   }
 
   .create-post, .post {
@@ -1489,24 +1503,39 @@ body {
     margin-top: 70px;
     height: calc(100vh - 70px);
   }
+  
+  .main-content.messages-active {
+    margin-top: 70px;
+    height: calc(100vh - 70px);
+    padding: 0;
+    overflow: hidden;
+  }
 }
 /* ИСПРАВЛЕННЫЕ И ДОПОЛНЕННЫЕ СТИЛИ ДЛЯ ЧАТОВ */
+
+/* Основной контент когда активны сообщения */
+.main-content.messages-active {
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
 
 /* Контейнер сообщений */
 .messages-container {
   display: grid;
   grid-template-columns: 300px 1fr;
-  height: calc(100vh - 80px);
+  height: 100%;
   gap: 0;
   border-radius: 0;
   overflow: hidden;
-  margin-top: 0;
-  position: absolute;
-  top: 80px;
-  left: 250px;
+  margin: 0;
+  position: relative;
+  top: 0;
+  left: 0;
   right: 0;
   bottom: 0;
-  width: calc(100% - 250px);
+  width: 100%;
 }
 
 /* Боковая панель чатов */
@@ -1696,7 +1725,6 @@ body {
   gap: 12px;
   background: rgba(30, 41, 59, 0.9);
   min-height: 0;
-  height: 0;
 }
 
 .messages-loading {
@@ -1754,8 +1782,8 @@ body {
   padding: 12px 16px;
   border-radius: 16px;
   color: #e2e8f0;
-  font-size: 14px;
-  line-height: 1.4;
+    font-size: 14px;
+    line-height: 1.4;
   border: 1px solid rgba(71, 85, 105, 0.3);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -1992,13 +2020,13 @@ body {
 @media (max-width: 1023px) {
   .messages-container {
     grid-template-columns: 250px 1fr;
-    height: calc(100vh - 80px);
-    position: absolute;
-    top: 80px;
-    left: 250px;
+    height: 100%;
+    position: relative;
+    top: 0;
+    left: 0;
     right: 0;
     bottom: 0;
-    width: calc(100% - 250px);
+    width: 100%;
   }
   
   .chats-sidebar {
@@ -2018,10 +2046,10 @@ body {
 @media (max-width: 767px) {
   .messages-container {
     grid-template-columns: 1fr;
-    height: calc(100vh - 140px);
-    margin-top: 0;
-    position: absolute;
-    top: 140px;
+    height: 100%;
+    margin: 0;
+    position: relative;
+    top: 0;
     left: 0;
     right: 0;
     bottom: 0;
@@ -2048,7 +2076,6 @@ body {
     padding: 15px;
     flex: 1;
     min-height: 0;
-    height: 0;
   }
   
   .message {

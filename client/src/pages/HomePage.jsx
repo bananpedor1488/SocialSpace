@@ -1252,7 +1252,7 @@ const HomePage = () => {
         </ul>
       </nav>
 
-      <main className="main-content">
+      <main className={`main-content ${activeTab === 'messages' ? 'messages-active' : ''}`}>
         {activeTab === 'home' && (
           <div>
             <div className="create-post">
