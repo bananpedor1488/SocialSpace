@@ -196,13 +196,15 @@ const HomePage = () => {
         setIsConnected(true);
         setConnectionStatus('Подключено');
       });
-socketRef.current.on('unreadCountUpdated', ({ chatId, unreadCount, totalUnreadDecrement }) => {
-  console.log('Unread count updated:', { chatId, unreadCount, totalUnreadDecrement });
-  setChats(prev => prev.map(chat =>
-    chat._id === chatId ? { ...chat, unreadCount } : chat
-  ));
-  setTotalUnread(prev => Math.max(0, prev - totalUnreadDecrement));
-});
+
+      socketRef.current.on('unreadCountUpdated', ({ chatId, unreadCount, totalUnreadDecrement }) => {
+        console.log('Unread count updated:', { chatId, unreadCount, totalUnreadDecrement });
+        setChats(prev => prev.map(chat =>
+          chat._id === chatId ? { ...chat, unreadCount } : chat
+        ));
+        setTotalUnread(prev => Math.max(0, prev - totalUnreadDecrement));
+      });
+
       socketRef.current.on('disconnect', () => {
         console.log('Socket.IO disconnected');
         setIsConnected(false);
@@ -214,13 +216,15 @@ socketRef.current.on('unreadCountUpdated', ({ chatId, unreadCount, totalUnreadDe
         setIsConnected(false);
         setConnectionStatus('Ошибка подключения');
       });
-    socketRef.current.on('userTyping', ({ chatId, userId, username, isTyping }) => {
-      console.log('Typing status received:', { chatId, userId, username, isTyping });
-      setTypingUsers(prev => ({
-        ...prev,
-        [chatId]: isTyping ? { userId, username } : null
-      }));
-    });
+
+      socketRef.current.on('userTyping', ({ chatId, userId, username, isTyping }) => {
+        console.log('Typing status received:', { chatId, userId, username, isTyping });
+        setTypingUsers(prev => ({
+          ...prev,
+          [chatId]: isTyping ? { userId, username } : null
+        }));
+      });
+
       // Real-time обработчики событий
       
       // Новый пост
@@ -393,26 +397,41 @@ socketRef.current.on('unreadCountUpdated', ({ chatId, unreadCount, totalUnreadDe
         }
       });
 
-      // НОВЫЕ SOCKET ОБРАБОТЧИКИ ДЛЯ ЧАТОВ
+      // ИСПРАВЛЕННЫЕ SOCKET ОБРАБОТЧИКИ ДЛЯ ЧАТОВ
       socketRef.current.on('newChat', (newChat) => {
         console.log('New chat received:', newChat);
-        setChats(prev => [newChat, ...prev]);
+        setChats(prev => {
+          const existingChat = prev.find(chat => chat._id === newChat._id);
+          if (existingChat) {
+            return prev.map(chat => chat._id === newChat._id ? newChat : chat);
+          }
+          return [newChat, ...prev];
+        });
       });
 
+      // ИСПРАВЛЕН обработчик newMessage
       socketRef.current.on('newMessage', ({ chatId, message }) => {
         console.log('New message received:', { chatId, message });
         
+        // Обновляем сообщения в реальном времени
         setMessages(prev => ({
           ...prev,
           [chatId]: [...(prev[chatId] || []), message]
         }));
 
-        setChats(prev => prev.map(chat => 
-          chat._id === chatId 
-            ? { ...chat, lastMessage: message, unreadCount: activeChat?._id === chatId ? 0 : chat.unreadCount + 1 }
-            : chat
-        ));
+        // Обновляем чаты
+        setChats(prev => prev.map(chat => {
+          if (chat._id === chatId) {
+            return {
+              ...chat,
+              lastMessage: message,
+              unreadCount: activeChat?._id === chatId ? 0 : chat.unreadCount + 1
+            };
+          }
+          return chat;
+        }));
 
+        // Обновляем общий счетчик непрочитанных только если это не активный чат
         if (activeChat?._id !== chatId) {
           setTotalUnread(prev => prev + 1);
         }
@@ -654,7 +673,7 @@ socketRef.current.on('unreadCountUpdated', ({ chatId, unreadCount, totalUnreadDe
     }
   };
 
-  // НОВЫЕ ФУНКЦИИ ДЛЯ ЧАТОВ
+  // ФУНКЦИИ ДЛЯ ЧАТОВ
   const loadChats = async () => {
     try {
       const res = await axios.get('https://server-u9ji.onrender.com/api/messages/chats');
@@ -691,25 +710,50 @@ socketRef.current.on('unreadCountUpdated', ({ chatId, unreadCount, totalUnreadDe
     }
   };
 
+  // ИСПРАВЛЕНА функция отправки сообщения
   const sendMessage = async () => {
     if (!newMessage.trim() || !activeChat) return;
     
+    const messageContent = newMessage.trim();
+    setNewMessage(''); // Сразу очищаем поле ввода
+    
     try {
-      await axios.post(`https://server-u9ji.onrender.com/api/messages/chats/${activeChat._id}/messages`, {
-        content: newMessage
+      const response = await axios.post(`https://server-u9ji.onrender.com/api/messages/chats/${activeChat._id}/messages`, {
+        content: messageContent
       });
-      setNewMessage('');
+      
+      // Добавляем сообщение локально (оно также придет через Socket.IO, но так быстрее)
+      const newMsg = {
+        _id: response.data._id || Date.now().toString(),
+        content: messageContent,
+        sender: {
+          _id: user._id || user.id,
+          username: user.username
+        },
+        createdAt: new Date().toISOString(),
+        isRead: false
+      };
+      
+      setMessages(prev => ({
+        ...prev,
+        [activeChat._id]: [...(prev[activeChat._id] || []), newMsg]
+      }));
+      
     } catch (err) {
       console.error('Ошибка отправки сообщения:', err);
+      // В случае ошибки возвращаем текст обратно
+      setNewMessage(messageContent);
     }
   };
-const deleteMessage = async (messageId) => {
-  try {
-    await axios.delete(`https://server-u9ji.onrender.com/api/messages/messages/${messageId}`);
-  } catch (err) {
-    console.error('Ошибка удаления сообщения:', err);
-  }
-};
+
+  const deleteMessage = async (messageId) => {
+    try {
+      await axios.delete(`https://server-u9ji.onrender.com/api/messages/messages/${messageId}`);
+    } catch (err) {
+      console.error('Ошибка удаления сообщения:', err);
+    }
+  };
+
   const startChat = async (userId) => {
     try {
       const res = await axios.post('https://server-u9ji.onrender.com/api/messages/chats', {
@@ -1309,13 +1353,13 @@ const deleteMessage = async (messageId) => {
             <div className="chat-area">
               {activeChat ? (
                 <>
-                <div className="connection-status">
-  {isConnected ? (
-    <><Wifi size={16} /> {connectionStatus}</>
-  ) : (
-    <><WifiOff size={16} /> {connectionStatus}</>
-  )}
-</div>
+                  <div className="connection-status">
+                    {isConnected ? (
+                      <><Wifi size={16} /> {connectionStatus}</>
+                    ) : (
+                      <><WifiOff size={16} /> {connectionStatus}</>
+                    )}
+                  </div>
                   <div className="chat-header">
                     <h3>{activeChat.name}</h3>
                   </div>
@@ -1325,58 +1369,58 @@ const deleteMessage = async (messageId) => {
                       <div className="messages-loading">Загрузка сообщений...</div>
                     ) : (
                       <>
-                     {(messages[activeChat._id] || []).map(message => (
-  <div 
-    key={message._id} 
-    className={`message ${message.sender._id === (user._id || user.id) ? 'own' : 'other'}`}
-  >
-    <div className="message-header">
-      <span className="message-sender">{message.sender.username}</span>
-      <span className="message-time">
-        {new Date(message.createdAt).toLocaleTimeString('ru-RU', {
-          hour: '2-digit',
-          minute: '2-digit'
-        })}
-      </span>
-      {message.sender._id === (user._id || user.id) && (
-        <button 
-          onClick={() => deleteMessage(message._id)}
-          className="delete-message-btn"
-        >
-          <Trash2 size={14} />
-        </button>
-      )}
-    </div>
-    <div className="message-content">{message.content}</div>
-  </div>
-))}
+                        {(messages[activeChat._id] || []).map(message => (
+                          <div 
+                            key={message._id} 
+                            className={`message ${message.sender._id === (user._id || user.id) ? 'own' : 'other'}`}
+                          >
+                            <div className="message-header">
+                              <span className="message-sender">{message.sender.username}</span>
+                              <span className="message-time">
+                                {new Date(message.createdAt).toLocaleTimeString('ru-RU', {
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </span>
+                              {message.sender._id === (user._id || user.id) && (
+                                <button 
+                                  onClick={() => deleteMessage(message._id)}
+                                  className="delete-message-btn"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              )}
+                            </div>
+                            <div className="message-content">{message.content}</div>
+                          </div>
+                        ))}
                         {typingUsers[activeChat?._id] && (
-                        <div className="typing-indicator">
-                          {typingUsers[activeChat._id].username} печатает...
-                        </div>
-                      )}
+                          <div className="typing-indicator">
+                            {typingUsers[activeChat._id].username} печатает...
+                          </div>
+                        )}
                         <div ref={messagesEndRef} />
                       </>
                     )}
                   </div>
                   
                   <div className="message-input-area">
-                   <input
-                    type="text"
-                    value={newMessage}
-                    onChange={(e) => {
-                      setNewMessage(e.target.value);
-                      if (activeChat) {
-                        socketRef.current.emit('typing', {
-                          chatId: activeChat._id,
-                          isTyping: e.target.value.length > 0
-                        });
-                      }
-                    }}
-                    placeholder="Написать сообщение..."
-                    className="message-input"
-                    onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                  />
+                    <input
+                      type="text"
+                      value={newMessage}
+                      onChange={(e) => {
+                        setNewMessage(e.target.value);
+                        if (activeChat) {
+                          socketRef.current.emit('typing', {
+                            chatId: activeChat._id,
+                            isTyping: e.target.value.length > 0
+                          });
+                        }
+                      }}
+                      placeholder="Написать сообщение..."
+                      className="message-input"
+                      onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                    />
                     <button 
                       onClick={sendMessage} 
                       className="send-message-btn"
@@ -1445,7 +1489,8 @@ const deleteMessage = async (messageId) => {
                         </button>
                         <button 
                           onClick={() => startChat(profile._id)}
-                          className="message-profile-btn"
+                          className="follow-btn"
+                          style={{ marginLeft: '12px' }}
                         >
                           <MessageCircle size={16} /> Написать
                         </button>
@@ -1522,12 +1567,6 @@ const deleteMessage = async (messageId) => {
                       className="suggestion-follow-btn"
                     >
                       <Users size={14} /> Подписаться
-                    </button>
-                    <button 
-                      onClick={() => startChat(suggestionUser._id)}
-                      className="suggestion-message-btn"
-                    >
-                      <MessageCircle size={14} /> Написать
                     </button>
                   </div>
                 </div>
