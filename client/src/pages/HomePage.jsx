@@ -689,6 +689,26 @@ const HomePage = () => {
         console.log('Current user data:', res.data.user);
         setUser(res.data.user);
         localStorage.setItem('user', JSON.stringify(res.data.user));
+        
+        // Очищаем любые "зависшие" звонки при загрузке
+        try {
+          await axios.get('https://server-u9ji.onrender.com/api/calls/active');
+        } catch (err) {
+          // Если есть активный звонок, пытаемся его завершить
+          if (err.response?.status === 409) {
+            console.log('Found stuck call, cleaning up...');
+            try {
+              const activeCallRes = await axios.get('https://server-u9ji.onrender.com/api/calls/active');
+              if (activeCallRes.data) {
+                await axios.post(`https://server-u9ji.onrender.com/api/calls/end/${activeCallRes.data._id}`);
+                console.log('Stuck call cleaned up');
+              }
+            } catch (cleanupErr) {
+              console.log('Could not cleanup stuck call:', cleanupErr);
+            }
+          }
+        }
+        
       } catch (error) {
         console.error('Auth check failed:', error);
         clearTokens();
@@ -776,12 +796,20 @@ const HomePage = () => {
   const endCall = async () => {
     if (!currentCall) return;
     
+    console.log('Ending call via API...');
+    
     try {
-      await axios.post(`https://server-u9ji.onrender.com/api/calls/end/${currentCall.callId}`);
-      setCurrentCall(null);
-      setIsIncomingCall(false);
+      const callId = currentCall.callId || currentCall._id;
+      await axios.post(`https://server-u9ji.onrender.com/api/calls/end/${callId}`);
+      console.log('Call ended successfully via API');
     } catch (err) {
       console.error('Ошибка завершения звонка:', err);
+      // Принудительно завершаем локально даже если API не сработал
+    } finally {
+      // В любом случае очищаем локальное состояние
+      setCurrentCall(null);
+      setIsIncomingCall(false);
+      console.log('Local call state cleared');
     }
   };
 
@@ -1473,22 +1501,24 @@ const HomePage = () => {
                     )}
                   </div>
                   <div className="chat-header">
-                    <h3>{activeChat.name}</h3>
-                    <div className="chat-call-buttons">
-                      <button 
-                        onClick={() => initiateCall('audio')}
-                        className="call-button audio-call"
-                        title="Голосовой звонок"
-                      >
-                        <Phone size={18} />
-                      </button>
-                      <button 
-                        onClick={() => initiateCall('video')}
-                        className="call-button video-call"
-                        title="Видео звонок"
-                      >
-                        <Video size={18} />
-                      </button>
+                    <div className="chat-header-content">
+                      <h3>{activeChat.name}</h3>
+                      <div className="chat-call-buttons">
+                        <button 
+                          onClick={() => initiateCall('audio')}
+                          className="call-button audio-call"
+                          title="Голосовой звонок"
+                        >
+                          <Phone size={18} />
+                        </button>
+                        <button 
+                          onClick={() => initiateCall('video')}
+                          className="call-button video-call"
+                          title="Видео звонок"
+                        >
+                          <Video size={18} />
+                        </button>
+                      </div>
                     </div>
                   </div>
                   

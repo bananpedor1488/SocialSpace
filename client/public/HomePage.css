@@ -2292,6 +2292,13 @@ body {
 }
 
 /* СТИЛИ ДЛЯ ЗВОНКОВ */
+.chat-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
 .chat-call-buttons {
   display: flex;
   gap: 8px;

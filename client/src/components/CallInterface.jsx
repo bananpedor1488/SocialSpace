@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Phone, PhoneOff, Mic, MicOff, Video, VideoOff, VolumeX, Volume2 } from 'lucide-react';
+import { checkWebRTCSupport, requestMediaPermissions, getOptimalConstraints, handleWebRTCError } from '../utils/webrtc';
 
 const CallInterface = ({ 
   call, 
@@ -47,6 +48,14 @@ const CallInterface = ({
     };
   }, [callStatus]);
 
+  // Автоматически начинаем звонок для инициатора
+  useEffect(() => {
+    if (call && !isIncoming && socket && callStatus === 'pending') {
+      console.log('Auto-starting call for initiator');
+      startCall();
+    }
+  }, [call, isIncoming, socket, callStatus]);
+
   useEffect(() => {
     if (!socket || !call) return;
 
@@ -72,17 +81,26 @@ const CallInterface = ({
     if (callId !== call?._id) return;
     
     try {
+      console.log('Received offer:', offer);
       await createPeerConnection();
+      
+      console.log('Setting remote description...');
       await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(offer));
       
+      console.log('Getting user media...');
       const stream = await getUserMedia();
+      
+      console.log('Adding tracks...');
       stream.getTracks().forEach(track => {
+        console.log('Adding track:', track.kind, track);
         peerConnectionRef.current.addTrack(track, stream);
       });
 
+      console.log('Creating answer...');
       const answer = await peerConnectionRef.current.createAnswer();
       await peerConnectionRef.current.setLocalDescription(answer);
 
+      console.log('Sending answer...');
       socket.emit('webrtc-answer', {
         callId: call._id,
         answer: answer,
@@ -141,29 +159,40 @@ const CallInterface = ({
     };
 
     peerConnectionRef.current.ontrack = (event) => {
-      if (remoteVideoRef.current) {
+      console.log('Received remote track:', event.track.kind, event.streams[0]);
+      if (remoteVideoRef.current && event.streams[0]) {
         remoteVideoRef.current.srcObject = event.streams[0];
+        console.log('Remote video assigned');
       }
     };
   };
 
   const getUserMedia = async () => {
     try {
-      const constraints = {
-        audio: true,
-        video: call?.type === 'video'
-      };
+      // Проверяем поддержку WebRTC
+      checkWebRTCSupport();
 
+      const constraints = getOptimalConstraints(call?.type);
+      console.log('Requesting media with constraints:', constraints);
+      
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       localStreamRef.current = stream;
 
+      console.log('Media stream obtained:', stream);
+      console.log('Audio tracks:', stream.getAudioTracks());
+      console.log('Video tracks:', stream.getVideoTracks());
+
+      // Настраиваем локальное видео
       if (localVideoRef.current && call?.type === 'video') {
         localVideoRef.current.srcObject = stream;
+        localVideoRef.current.muted = true; // Важно для локального видео
+        console.log('Local video assigned');
       }
 
       return stream;
     } catch (error) {
       console.error('Error accessing media devices:', error);
+      alert(handleWebRTCError(error));
       throw error;
     }
   };
@@ -176,16 +205,27 @@ const CallInterface = ({
 
   const startCall = async () => {
     try {
+      console.log('Starting call...');
       await createPeerConnection();
+      
       const stream = await getUserMedia();
       
+      console.log('Adding tracks to peer connection...');
       stream.getTracks().forEach(track => {
+        console.log('Adding track:', track.kind, track);
         peerConnectionRef.current.addTrack(track, stream);
       });
 
-      const offer = await peerConnectionRef.current.createOffer();
+      console.log('Creating offer...');
+      const offer = await peerConnectionRef.current.createOffer({
+        offerToReceiveAudio: true,
+        offerToReceiveVideo: call?.type === 'video'
+      });
+      
       await peerConnectionRef.current.setLocalDescription(offer);
+      console.log('Offer created and set as local description');
 
+      console.log('Sending offer via socket...');
       socket.emit('webrtc-offer', {
         callId: call._id,
         offer: offer,
@@ -211,21 +251,51 @@ const CallInterface = ({
     setCallStatus('declined');
   };
 
-  const endCall = () => {
-    onEndCall();
-    cleanupCall();
+  const endCall = async () => {
+    console.log('Ending call...');
+    try {
+      await onEndCall();
+      cleanupCall();
+    } catch (error) {
+      console.error('Error ending call:', error);
+      // Принудительно очищаем всё равно
+      cleanupCall();
+    }
   };
 
   const cleanupCall = () => {
+    console.log('Cleaning up call...');
+    
+    // Останавливаем все медиа треки
     if (localStreamRef.current) {
-      localStreamRef.current.getTracks().forEach(track => track.stop());
+      localStreamRef.current.getTracks().forEach(track => {
+        console.log('Stopping track:', track.kind);
+        track.stop();
+      });
+      localStreamRef.current = null;
     }
+    
+    // Закрываем peer connection
     if (peerConnectionRef.current) {
       peerConnectionRef.current.close();
+      peerConnectionRef.current = null;
     }
+    
+    // Очищаем таймер
     if (durationIntervalRef.current) {
       clearInterval(durationIntervalRef.current);
+      durationIntervalRef.current = null;
     }
+    
+    // Очищаем видео элементы
+    if (localVideoRef.current) {
+      localVideoRef.current.srcObject = null;
+    }
+    if (remoteVideoRef.current) {
+      remoteVideoRef.current.srcObject = null;
+    }
+    
+    console.log('Call cleanup completed');
   };
 
   const toggleAudio = () => {
