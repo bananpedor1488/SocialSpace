@@ -159,8 +159,6 @@ body.light-theme .call-type-indicator {
   height: 300px;
   object-fit: cover;
   background: #000;
-  /* Принудительно включаем звук */
-  volume: 1;
 }
 
 .local-video {
