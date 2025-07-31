@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import AuthPage from './pages/AuthPage';
-import Layout from './components/Layout';
-import Home from './pages/Home';
-import Messages from './pages/Messages';
-import Profile from './pages/Profile';
-import Search from './pages/Search';
+import HomePage from './pages/HomePage';
 import axios from 'axios';
 
 // Настройка axios interceptors для автоматической отправки токенов
@@ -119,12 +115,7 @@ function AppRouter() {
   return (
     <Routes>
       <Route path="/" element={<AuthPage />} />
-      <Route path="/" element={<Layout />}>
-        <Route path="home" element={<Home />} />
-        <Route path="messages" element={<Messages />} />
-        <Route path="profile/:userId?" element={<Profile />} />
-        <Route path="search" element={<Search />} />
-      </Route>
+      <Route path="/home" element={<HomePage />} />
     </Routes>
   );
 }
