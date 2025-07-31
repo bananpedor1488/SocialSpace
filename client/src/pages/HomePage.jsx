@@ -485,7 +485,7 @@ const HomePage = () => {
           _id: callData.callId,
           callId: callData.callId,
           caller: callData.caller,
-          callee: callData.callee || { _id: user._id, username: user.username },
+          callee: callData.callee,
           type: callData.type,
           status: 'pending'
         };
@@ -502,7 +502,7 @@ const HomePage = () => {
         const formattedCall = {
           _id: callData.callId,
           callId: callData.callId,
-          caller: callData.caller || { _id: user._id, username: user.username },
+          caller: callData.caller,
           callee: callData.callee,
           type: callData.type,
           status: 'pending'

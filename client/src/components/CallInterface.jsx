@@ -449,9 +449,12 @@ const CallInterface = ({
     const user = JSON.parse(localStorage.getItem('user'));
     const currentUserId = user?._id || user?.id;
     
+    // Определяем с кем ведется разговор (не кто звонит, а с кем говорим)
     if (call?.caller?._id === currentUserId) {
+      // Я звоню кому-то - показываем имя получателя
       return call?.callee?.username || 'Неизвестный';
     } else {
+      // Мне звонят - показываем имя звонящего
       return call?.caller?.username || 'Неизвестный';
     }
   };
