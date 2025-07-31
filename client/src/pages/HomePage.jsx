@@ -6,8 +6,10 @@ import { io } from 'socket.io-client';
 import {
   Home, MessageCircle, User, LogOut, Plus,
   Heart, MessageSquare, Repeat, Pencil, Trash2, Users, UserCheck, Send, X, ChevronDown,
-  Moon, Sun, Wifi, WifiOff, Flame, Clock
+  Moon, Sun, Wifi, WifiOff, Flame, Clock, Phone, Video
 } from 'lucide-react';
+
+import CallInterface from '../components/CallInterface';
 
 const HomePage = () => {
   const [user, setUser] = useState(null);
@@ -39,12 +41,27 @@ const HomePage = () => {
   const [messagesLoading, setMessagesLoading] = useState(false);
   const [totalUnread, setTotalUnread] = useState(0);
   const messagesEndRef = useRef(null);
+  // СОСТОЯНИЯ ДЛЯ ЗВОНКОВ
+  const [currentCall, setCurrentCall] = useState(null);
+  const [isIncomingCall, setIsIncomingCall] = useState(false);
 
   const navigate = useNavigate();
   const socketRef = useRef(null);
 
   // Список изменений версий
   const changelogData = [
+    {
+      version: '1.6',
+      date: '1 августа 2025',
+      changes: [
+        '📞 Голосовые звонки через WebRTC',
+        '📹 Видео звонки с поддержкой камеры',
+        '🎯 Красивые кнопки звонков в чатах',
+        '⚡ Управление микрофоном и камерой',
+        '🔔 Уведомления о входящих звонках',
+        '✨ Анимации и современный дизайн интерфейса'
+      ]
+    },
     {
       version: '1.5',
       date: '30 июля 2025',
@@ -458,6 +475,42 @@ const HomePage = () => {
           [chatId]: (prev[chatId] || []).filter(msg => msg._id !== messageId)
         }));
       });
+
+      // ОБРАБОТЧИКИ СОБЫТИЙ ЗВОНКОВ
+      socketRef.current.on('incomingCall', (callData) => {
+        console.log('Incoming call received:', callData);
+        setCurrentCall(callData);
+        setIsIncomingCall(true);
+      });
+
+      socketRef.current.on('callInitiated', (callData) => {
+        console.log('Call initiated:', callData);
+        setCurrentCall(callData);
+        setIsIncomingCall(false);
+      });
+
+      socketRef.current.on('callAccepted', ({ callId }) => {
+        console.log('Call accepted:', callId);
+        if (currentCall?._id === callId) {
+          setCurrentCall(prev => ({ ...prev, status: 'accepted' }));
+        }
+      });
+
+      socketRef.current.on('callDeclined', ({ callId }) => {
+        console.log('Call declined:', callId);
+        if (currentCall?._id === callId) {
+          setCurrentCall(null);
+          setIsIncomingCall(false);
+        }
+      });
+
+      socketRef.current.on('callEnded', ({ callId }) => {
+        console.log('Call ended:', callId);
+        if (currentCall?._id === callId) {
+          setCurrentCall(null);
+          setIsIncomingCall(false);
+        }
+      });
     };
 
     if (user) {
@@ -670,6 +723,58 @@ const HomePage = () => {
     } catch (err) {
       console.error('Ошибка загрузки рекомендаций:', err);
       setSuggestions([]);
+    }
+  };
+
+  // ФУНКЦИИ ДЛЯ ЗВОНКОВ
+  const initiateCall = async (type = 'audio') => {
+    if (!activeChat) return;
+    
+    try {
+      const response = await axios.post('https://server-u9ji.onrender.com/api/calls/initiate', {
+        chatId: activeChat._id,
+        type: type
+      });
+      
+      console.log('Call initiated successfully:', response.data);
+    } catch (err) {
+      console.error('Ошибка инициации звонка:', err);
+      alert('Не удалось начать звонок');
+    }
+  };
+
+  const acceptCall = async () => {
+    if (!currentCall) return;
+    
+    try {
+      await axios.post(`https://server-u9ji.onrender.com/api/calls/accept/${currentCall.callId}`);
+      console.log('Call accepted');
+    } catch (err) {
+      console.error('Ошибка принятия звонка:', err);
+    }
+  };
+
+  const declineCall = async () => {
+    if (!currentCall) return;
+    
+    try {
+      await axios.post(`https://server-u9ji.onrender.com/api/calls/decline/${currentCall.callId}`);
+      setCurrentCall(null);
+      setIsIncomingCall(false);
+    } catch (err) {
+      console.error('Ошибка отклонения звонка:', err);
+    }
+  };
+
+  const endCall = async () => {
+    if (!currentCall) return;
+    
+    try {
+      await axios.post(`https://server-u9ji.onrender.com/api/calls/end/${currentCall.callId}`);
+      setCurrentCall(null);
+      setIsIncomingCall(false);
+    } catch (err) {
+      console.error('Ошибка завершения звонка:', err);
     }
   };
 
@@ -1362,6 +1467,22 @@ const HomePage = () => {
                   </div>
                   <div className="chat-header">
                     <h3>{activeChat.name}</h3>
+                    <div className="chat-call-buttons">
+                      <button 
+                        onClick={() => initiateCall('audio')}
+                        className="call-button audio-call"
+                        title="Голосовой звонок"
+                      >
+                        <Phone size={18} />
+                      </button>
+                      <button 
+                        onClick={() => initiateCall('video')}
+                        className="call-button video-call"
+                        title="Видео звонок"
+                      >
+                        <Video size={18} />
+                      </button>
+                    </div>
                   </div>
                   
                   <div className="messages-area">
@@ -1576,6 +1697,18 @@ const HomePage = () => {
           )}
         </div>
       </aside>
+
+      {/* ИНТЕРФЕЙС ЗВОНКА */}
+      {currentCall && (
+        <CallInterface 
+          call={currentCall}
+          onEndCall={endCall}
+          onAcceptCall={acceptCall}
+          onDeclineCall={declineCall}
+          isIncoming={isIncomingCall}
+          socket={socketRef.current}
+        />
+      )}
     </div>
   );
 };
