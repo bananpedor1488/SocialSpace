@@ -7,7 +7,10 @@ const useOnlineStatus = (socket) => {
   const updateUserStatus = useCallback((userId, status) => {
     setOnlineUsers(prev => {
       const newMap = new Map(prev);
-      newMap.set(userId, status);
+      newMap.set(userId, {
+        ...status,
+        lastSeen: status.lastSeen ? new Date(status.lastSeen) : null
+      });
       return newMap;
     });
   }, []);
