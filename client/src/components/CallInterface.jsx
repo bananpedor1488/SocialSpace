@@ -862,6 +862,13 @@ const CallInterface = ({
               className="remote-video"
               autoPlay
               playsInline
+              onLoadedMetadata={() => {
+                if (remoteVideoRef.current) {
+                  remoteVideoRef.current.style.objectFit = 'cover';
+                  remoteVideoRef.current.style.width = '100%';
+                  remoteVideoRef.current.style.height = '100%';
+                }
+              }}
             />
             <video
               ref={localVideoRef}
@@ -869,6 +876,11 @@ const CallInterface = ({
               autoPlay
               playsInline
               muted
+              onLoadedMetadata={() => {
+                if (localVideoRef.current) {
+                  localVideoRef.current.style.objectFit = 'cover';
+                }
+              }}
             />
             {call.type === 'audio' && (
               <div className="upgraded-call-indicator">
