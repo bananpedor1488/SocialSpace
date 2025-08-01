@@ -469,6 +469,41 @@
 
 /* Убрали анимацию пульсации для call-status */
 
+/* Пульсация при входящем звонке */
+.call-interface.incoming {
+  animation: incoming-pulse 2s infinite;
+}
+
+@keyframes incoming-pulse {
+  0%, 100% {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 0 0 0 rgba(59, 130, 246, 0.4);
+  }
+  50% {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 0 0 10px rgba(59, 130, 246, 0);
+  }
+}
+
+/* Эффект размытия фона при звонке */
+.call-interface-overlay.blur-effect {
+  backdrop-filter: blur(25px);
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.85));
+}
+
+/* Счетчик времени */
+.call-timer {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: rgba(15, 23, 42, 0.9);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
 /* Адаптивность */
 @media (max-width: 640px) {
   .call-interface {
@@ -540,5 +575,12 @@
     width: 28px;
     height: 28px;
     padding: 0.25rem;
+  }
+  
+  .call-timer {
+    top: 0.5rem;
+    left: 0.5rem;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
   }
 }
