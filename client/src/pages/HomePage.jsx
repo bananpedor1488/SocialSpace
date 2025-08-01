@@ -1229,6 +1229,25 @@ const HomePage = () => {
     }
   };
 
+  const handleDeletePost = async (postId) => {
+    if (!confirm('Вы уверены, что хотите удалить этот пост?')) {
+      return;
+    }
+    
+    try {
+      await axios.delete(`https://server-u9ji.onrender.com/api/posts/${postId}`);
+      
+      // Удаляем пост из локального состояния
+      setPosts(prevPosts => prevPosts.filter(post => post._id !== postId));
+      setProfilePosts(prevProfilePosts => prevProfilePosts.filter(post => post._id !== postId));
+      
+      console.log('Пост успешно удален');
+    } catch (err) {
+      console.error('Ошибка удаления поста:', err);
+      alert('Не удалось удалить пост. Попробуйте еще раз.');
+    }
+  };
+
   const handleSearch = async (e) => {
     const query = e.target.value;
     setSearchQuery(query);
