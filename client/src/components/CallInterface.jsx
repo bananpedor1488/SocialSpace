@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Phone, PhoneOff, Mic, MicOff, Video, VideoOff, VolumeX, Volume2 } from 'lucide-react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { Phone, PhoneOff, Mic, MicOff, Video, VideoOff, Volume2, Settings } from 'lucide-react';
 import { checkWebRTCSupport, requestMediaPermissions, getOptimalConstraints, handleWebRTCError } from '../utils/webrtc';
 
 const CallInterface = ({ 
@@ -26,9 +26,9 @@ const CallInterface = ({
   const durationIntervalRef = useRef(null);
 
   // ICE серверы для WebRTC
-  // Пул публичных STUN/TURN-узлов (можно легко заменить на свои)
-  const iceServers = {
-    iceServers: [
+  // Профили ICE-серверов для переключения во время звонка
+  const ICE_PROFILES = {
+    auto: [
       // Google STUN
       { urls: 'stun:stun.l.google.com:19302' },
       { urls: 'stun:stun1.l.google.com:19302' },
@@ -46,8 +46,33 @@ const CallInterface = ({
 
       // AnyFirewall (Германия) — общественный TCP-TURN
       { urls: 'turn:turn.anyfirewall.com:443?transport=tcp',    username: 'webrtc', credential: 'webrtc' }
+    ],
+    
+    openrelay: [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'turn:global.relay.metered.ca:80',   username: 'openrelayproject', credential: 'openrelayproject' },
+      { urls: 'turn:global.relay.metered.ca:443',  username: 'openrelayproject', credential: 'openrelayproject' },
+      { urls: 'turn:global.relay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' }
+    ],
+    
+    expressturn: [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'turn:relay1.expressturn.com:3478',               username: 'ef727d', credential: 'webrtcdemo' },
+      { urls: 'turn:relay1.expressturn.com:443?transport=tcp',  username: 'ef727d', credential: 'webrtcdemo' }
+    ],
+    
+    anyfirewall: [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'turn:turn.anyfirewall.com:443?transport=tcp',    username: 'webrtc', credential: 'webrtc' }
     ]
   };
+
+  const [serverKey, setServerKey] = useState('auto');
+  
+  // Динамическая ICE-конфигурация
+  const currentIceConfig = useMemo(() => ({
+    iceServers: ICE_PROFILES[serverKey] || ICE_PROFILES.auto
+  }), [serverKey]);
 
   useEffect(() => {
     if (callStatus === 'accepted') {
@@ -179,6 +204,15 @@ const CallInterface = ({
     socket.on('callDeclined', handleCallDeclined);
     socket.on('callEnded', handleCallEnded);
     socket.on('call-video-upgrade', handleVideoUpgrade);
+    
+    // Обработка смены ICE-профиля
+    const handleServerChange = async ({ callId, serverKey }) => {
+      if (callId !== call._id) return;
+      console.log(`Received server change request to: ${serverKey}`);
+      await switchIceProfile(serverKey);
+    };
+    
+    socket.on('webrtc-change-server', handleServerChange);
 
     return () => {
       socket.off('webrtc-offer', handleReceiveOffer);
@@ -188,6 +222,7 @@ const CallInterface = ({
       socket.off('callDeclined', handleCallDeclined);
       socket.off('callEnded', handleCallEnded);
       socket.off('call-video-upgrade', handleVideoUpgrade);
+      socket.off('webrtc-change-server', handleServerChange);
     };
   }, [socket, call]);
 
@@ -275,7 +310,7 @@ const CallInterface = ({
   };
 
   const createPeerConnection = async () => {
-    peerConnectionRef.current = new RTCPeerConnection(iceServers);
+    peerConnectionRef.current = new RTCPeerConnection(currentIceConfig);
 
     peerConnectionRef.current.onicecandidate = (event) => {
       if (event.candidate) {
@@ -438,6 +473,54 @@ const CallInterface = ({
       console.error('Error ending call:', error);
       // Принудительно очищаем всё равно
       cleanupCall();
+    }
+  };
+
+  // Функция переключения ICE-профиля во время звонка
+  const switchIceProfile = async (newKey) => {
+    if (newKey === serverKey || callStatus !== 'accepted') return;
+    
+    console.log(`Switching ICE profile from ${serverKey} to ${newKey}`);
+    setServerKey(newKey);
+
+    const targetUserId = getTargetUserId();
+
+    try {
+      // 1. Закрываем старое соединение
+      if (peerConnectionRef.current) {
+        peerConnectionRef.current.close();
+      }
+
+      // 2. Создаём заново с новым профилем
+      await createPeerConnection();
+
+      // 3. Добавляем существующие треки
+      if (localStreamRef.current) {
+        localStreamRef.current.getTracks().forEach(track => {
+          peerConnectionRef.current.addTrack(track, localStreamRef.current);
+        });
+      }
+
+      // 4. Создаём новый offer с iceRestart
+      const offer = await peerConnectionRef.current.createOffer({ iceRestart: true });
+      await peerConnectionRef.current.setLocalDescription(offer);
+
+      // 5. Отправляем offer и уведомление о смене профиля
+      socket.emit('webrtc-offer', {
+        callId: call._id,
+        offer: offer,
+        targetUserId: targetUserId
+      });
+
+      socket.emit('webrtc-change-server', {
+        callId: call._id,
+        serverKey: newKey,
+        targetUserId: targetUserId
+      });
+
+      console.log(`ICE profile switched to ${newKey}`);
+    } catch (error) {
+      console.error('Error switching ICE profile:', error);
     }
   };
 
@@ -753,6 +836,22 @@ const CallInterface = ({
               </button>
               
               {/* Кнопка для принудительного включения звука */}
+              {/* Селектор ICE-профиля */}
+              <div className="ice-profile-selector">
+                <select
+                  value={serverKey}
+                  onChange={(e) => switchIceProfile(e.target.value)}
+                  className="ice-select"
+                  title="Выбор TURN/STUN сервера"
+                >
+                  <option value="auto">Auto (Все)</option>
+                  <option value="openrelay">OpenRelay</option>
+                  <option value="expressturn">ExpressTurn</option>
+                  <option value="anyfirewall">AnyFirewall</option>
+                </select>
+                <Settings size={16} className="ice-select-icon" />
+              </div>
+
               <button 
                 onClick={() => {
                   if (remoteAudioRef.current) {
