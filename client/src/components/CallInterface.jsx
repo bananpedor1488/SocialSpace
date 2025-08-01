@@ -68,6 +68,10 @@ const CallInterface = ({
   };
 
   const [serverKey, setServerKey] = useState('auto');
+  const [serverPing, setServerPing] = useState(null);
+  const [connectionType, setConnectionType] = useState('unknown');
+  const [dataReceived, setDataReceived] = useState(0);
+  const [dataSent, setDataSent] = useState(0);
   
   // Динамическая ICE-конфигурация
   const currentIceConfig = useMemo(() => ({
@@ -148,6 +152,12 @@ const CallInterface = ({
       });
       
       const lossRate = packetsReceived > 0 ? (packetsLost / packetsReceived) * 100 : 0;
+      
+      // Обновляем метрики в реальном времени
+      setServerPing(Math.round(roundTripTime));
+      setConnectionType(connectionType);
+      setDataReceived(bytesReceived);
+      setDataSent(bytesSent);
       
       // Улучшенная логика определения качества
       let quality = 'excellent';
@@ -718,6 +728,32 @@ const CallInterface = ({
               <h3 className="call-username">{getCallerName()}</h3>
               <p className="call-status">{getCallStatusText()}</p>
               
+              {/* Метрики соединения в реальном времени */}
+              {callStatus === 'accepted' && (
+                <div className="connection-metrics">
+                  <div className="metric ping">
+                    <span className="metric-label">📡</span>
+                    <span className={`metric-value ${serverPing > 200 ? 'poor' : serverPing > 100 ? 'fair' : 'good'}`}>
+                      {serverPing ? `${serverPing}ms` : '---'}
+                    </span>
+                  </div>
+                  <div className="metric connection">
+                    <span className="metric-label">🔗</span>
+                    <span className="metric-value">
+                      {connectionType === 'relay' ? 'TURN' : 
+                       connectionType === 'srflx' ? 'STUN' : 
+                       connectionType === 'host' ? 'P2P' : '?'}
+                    </span>
+                  </div>
+                  <div className="metric data">
+                    <span className="metric-label">📊</span>
+                    <span className="metric-value">
+                      ↓{(dataReceived / 1024 / 1024).toFixed(1)} ↑{(dataSent / 1024 / 1024).toFixed(1)}MB
+                    </span>
+                  </div>
+                </div>
+              )}
+
               {/* Индикатор качества сети */}
               {callStatus === 'accepted' && (
                 <div className={`network-quality ${networkQuality}`}>
