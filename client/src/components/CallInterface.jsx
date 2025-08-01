@@ -74,6 +74,7 @@ const CallInterface = ({
   const [dataSent, setDataSent] = useState(0);
   const [showAdvancedMetrics, setShowAdvancedMetrics] = useState(false);
   const [showServerSelector, setShowServerSelector] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   
   // Динамическая ICE-конфигурация
   const currentIceConfig = useMemo(() => ({
@@ -121,6 +122,7 @@ const CallInterface = ({
       let audioBytes = 0;
       let videoBytes = 0;
       let connectionType = 'unknown';
+      let audioLevel = 0;
       
       stats.forEach(stat => {
         // Входящий трафик
@@ -132,6 +134,8 @@ const CallInterface = ({
           
           if (stat.mediaType === 'audio') {
             audioBytes += stat.bytesReceived || 0;
+            // Детекция звука собеседника
+            audioLevel = stat.audioLevel || 0;
           } else if (stat.mediaType === 'video') {
             videoBytes += stat.bytesReceived || 0;
           }
@@ -152,6 +156,9 @@ const CallInterface = ({
           connectionType = stat.candidateType; // 'host', 'srflx', 'relay'
         }
       });
+      
+      // Детекция активности звука (если есть входящий аудио трафик)
+      setIsSpeaking(audioBytes > 0 && audioLevel > 0.01);
       
       const lossRate = packetsReceived > 0 ? (packetsLost / packetsReceived) * 100 : 0;
       
@@ -723,7 +730,7 @@ const CallInterface = ({
       <div className="call-interface" style={{ position: 'relative' }}>
         <div className="call-header">
           <div className="call-user-info">
-            <div className="call-avatar">
+            <div className={`call-avatar ${isSpeaking ? 'speaking' : ''}`}>
               {getCallerName().charAt(0).toUpperCase()}
             </div>
             <div className="call-details">
