@@ -131,9 +131,10 @@
   justify-content: center;
   gap: 0.5rem;
   margin: 1rem 0;
-  padding: 0.5rem;
-  border-radius: 8px;
-  background: rgba(15, 23, 42, 0.4);
+  padding: 0.75rem;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .signal-bars {
@@ -166,6 +167,27 @@
 .quality-text {
   font-size: 0.875rem;
   font-weight: 500;
+  color: #374151;
+}
+
+.connection-details {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.stat {
+  font-size: 0.75rem;
+  color: #6b7280;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.quality-info {
+  text-align: center;
 }
 
 /* Видео области */
@@ -416,8 +438,8 @@
   
   .video-container {
     margin: 0.75rem 0;
-    max-height: 200px;
-    aspect-ratio: 16/10;
+    max-height: 250px;
+    aspect-ratio: 16/9;
   }
   
   .local-video {
