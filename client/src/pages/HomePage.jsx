@@ -10,7 +10,6 @@ import {
 } from 'lucide-react';
 
 import CallInterface from '../components/CallInterface';
-import CallMessage from '../components/CallMessage';
 import OnlineStatus from '../components/OnlineStatus';
 import useOnlineStatus from '../hooks/useOnlineStatus';
 
@@ -822,54 +821,10 @@ const HomePage = () => {
     }
   };
 
+  // Убрали логирование звонков в чат - они больше не отображаются как сообщения
   const logCallToChat = async (callData) => {
-    if (!currentCall) return;
-    
-    // Находим чат с участником звонка
-    const otherUserId = currentCall.caller?._id === (user._id || user.id) ? 
-                       currentCall.callee?._id : currentCall.caller?._id;
-    
-    const targetChat = chats.find(chat => 
-      chat.participants.some(p => p._id === otherUserId)
-    );
-    
-    if (!targetChat) return;
-    
-    try {
-      const callMessage = {
-        type: 'call',
-        content: 'Звонок',
-        callData: {
-          direction: callData.direction, // 'incoming' or 'outgoing'
-          status: callData.status, // 'answered', 'declined', 'missed', 'ended'
-          duration: callData.duration || 0,
-          callType: currentCall.type // 'audio' or 'video'
-        }
-      };
-      
-      // Отправляем на сервер как специальное сообщение
-      const response = await axios.post(`https://server-u9ji.onrender.com/api/messages/chats/${targetChat._id}/messages`, callMessage);
-      
-      // Добавляем в локальные сообщения
-      const callMsg = {
-        ...response.data,
-        type: 'call',
-        callData: callMessage.callData,
-        sender: {
-          _id: user._id || user.id,
-          username: user.username
-        },
-        createdAt: new Date().toISOString()
-      };
-      
-      setMessages(prev => ({
-        ...prev,
-        [targetChat._id]: [...(prev[targetChat._id] || []), callMsg]
-      }));
-      
-    } catch (error) {
-      console.error('Ошибка записи звонка в чат:', error);
-    }
+    // Ничего не делаем - звонки не записываются в чат
+    return;
   };
 
   const acceptCall = async () => {
@@ -1012,7 +967,6 @@ const HomePage = () => {
     try {
       const res = await axios.get(`https://server-u9ji.onrender.com/api/messages/chats/${chatId}/messages`);
       console.log('Messages loaded for chat:', res.data);
-      console.log('Call messages found:', res.data.filter(msg => msg.type === 'call')); // Отладка звонков
       setMessages(prev => ({ ...prev, [chatId]: res.data }));
       
       // Загружаем онлайн статусы участников чата
@@ -1752,20 +1706,9 @@ const HomePage = () => {
                     ) : (
                       <>
                         {(messages[activeChat._id] || []).map(message => {
-                          // Проверяем, является ли сообщение записью о звонке
-                          console.log('Message type check:', message.type, message); // Отладка
+                          // Пропускаем сообщения о звонках - не отображаем их
                           if (message.type === 'call') {
-                            console.log('Rendering CallMessage for:', message); // Отладка
-                            return (
-                              <CallMessage
-                                key={message._id}
-                                message={message}
-                                isOwn={message.sender._id === (user._id || user.id)}
-                                onRetryCall={initiateCall}
-                                activeChat={activeChat}
-                                user={user}
-                              />
-                            );
+                            return null;
                           }
                           
                           // Обычное сообщение
