@@ -26,10 +26,19 @@ const CallInterface = ({
   const durationIntervalRef = useRef(null);
 
   // ICE серверы для WebRTC
+  // Расширенный список ICE-серверов (STUN + TURN)
+  // Бесплатный TURN от metered.ca подойдёт для тестов; для продакшена лучше развернуть свой coturn.
   const iceServers = {
     iceServers: [
+      // STUN
       { urls: 'stun:stun.l.google.com:19302' },
-      { urls: 'stun:stun1.l.google.com:19302' }
+      { urls: 'stun:stun1.l.google.com:19302' },
+
+      // TURN (UDP)
+      { urls: 'turn:global.relay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
+      // TURN (TCP) — поможет, если UDP блокируется
+      { urls: 'turn:global.relay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
+      { urls: 'turn:global.relay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' }
     ]
   };
 
