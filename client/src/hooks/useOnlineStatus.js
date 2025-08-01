@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import axios from 'axios';
 
 const useOnlineStatus = (socket) => {
   const [onlineUsers, setOnlineUsers] = useState(new Map());
@@ -20,22 +21,22 @@ const useOnlineStatus = (socket) => {
     if (!userIds || userIds.length === 0) return {};
     
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('accessToken');
       const baseURL = window.location.hostname === 'localhost' ? 
         'http://localhost:3000' : 
         'https://server-u9ji.onrender.com';
       
       console.log(`Fetching online status for users: ${userIds.join(',')}`);
       
-      const response = await fetch(`${baseURL}/api/users/online-status?userIds=${userIds.join(',')}`, {
+      const response = await axios.get(`${baseURL}/api/users/online-status`, {
+        params: { userIds: userIds.join(',') },
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Authorization': `Bearer ${token}`
         }
       });
 
-      if (response.ok) {
-        const statusMap = await response.json();
+      if (response.status === 200) {
+        const statusMap = response.data;
         console.log('Online status received:', statusMap);
         
         // Обновляем локальное состояние
@@ -45,7 +46,7 @@ const useOnlineStatus = (socket) => {
         
         return statusMap;
       } else {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        throw new Error(`HTTP ${response.status}`);
       }
     } catch (error) {
       console.error('Error fetching online status:', error);
