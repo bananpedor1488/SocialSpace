@@ -892,10 +892,26 @@ const HomePage = () => {
   };
 
   // ФУНКЦИИ ДЛЯ ЧАТОВ
+
+  // Предзагрузка сообщений для чатов
+  const preloadMessages = async (chatId) => {
+    // Не загружаем, если уже есть сообщения этого чата в стейте
+    if (messages[chatId]) return;
+    try {
+      const res = await axios.get(`https://server-u9ji.onrender.com/api/messages/chats/${chatId}/messages`);
+      setMessages(prev => ({ ...prev, [chatId]: res.data }));
+    } catch (err) {
+      console.error('Ошибка предзагрузки сообщений:', err);
+    }
+  };
+
   const loadChats = async () => {
     try {
       const res = await axios.get('https://server-u9ji.onrender.com/api/messages/chats');
       setChats(res.data);
+
+      // Предзагружаем сообщения для каждого чата, чтобы они были сразу доступны
+      res.data.forEach(chat => preloadMessages(chat._id));
       
       // Собираем ID всех участников всех чатов для загрузки онлайн статусов
       const allParticipantIds = new Set();
