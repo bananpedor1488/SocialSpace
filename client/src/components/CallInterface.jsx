@@ -730,7 +730,7 @@ const CallInterface = ({
       <div className="call-interface" style={{ position: 'relative' }}>
         <div className="call-header">
           <div className="call-user-info">
-            <div className={`call-avatar ${isSpeaking ? 'speaking' : ''}`}>
+            <div className={`call-avatar ${callStatus === 'pending' ? 'calling' : ''} ${isSpeaking ? 'speaking' : ''}`}>
               {getCallerName().charAt(0).toUpperCase()}
             </div>
             <div className="call-details">

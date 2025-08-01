@@ -55,6 +55,25 @@
   box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
   border: 3px solid rgba(255, 255, 255, 0.2);
   position: relative;
+  overflow: hidden;
+}
+
+/* Синяя волна при дозвоне */
+.call-avatar.calling::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { 
+    transform: translateX(-100%) rotate(45deg); 
+  }
+  100% { 
+    transform: translateX(100%) rotate(45deg); 
+  }
 }
 
 /* Волны от аватарки при активном звуке */
@@ -448,9 +467,7 @@
   }
 }
 
-.call-status {
-  /* Убрали анимацию пульсации */
-}
+/* Убрали анимацию пульсации для call-status */
 
 /* Адаптивность */
 @media (max-width: 640px) {
