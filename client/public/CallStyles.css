@@ -133,8 +133,8 @@
   margin: 1rem 0;
   padding: 0.75rem;
   border-radius: 12px;
-  background: rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .signal-bars {
@@ -167,7 +167,7 @@
 .quality-text {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #374151;
+  color: white;
 }
 
 .connection-details {
@@ -179,11 +179,11 @@
 
 .stat {
   font-size: 0.75rem;
-  color: #6b7280;
-  background: rgba(0, 0, 0, 0.05);
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
   padding: 0.25rem 0.5rem;
   border-radius: 6px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .quality-info {
@@ -303,10 +303,10 @@
 }
 
 .server-btn {
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 6px;
-  color: #374151;
+  color: white;
   padding: 0.375rem 0.5rem;
   font-size: 0.75rem;
   cursor: pointer;
@@ -316,13 +316,14 @@
   gap: 0.25rem;
   min-width: 80px;
   justify-content: space-between;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(8px);
 }
 
 .server-btn:hover {
-  background: rgba(255, 255, 255, 1);
-  border-color: rgba(59, 130, 246, 0.3);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: rgba(15, 23, 42, 1);
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
 }
 
 .server-name {
@@ -337,23 +338,24 @@
   position: absolute;
   top: 100%;
   right: 0;
-  background: white;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 6px;
   z-index: 25;
   min-width: 120px;
   margin-top: 0.25rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(12px);
   overflow: hidden;
 }
 
 .dropdown-option {
   padding: 0.5rem 0.75rem;
   font-size: 0.75rem;
-  color: #374151;
+  color: white;
   cursor: pointer;
   transition: background 0.2s ease;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .dropdown-option:last-child {
@@ -361,15 +363,15 @@
 }
 
 .dropdown-option:hover {
-  background: #f3f4f6;
+  background: rgba(59, 130, 246, 0.2);
 }
 
 /* Кнопка информации */
 .info-btn {
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 6px;
-  color: #374151;
+  color: white;
   padding: 0.375rem;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -378,17 +380,18 @@
   justify-content: center;
   width: 32px;
   height: 32px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(8px);
 }
 
 .info-btn:hover {
-  background: rgba(255, 255, 255, 1);
-  border-color: rgba(59, 130, 246, 0.3);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: rgba(15, 23, 42, 1);
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
 }
 
 .info-btn:active {
-  background: rgba(59, 130, 246, 0.1);
+  background: rgba(59, 130, 246, 0.4);
 }
 
 /* Анимации */
