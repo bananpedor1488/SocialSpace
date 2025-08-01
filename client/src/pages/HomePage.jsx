@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 
 import CallInterface from '../components/CallInterface';
+import CallMessage from '../components/CallMessage';
 import OnlineStatus from '../components/OnlineStatus';
 import useOnlineStatus from '../hooks/useOnlineStatus';
 
@@ -1752,53 +1753,14 @@ const HomePage = () => {
                           // Проверяем, является ли сообщение записью о звонке
                           if (message.type === 'call') {
                             return (
-                              <div 
-                                key={message._id} 
-                                className={`message call-message ${message.sender._id === (user._id || user.id) ? 'own' : 'other'}`}
-                                onClick={() => {
-                                  if (message.callData?.status !== 'answered') {
-                                    // Перезвонить при клике на пропущенный/отклоненный звонок
-                                    const otherUser = activeChat.participants.find(p => p._id !== (user._id || user.id));
-                                    if (otherUser) {
-                                      initiateCall(otherUser._id, 'audio');
-                                    }
-                                  }
-                                }}
-                              >
-                                <div className="call-message-content">
-                                  <div className="call-icon">
-                                    {message.callData?.direction === 'incoming' ? (
-                                      message.callData?.status === 'answered' ? '📞' : 
-                                      message.callData?.status === 'missed' ? '📵' : '📞'
-                                    ) : (
-                                      message.callData?.status === 'answered' ? '📱' : 
-                                      message.callData?.status === 'declined' ? '📵' : '📱'
-                                    )}
-                                  </div>
-                                  <div className="call-details">
-                                    <div className="call-type">
-                                      {message.callData?.direction === 'incoming' ? 
-                                        (message.callData?.status === 'answered' ? 'Входящий звонок' : 
-                                         message.callData?.status === 'missed' ? 'Пропущенный звонок' : 'Входящий звонок') :
-                                        (message.callData?.status === 'answered' ? 'Исходящий звонок' : 
-                                         message.callData?.status === 'declined' ? 'Отклоненный звонок' : 'Исходящий звонок')
-                                      }
-                                    </div>
-                                    <div className="call-duration">
-                                      {message.callData?.duration ? 
-                                        `${Math.floor(message.callData.duration / 60)}:${(message.callData.duration % 60).toString().padStart(2, '0')}` : 
-                                        'Не отвечен'
-                                      }
-                                    </div>
-                                  </div>
-                                  <div className="call-time">
-                                    {new Date(message.createdAt).toLocaleTimeString('ru-RU', {
-                                      hour: '2-digit',
-                                      minute: '2-digit'
-                                    })}
-                                  </div>
-                                </div>
-                              </div>
+                              <CallMessage
+                                key={message._id}
+                                message={message}
+                                isOwn={message.sender._id === (user._id || user.id)}
+                                onRetryCall={initiateCall}
+                                activeChat={activeChat}
+                                user={user}
+                              />
                             );
                           }
                           

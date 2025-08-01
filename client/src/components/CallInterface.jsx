@@ -24,6 +24,7 @@ const CallInterface = ({
   const peerConnectionRef = useRef(null);
   const callStartTimeRef = useRef(null);
   const durationIntervalRef = useRef(null);
+  const pendingOfferRef = useRef(null);
 
   // ICE серверы для WebRTC
   // Профили ICE-серверов для переключения во время звонка
@@ -258,30 +259,11 @@ const CallInterface = ({
     
     try {
       console.log('Received offer:', offer);
-      await createPeerConnection();
       
-      console.log('Setting remote description...');
-      await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(offer));
+      // Сохраняем offer для использования после принятия звонка
+      pendingOfferRef.current = { offer, fromUserId };
       
-      console.log('Getting user media...');
-      const stream = await getUserMedia();
-      
-      console.log('Adding tracks...');
-      stream.getTracks().forEach(track => {
-        console.log('Adding track:', track.kind, track);
-        peerConnectionRef.current.addTrack(track, stream);
-      });
-
-      console.log('Creating answer...');
-      const answer = await peerConnectionRef.current.createAnswer();
-      await peerConnectionRef.current.setLocalDescription(answer);
-
-      console.log('Sending answer...');
-      socket.emit('webrtc-answer', {
-        callId: call._id,
-        answer: answer,
-        targetUserId: fromUserId
-      });
+      console.log('Offer saved, waiting for user to accept call');
     } catch (error) {
       console.error('Error handling offer:', error);
     }
@@ -468,17 +450,65 @@ const CallInterface = ({
     }
   };
 
+  const processStoredOffer = async () => {
+    if (!pendingOfferRef.current) return;
+    
+    const { offer, fromUserId } = pendingOfferRef.current;
+    
+    try {
+      console.log('Processing stored offer after call acceptance');
+      await createPeerConnection();
+      
+      console.log('Setting remote description...');
+      await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(offer));
+      
+      console.log('Getting user media after accepting call...');
+      const stream = await getUserMedia();
+      
+      console.log('Adding tracks...');
+      stream.getTracks().forEach(track => {
+        console.log('Adding track:', track.kind, track);
+        peerConnectionRef.current.addTrack(track, stream);
+      });
+
+      console.log('Creating answer...');
+      const answer = await peerConnectionRef.current.createAnswer();
+      await peerConnectionRef.current.setLocalDescription(answer);
+
+      console.log('Sending answer...');
+      socket.emit('webrtc-answer', {
+        callId: call._id,
+        answer: answer,
+        targetUserId: fromUserId
+      });
+      
+      // Очищаем сохраненный offer
+      pendingOfferRef.current = null;
+    } catch (error) {
+      console.error('Error processing stored offer:', error);
+    }
+  };
+
   const acceptCall = async () => {
     try {
       await onAcceptCall();
-      await startCall();
       setCallStatus('accepted');
+      
+      // Обрабатываем сохраненный offer если это входящий звонок
+      if (isIncoming && pendingOfferRef.current) {
+        await processStoredOffer();
+      } else {
+        // Для исходящих звонков запускаем обычный процесс
+        await startCall();
+      }
     } catch (error) {
       console.error('Error accepting call:', error);
     }
   };
 
   const declineCall = () => {
+    // Очищаем сохраненный offer при отклонении
+    pendingOfferRef.current = null;
     onDeclineCall();
     setCallStatus('declined');
   };
@@ -598,6 +628,9 @@ const CallInterface = ({
       remoteAudioRef.current.srcObject = null;
       remoteAudioRef.current.pause();
     }
+    
+    // Очищаем сохраненный offer
+    pendingOfferRef.current = null;
     
     // Сбрасываем состояния кнопок
     setIsAudioEnabled(true);
