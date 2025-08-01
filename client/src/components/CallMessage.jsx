@@ -78,8 +78,9 @@ const CallMessage = ({
   const shouldShowRetry = (isMissed || isDeclined) && onRetryCall;
   
   return (
-    <div className={`call-message-bubble ${isOwn ? 'own' : 'other'} ${shouldShowRetry ? 'clickable' : ''}`}
-         onClick={shouldShowRetry ? handleRetryCall : undefined}>
+    <div className={`call-message-wrapper`}>
+      <div className={`call-message-bubble ${isOwn ? 'own' : 'other'} ${shouldShowRetry ? 'clickable' : ''}`}
+           onClick={shouldShowRetry ? handleRetryCall : undefined}>
       <div className="call-message-header">
         <div className="call-icon-wrapper" style={{ color: getIconColor() }}>
           {getCallIcon()}
@@ -114,6 +115,7 @@ const CallMessage = ({
           <span>Нажмите для повторного звонка</span>
         </div>
       )}
+      </div>
     </div>
   );
 };
