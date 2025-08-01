@@ -2628,6 +2628,14 @@ body {
   --online-pulse: rgba(76, 175, 80, 0.4);
 }
 
+/* Основные стили статус точки */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
 /* Переопределяем цвета статуса для темы */
 .status-indicator.online .status-dot {
   background: var(--online-color);

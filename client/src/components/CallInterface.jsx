@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Phone, PhoneOff, Mic, MicOff, Video, VideoOff, Volume2, Settings } from 'lucide-react';
+import { Phone, PhoneOff, Mic, MicOff, Video, VideoOff, Volume2, Settings, Info, ChevronDown } from 'lucide-react';
 import { checkWebRTCSupport, requestMediaPermissions, getOptimalConstraints, handleWebRTCError } from '../utils/webrtc';
 
 const CallInterface = ({ 
@@ -72,6 +72,8 @@ const CallInterface = ({
   const [connectionType, setConnectionType] = useState('unknown');
   const [dataReceived, setDataReceived] = useState(0);
   const [dataSent, setDataSent] = useState(0);
+  const [showAdvancedMetrics, setShowAdvancedMetrics] = useState(false);
+  const [showServerSelector, setShowServerSelector] = useState(false);
   
   // Динамическая ICE-конфигурация
   const currentIceConfig = useMemo(() => ({
@@ -718,7 +720,7 @@ const CallInterface = ({
 
   return (
     <div className="call-interface-overlay">
-      <div className="call-interface">
+      <div className="call-interface" style={{ position: 'relative' }}>
         <div className="call-header">
           <div className="call-user-info">
             <div className="call-avatar">
@@ -728,8 +730,57 @@ const CallInterface = ({
               <h3 className="call-username">{getCallerName()}</h3>
               <p className="call-status">{getCallStatusText()}</p>
               
-              {/* Метрики соединения в реальном времени */}
+              {/* Контролы в правом верхнем углу */}
               {callStatus === 'accepted' && (
+                <div className="call-top-controls">
+                  {/* Кнопка выбора сервера */}
+                  <div className="server-selector-dropdown">
+                    <button 
+                      className="server-btn"
+                      onClick={() => setShowServerSelector(!showServerSelector)}
+                      title="Выбор TURN/STUN сервера"
+                    >
+                      <Settings size={14} />
+                      <span className="server-name">
+                        {serverKey === 'auto' ? 'Auto' : 
+                         serverKey === 'openrelay' ? 'OpenRelay' :
+                         serverKey === 'expressturn' ? 'ExpressTurn' :
+                         serverKey === 'anyfirewall' ? 'AnyFirewall' : 'Auto'}
+                      </span>
+                      <ChevronDown size={12} />
+                    </button>
+                    
+                    {showServerSelector && (
+                      <div className="server-dropdown">
+                        <div className="dropdown-option" onClick={() => { switchIceProfile('auto'); setShowServerSelector(false); }}>
+                          Auto (Все)
+                        </div>
+                        <div className="dropdown-option" onClick={() => { switchIceProfile('openrelay'); setShowServerSelector(false); }}>
+                          OpenRelay
+                        </div>
+                        <div className="dropdown-option" onClick={() => { switchIceProfile('expressturn'); setShowServerSelector(false); }}>
+                          ExpressTurn
+                        </div>
+                        <div className="dropdown-option" onClick={() => { switchIceProfile('anyfirewall'); setShowServerSelector(false); }}>
+                          AnyFirewall
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Кнопка расширенной информации */}
+                  <button 
+                    className="info-btn"
+                    onClick={() => setShowAdvancedMetrics(!showAdvancedMetrics)}
+                    title="Подробная информация о соединении"
+                  >
+                    <Info size={14} />
+                  </button>
+                </div>
+              )}
+
+              {/* Расширенные метрики (показываются по клику) */}
+              {callStatus === 'accepted' && showAdvancedMetrics && (
                 <div className="connection-metrics">
                   <div className="metric ping">
                     <span className="metric-label">📡</span>
@@ -872,21 +923,7 @@ const CallInterface = ({
               </button>
               
               {/* Кнопка для принудительного включения звука */}
-              {/* Селектор ICE-профиля */}
-              <div className="ice-profile-selector">
-                <select
-                  value={serverKey}
-                  onChange={(e) => switchIceProfile(e.target.value)}
-                  className="ice-select"
-                  title="Выбор TURN/STUN сервера"
-                >
-                  <option value="auto">Auto (Все)</option>
-                  <option value="openrelay">OpenRelay</option>
-                  <option value="expressturn">ExpressTurn</option>
-                  <option value="anyfirewall">AnyFirewall</option>
-                </select>
-                <Settings size={16} className="ice-select-icon" />
-              </div>
+
 
               <button 
                 onClick={() => {
