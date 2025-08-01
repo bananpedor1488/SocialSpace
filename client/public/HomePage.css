@@ -2725,6 +2725,63 @@ body {
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
 }
 
+/* Стили для обновленного профиля */
+.profile-avatar-section {
+  margin-right: 20px;
+}
+
+.profile-header-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.profile-display-name {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #2d3748;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-settings-btn {
+  background: none;
+  border: 2px solid #e2e8f0;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #4a5568;
+  transition: all 0.2s;
+}
+
+.profile-settings-btn:hover {
+  border-color: #667eea;
+  color: #667eea;
+  background: rgba(102, 126, 234, 0.05);
+  transform: rotate(45deg);
+}
+
+.profile-bio {
+  margin: 8px 0 16px 0;
+  color: #4a5568;
+  font-size: 16px;
+  line-height: 1.4;
+  max-width: 400px;
+}
+
+.profile-main-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
 /* Адаптация для мобильных устройств */
 @media (max-width: 768px) {
   .chat-header-row {
@@ -2738,4 +2795,90 @@ body {
   .status-text {
     font-size: 11px;
   }
+  
+  .profile-main-info {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+  }
+  
+  .profile-avatar-section {
+    margin-right: 0;
+  }
+  
+  .profile-header-row {
+    justify-content: center;
+  }
+  
+  .profile-display-name {
+    font-size: 20px;
+  }
+}
+
+/* Стили для постов с аватарками */
+.post-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.post-avatar {
+  cursor: pointer;
+}
+
+.post-author-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.post-author {
+  font-weight: 600;
+  color: #2d3748;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.post-author:hover {
+  color: #667eea;
+}
+
+.post-username {
+  font-size: 13px;
+  color: #718096;
+}
+
+.post-date {
+  font-size: 13px;
+  color: #a0aec0;
+  margin-left: auto;
+}
+
+/* Стили для рекомендаций с аватарками */
+.suggestion-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.suggestion-display-name {
+  font-weight: 600;
+  color: #2d3748;
+  display: block;
+}
+
+.suggestion-username {
+  font-size: 13px;
+  color: #718096;
+  display: block;
+}
+
+.suggestion-stats {
+  font-size: 12px;
+  color: #a0aec0;
+  display: block;
 }

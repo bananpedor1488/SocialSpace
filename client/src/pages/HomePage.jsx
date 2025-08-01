@@ -6,17 +6,20 @@ import { io } from 'socket.io-client';
 import {
   Home, MessageCircle, User, LogOut, Plus,
   Heart, MessageSquare, Repeat, Pencil, Trash2, Users, UserCheck, Send, X, ChevronDown,
-  Moon, Sun, Wifi, WifiOff, Flame, Clock, Phone, Video
+  Moon, Sun, Wifi, WifiOff, Flame, Clock, Phone, Video, Settings
 } from 'lucide-react';
 
 import CallInterface from '../components/CallInterface';
 import OnlineStatus from '../components/OnlineStatus';
+import ProfileSettings from '../components/ProfileSettings';
+import Avatar from '../components/Avatar';
 import useOnlineStatus from '../hooks/useOnlineStatus';
 
 const HomePage = () => {
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('home');
   const [postText, setPostText] = useState('');
+  const [showProfileSettings, setShowProfileSettings] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [posts, setPosts] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
@@ -827,6 +830,15 @@ const HomePage = () => {
     return;
   };
 
+  // Обновление профиля пользователя
+  const handleProfileUpdate = (updatedUser) => {
+    setUser(updatedUser);
+    // Также обновляем profile если это текущий пользователь
+    if (profile?._id === updatedUser._id || profile?.id === updatedUser.id) {
+      setProfile(updatedUser);
+    }
+  };
+
   const acceptCall = async () => {
     if (!currentCall) return;
     
@@ -1342,25 +1354,41 @@ const HomePage = () => {
           )}
           
           <div className="post-header">
-            <div className="post-user-info">
-              <div className="user-details">
-                <span className="username">
-                  @{post.isRepost ? post.originalPost?.author?.username || 'Unknown' : post.username || 'Unknown'}
-                </span>
-                <span className="post-date">
-                  {post.isRepost && post.originalPost?.createdAt 
-                    ? new Date(post.originalPost.createdAt).toLocaleDateString('ru-RU', {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })
-                    : post.date
-                  }
-                </span>
-              </div>
+            <Avatar 
+              src={post.isRepost ? post.originalPost?.author?.avatar : post.avatar}
+              alt={post.isRepost ? post.originalPost?.author?.displayName || post.originalPost?.author?.username : post.displayName || post.username}
+              size="medium"
+              onClick={() => loadUserProfile(post.isRepost ? post.originalPost?.author?._id : post.userId)}
+              className="post-avatar"
+            />
+            <div className="post-author-info">
+              <span className="post-author" onClick={() => loadUserProfile(post.isRepost ? post.originalPost?.author?._id : post.userId)}>
+                {post.isRepost 
+                  ? post.originalPost?.author?.displayName || post.originalPost?.author?.username || 'Unknown'
+                  : post.displayName || post.username || 'Unknown'
+                }
+              </span>
+              <span className="post-username">
+                @{post.isRepost ? post.originalPost?.author?.username || 'Unknown' : post.username || 'Unknown'}
+              </span>
             </div>
+            <span className="post-date">
+              {post.isRepost && post.originalPost?.createdAt 
+                ? new Date(post.originalPost.createdAt).toLocaleDateString('ru-RU', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })
+                : post.date
+              }
+            </span>
+            {(post.isRepost ? post.originalPost?.author?._id : post.userId) === (user._id || user.id) && (
+              <button onClick={() => handleDeletePost(post.isRepost ? post.originalPost?._id || post._id : post._id)} className="delete-btn">
+                <Trash2 size={16} />
+              </button>
+            )}
           </div>
           
           <div className="post-content">
@@ -1789,16 +1817,37 @@ const HomePage = () => {
             <div className="profile-header">
               <div className="profile-content">
                 <div className="profile-main-info">
+                  <div className="profile-avatar-section">
+                    <Avatar 
+                      src={profile.avatar} 
+                      alt={profile.displayName || profile.username}
+                      size="xlarge"
+                    />
+                  </div>
                   <div className="profile-info">
-                    <h2 className="profile-username">
-                      {profile.username}
+                    <div className="profile-header-row">
+                      <h2 className="profile-display-name">
+                        {profile.displayName || profile.username}
+                        {isOwnProfile() && (
+                          <span className="own-profile-badge">
+                            <UserCheck size={16} /> Ваш профиль
+                          </span>
+                        )}
+                      </h2>
                       {isOwnProfile() && (
-                        <span className="own-profile-badge">
-                          <UserCheck size={16} /> Ваш профиль
-                        </span>
+                        <button 
+                          className="profile-settings-btn"
+                          onClick={() => setShowProfileSettings(true)}
+                          title="Настройки профиля"
+                        >
+                          <Settings size={20} />
+                        </button>
                       )}
-                    </h2>
+                    </div>
                     <p className="profile-handle">@{profile.username}</p>
+                    {profile.bio && (
+                      <p className="profile-bio">{profile.bio}</p>
+                    )}
                     
                     <div className="profile-stats">
                       <div className="profile-stat">
@@ -1897,13 +1946,21 @@ const HomePage = () => {
           {suggestions.length > 0 ? (
             suggestions.map(suggestionUser => (
               <div key={suggestionUser._id} className="user-suggestion">
-                <div className="suggestion-info">
-                  <div className="suggestion-user-details">
-                    <span className="suggestion-username">@{suggestionUser.username}</span>
-                    <span className="suggestion-stats">
-                      {suggestionUser.followersCount || 0} подписчиков
-                    </span>
-                  </div>
+                                      <div className="suggestion-info">
+                        <Avatar 
+                          src={suggestionUser.avatar}
+                          alt={suggestionUser.displayName || suggestionUser.username}
+                          size="medium"
+                        />
+                        <div className="suggestion-user-details">
+                          <span className="suggestion-display-name">
+                            {suggestionUser.displayName || suggestionUser.username}
+                          </span>
+                          <span className="suggestion-username">@{suggestionUser.username}</span>
+                          <span className="suggestion-stats">
+                            {suggestionUser.followersCount || 0} подписчиков
+                          </span>
+                        </div>
                   <div className="suggestion-actions">
                     <button 
                       onClick={() => toggleFollow(suggestionUser._id)}
@@ -1922,14 +1979,23 @@ const HomePage = () => {
       </aside>
 
       {/* ИНТЕРФЕЙС ЗВОНКА */}
-      {currentCall && (
-        <CallInterface 
+            {currentCall && (
+        <CallInterface
           call={currentCall}
           onEndCall={endCall}
           onAcceptCall={acceptCall}
           onDeclineCall={declineCall}
           isIncoming={isIncomingCall}
           socket={socketRef.current}
+        />
+      )}
+      
+      {showProfileSettings && (
+        <ProfileSettings
+          isOpen={showProfileSettings}
+          onClose={() => setShowProfileSettings(false)}
+          user={user}
+          onProfileUpdate={handleProfileUpdate}
         />
       )}
     </div>
