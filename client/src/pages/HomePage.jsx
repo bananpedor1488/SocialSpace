@@ -1230,7 +1230,7 @@ const HomePage = () => {
   };
 
   const handleDeletePost = async (postId) => {
-    if (!confirm('Вы уверены, что хотите удалить этот пост?')) {
+    if (!window.confirm('Вы уверены, что хотите удалить этот пост?')) {
       return;
     }
     
@@ -1374,21 +1374,21 @@ const HomePage = () => {
           
           <div className="post-header">
             <Avatar 
-              src={post.isRepost ? post.originalPost?.author?.avatar : post.avatar}
-              alt={post.isRepost ? post.originalPost?.author?.displayName || post.originalPost?.author?.username : post.displayName || post.username}
+              src={post.isRepost ? post.originalPost?.author?.avatar : post.author?.avatar}
+              alt={post.isRepost ? post.originalPost?.author?.displayName || post.originalPost?.author?.username : post.author?.displayName || post.author?.username}
               size="medium"
-              onClick={() => loadUserProfile(post.isRepost ? post.originalPost?.author?._id : post.userId)}
+              onClick={() => loadUserProfile(post.isRepost ? post.originalPost?.author?._id : post.author?._id || post.userId)}
               className="post-avatar"
             />
             <div className="post-author-info">
-              <span className="post-author" onClick={() => loadUserProfile(post.isRepost ? post.originalPost?.author?._id : post.userId)}>
+              <span className="post-author" onClick={() => loadUserProfile(post.isRepost ? post.originalPost?.author?._id : post.author?._id || post.userId)}>
                 {post.isRepost 
                   ? post.originalPost?.author?.displayName || post.originalPost?.author?.username || 'Unknown'
-                  : post.displayName || post.username || 'Unknown'
+                  : post.author?.displayName || post.author?.username || post.displayName || post.username || 'Unknown'
                 }
               </span>
               <span className="post-username">
-                @{post.isRepost ? post.originalPost?.author?.username || 'Unknown' : post.username || 'Unknown'}
+                @{post.isRepost ? post.originalPost?.author?.username || 'Unknown' : post.author?.username || post.username || 'Unknown'}
               </span>
             </div>
             <span className="post-date">
