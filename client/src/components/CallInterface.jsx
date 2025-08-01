@@ -26,19 +26,26 @@ const CallInterface = ({
   const durationIntervalRef = useRef(null);
 
   // ICE серверы для WebRTC
-  // Расширенный список ICE-серверов (STUN + TURN)
-  // Бесплатный TURN от metered.ca подойдёт для тестов; для продакшена лучше развернуть свой coturn.
+  // Пул публичных STUN/TURN-узлов (можно легко заменить на свои)
   const iceServers = {
     iceServers: [
-      // STUN
+      // Google STUN
       { urls: 'stun:stun.l.google.com:19302' },
       { urls: 'stun:stun1.l.google.com:19302' },
+      { urls: 'stun:stun2.l.google.com:19302' },
+      { urls: 'stun:stun3.l.google.com:19302' },
 
-      // TURN (UDP)
-      { urls: 'turn:global.relay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
-      // TURN (TCP) — поможет, если UDP блокируется
-      { urls: 'turn:global.relay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
-      { urls: 'turn:global.relay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' }
+      // OpenRelay (Канада / NL)
+      { urls: 'turn:global.relay.metered.ca:80',   username: 'openrelayproject', credential: 'openrelayproject' },
+      { urls: 'turn:global.relay.metered.ca:443',  username: 'openrelayproject', credential: 'openrelayproject' },
+      { urls: 'turn:global.relay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' },
+
+      // EXPRESSTURN (USA / EU) — демо-учётка 1 Мбит/с
+      { urls: 'turn:relay1.expressturn.com:3478',               username: 'ef727d', credential: 'webrtcdemo' },
+      { urls: 'turn:relay1.expressturn.com:443?transport=tcp',  username: 'ef727d', credential: 'webrtcdemo' },
+
+      // AnyFirewall (Германия) — общественный TCP-TURN
+      { urls: 'turn:turn.anyfirewall.com:443?transport=tcp',    username: 'webrtc', credential: 'webrtc' }
     ]
   };
 
