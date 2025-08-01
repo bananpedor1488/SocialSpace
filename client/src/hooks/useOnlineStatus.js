@@ -13,17 +13,27 @@ const useOnlineStatus = (socket) => {
   }, []);
 
   // Получение онлайн статуса пользователей через API
-  const fetchOnlineStatus = useCallback(async (userIds) => {
+  const fetchOnlineStatus = useCallback(async (userIds, retryCount = 0) => {
+    if (!userIds || userIds.length === 0) return {};
+    
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/users/online-status?userIds=${userIds.join(',')}`, {
+      const baseURL = window.location.hostname === 'localhost' ? 
+        'http://localhost:3000' : 
+        'https://server-u9ji.onrender.com';
+      
+      console.log(`Fetching online status for users: ${userIds.join(',')}`);
+      
+      const response = await fetch(`${baseURL}/api/users/online-status?userIds=${userIds.join(',')}`, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       });
 
       if (response.ok) {
         const statusMap = await response.json();
+        console.log('Online status received:', statusMap);
         
         // Обновляем локальное состояние
         Object.entries(statusMap).forEach(([userId, status]) => {
@@ -31,9 +41,19 @@ const useOnlineStatus = (socket) => {
         });
         
         return statusMap;
+      } else {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
     } catch (error) {
       console.error('Error fetching online status:', error);
+      
+      // Retry механизм (максимум 2 попытки)
+      if (retryCount < 2) {
+        console.log(`Retrying online status fetch, attempt ${retryCount + 1}`);
+        setTimeout(() => {
+          fetchOnlineStatus(userIds, retryCount + 1);
+        }, 1000 * (retryCount + 1)); // Экспоненциальная задержка
+      }
     }
     return {};
   }, [updateUserStatus]);
@@ -50,6 +70,7 @@ const useOnlineStatus = (socket) => {
 
     // Обработчики Socket.IO событий
     const handleUserOnline = ({ userId, username, timestamp }) => {
+      console.log('User came online:', userId, username);
       updateUserStatus(userId, {
         username,
         isOnline: true,
@@ -58,6 +79,7 @@ const useOnlineStatus = (socket) => {
     };
 
     const handleUserOffline = ({ userId, username, lastSeen }) => {
+      console.log('User went offline:', userId, username);
       updateUserStatus(userId, {
         username,
         isOnline: false,
@@ -65,9 +87,18 @@ const useOnlineStatus = (socket) => {
       });
     };
 
+    // Синхронизация всех онлайн пользователей при подключении
+    const handleOnlineUsersSync = ({ users }) => {
+      console.log('Syncing online users:', users);
+      Object.entries(users).forEach(([userId, status]) => {
+        updateUserStatus(userId, status);
+      });
+    };
+
     // Подписываемся на события
     socket.on('userOnline', handleUserOnline);
     socket.on('userOffline', handleUserOffline);
+    socket.on('onlineUsersSync', handleOnlineUsersSync);
 
     // Настраиваем heartbeat каждые 30 секунд
     const heartbeatInterval = setInterval(sendHeartbeat, 30000);
@@ -75,6 +106,7 @@ const useOnlineStatus = (socket) => {
     return () => {
       socket.off('userOnline', handleUserOnline);
       socket.off('userOffline', handleUserOffline);
+      socket.off('onlineUsersSync', handleOnlineUsersSync);
       clearInterval(heartbeatInterval);
     };
   }, [socket, updateUserStatus, sendHeartbeat]);

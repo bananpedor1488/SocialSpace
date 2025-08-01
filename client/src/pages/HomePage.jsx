@@ -897,6 +897,24 @@ const HomePage = () => {
       const res = await axios.get('https://server-u9ji.onrender.com/api/messages/chats');
       setChats(res.data);
       
+      // Собираем ID всех участников всех чатов для загрузки онлайн статусов
+      const allParticipantIds = new Set();
+      res.data.forEach(chat => {
+        if (chat.participants) {
+          chat.participants.forEach(participant => {
+            if (participant._id !== user._id && participant._id !== user.id) {
+              allParticipantIds.add(participant._id);
+            }
+          });
+        }
+      });
+      
+      // Загружаем онлайн статусы всех участников
+      if (allParticipantIds.size > 0) {
+        console.log('Loading online status for all chat participants:', Array.from(allParticipantIds));
+        await fetchOnlineStatus(Array.from(allParticipantIds));
+      }
+      
       const unreadRes = await axios.get('https://server-u9ji.onrender.com/api/messages/unread-count');
       setTotalUnread(unreadRes.data.totalUnread);
     } catch (err) {
@@ -912,6 +930,19 @@ const HomePage = () => {
       const res = await axios.get(`https://server-u9ji.onrender.com/api/messages/chats/${chatId}/messages`);
       setMessages(prev => ({ ...prev, [chatId]: res.data }));
       
+      // Загружаем онлайн статусы участников чата
+      const currentChat = chats.find(chat => chat._id === chatId);
+      if (currentChat && currentChat.participants) {
+        const participantIds = currentChat.participants
+          .filter(p => p._id !== user._id && p._id !== user.id)
+          .map(p => p._id);
+        
+        if (participantIds.length > 0) {
+          console.log('Loading online status for chat participants:', participantIds);
+          await fetchOnlineStatus(participantIds);
+        }
+      }
+      
       // Отмечаем как прочитанные
       await axios.put(`https://server-u9ji.onrender.com/api/messages/chats/${chatId}/read`);
       
@@ -919,7 +950,6 @@ const HomePage = () => {
         chat._id === chatId ? { ...chat, unreadCount: 0 } : chat
       ));
       
-      const currentChat = chats.find(chat => chat._id === chatId);
       setTotalUnread(prev => Math.max(0, prev - (currentChat?.unreadCount || 0)));
     } catch (err) {
       console.error('Ошибка загрузки сообщений:', err);
