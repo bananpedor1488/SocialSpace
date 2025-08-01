@@ -14,7 +14,7 @@
 }
 
 .profile-settings-modal {
-  background: white;
+  background: var(--modal-bg, white);
   border-radius: 12px;
   width: 90%;
   max-width: 500px;
@@ -22,6 +22,23 @@
   overflow: hidden;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   animation: slideIn 0.3s ease-out;
+  color: var(--text-color, #2d3748);
+}
+
+/* Темная тема для модального окна */
+[data-theme="dark"] .profile-settings-modal {
+  --modal-bg: #1e293b;
+  --text-color: #e2e8f0;
+  --border-color: #374151;
+  --input-bg: #374151;
+  --input-text: #e2e8f0;
+  --label-color: #d1d5db;
+  --hint-color: #9ca3af;
+  --avatar-border: #4b5563;
+  --btn-bg: #374151;
+  --btn-hover: #4b5563;
+  --btn-text: #e2e8f0;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
 }
 
 .profile-settings-header {
@@ -69,7 +86,7 @@
   align-items: center;
   gap: 8px;
   font-weight: 600;
-  color: #2d3748;
+  color: var(--label-color, #2d3748);
   margin-bottom: 8px;
   font-size: 14px;
 }
@@ -78,12 +95,14 @@
 .setting-textarea {
   width: 100%;
   padding: 12px 16px;
-  border: 2px solid #e2e8f0;
+  border: 2px solid var(--border-color, #e2e8f0);
   border-radius: 8px;
   font-size: 14px;
   transition: border-color 0.2s, box-shadow 0.2s;
   font-family: inherit;
   resize: none;
+  background: var(--input-bg, white);
+  color: var(--input-text, #2d3748);
 }
 
 .setting-input:focus,
@@ -96,7 +115,7 @@
 .setting-hint {
   margin-top: 6px;
   font-size: 12px;
-  color: #718096;
+  color: var(--hint-color, #718096);
   margin-bottom: 0;
 }
 
@@ -114,7 +133,7 @@
   border-radius: 50%;
   cursor: pointer;
   overflow: hidden;
-  border: 3px solid #e2e8f0;
+  border: 3px solid var(--avatar-border, #e2e8f0);
   transition: border-color 0.2s;
 }
 
@@ -135,8 +154,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #f7fafc;
-  color: #a0aec0;
+  background: var(--input-bg, #f7fafc);
+  color: var(--hint-color, #a0aec0);
   font-size: 11px;
   text-align: center;
 }
@@ -172,7 +191,7 @@
 
 .avatar-info .avatar-hint {
   font-size: 12px;
-  color: #718096;
+  color: var(--hint-color, #718096);
 }
 
 /* Футер */
@@ -181,8 +200,8 @@
   gap: 12px;
   justify-content: flex-end;
   padding: 20px 24px;
-  border-top: 1px solid #e2e8f0;
-  background: #f8fafc;
+  border-top: 1px solid var(--border-color, #e2e8f0);
+  background: var(--input-bg, #f8fafc);
 }
 
 .cancel-btn,
@@ -199,14 +218,14 @@
 }
 
 .cancel-btn {
-  background: white;
-  border: 2px solid #e2e8f0;
-  color: #4a5568;
+  background: var(--btn-bg, white);
+  border: 2px solid var(--border-color, #e2e8f0);
+  color: var(--btn-text, #4a5568);
 }
 
 .cancel-btn:hover {
-  border-color: #cbd5e0;
-  background: #f7fafc;
+  border-color: var(--btn-hover, #cbd5e0);
+  background: var(--btn-hover, #f7fafc);
 }
 
 .save-btn {

@@ -2747,6 +2747,11 @@ body {
   gap: 8px;
 }
 
+/* Исправление цвета отображаемого имени в профиле в темной теме */
+[data-theme="dark"] .profile-display-name {
+  color: #e2e8f0;
+}
+
 .profile-settings-btn {
   background: none;
   border: 2px solid #e2e8f0;
@@ -2842,6 +2847,11 @@ body {
   transition: color 0.2s;
 }
 
+/* Исправление цвета автора поста в темной теме */
+[data-theme="dark"] .post-author {
+  color: #e2e8f0;
+}
+
 .post-author:hover {
   color: #667eea;
 }
@@ -2869,6 +2879,11 @@ body {
   font-weight: 600;
   color: #2d3748;
   display: block;
+}
+
+/* Исправление цвета имени в рекомендациях в темной теме */
+[data-theme="dark"] .suggestion-display-name {
+  color: #e2e8f0;
 }
 
 .suggestion-username {
