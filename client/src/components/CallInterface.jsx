@@ -725,22 +725,9 @@ const CallInterface = ({
 
   if (!call) return null;
 
-  const formatCallDuration = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
-
   return (
-    <div className={`call-interface-overlay ${callStatus === 'accepted' ? 'blur-effect' : ''}`}>
-      <div className={`call-interface ${isIncoming && callStatus === 'pending' ? 'incoming' : ''}`} style={{ position: 'relative' }}>
-        
-        {/* Счетчик времени */}
-        {callStatus === 'accepted' && (
-          <div className="call-timer">
-            {formatCallDuration(callDuration)}
-          </div>
-        )}
+    <div className="call-interface-overlay">
+      <div className="call-interface" style={{ position: 'relative' }}>
         <div className="call-header">
           <div className="call-user-info">
             <div className={`call-avatar ${callStatus === 'pending' ? 'calling' : ''} ${isSpeaking ? 'speaking' : ''}`}>
