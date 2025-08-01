@@ -2599,3 +2599,68 @@ body {
     height: 56px;
   }
 }
+
+/* Стили для онлайн статуса в чатах */
+.chat-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.chat-name {
+  flex: 1;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Цвета для онлайн статуса в светлой теме */
+:root {
+  --online-color: #4CAF50;
+  --offline-color: #757575;
+  --online-pulse: rgba(76, 175, 80, 0.3);
+}
+
+/* Цвета для онлайн статуса в темной теме */
+[data-theme="dark"] {
+  --online-color: #4CAF50;
+  --offline-color: #9E9E9E;
+  --online-pulse: rgba(76, 175, 80, 0.4);
+}
+
+/* Переопределяем цвета статуса для темы */
+.status-indicator.online .status-dot {
+  background: var(--online-color);
+}
+
+.status-indicator.offline .status-dot {
+  background: var(--offline-color);
+}
+
+.status-pulse {
+  border-color: var(--online-color);
+}
+
+/* Стили для чат элементов с онлайн статусом */
+.chat-item .online-status {
+  margin-left: auto;
+}
+
+.chat-title-section .online-status {
+  margin-top: 4px;
+}
+
+/* Адаптация для мобильных устройств */
+@media (max-width: 768px) {
+  .chat-header-row {
+    gap: 6px;
+  }
+  
+  .chat-name {
+    font-size: 14px;
+  }
+  
+  .status-text {
+    font-size: 11px;
+  }
+}

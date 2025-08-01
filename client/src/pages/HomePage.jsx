@@ -10,6 +10,8 @@ import {
 } from 'lucide-react';
 
 import CallInterface from '../components/CallInterface';
+import OnlineStatus from '../components/OnlineStatus';
+import useOnlineStatus from '../hooks/useOnlineStatus';
 
 const HomePage = () => {
   const [user, setUser] = useState(null);
@@ -44,9 +46,13 @@ const HomePage = () => {
   // СОСТОЯНИЯ ДЛЯ ЗВОНКОВ
   const [currentCall, setCurrentCall] = useState(null);
   const [isIncomingCall, setIsIncomingCall] = useState(false);
+  const [userStatuses, setUserStatuses] = useState({}); // Онлайн статусы пользователей
 
   const navigate = useNavigate();
   const socketRef = useRef(null);
+  
+  // Хук для онлайн статуса
+  const { onlineUsers, fetchOnlineStatus, getUserStatus } = useOnlineStatus(socketRef.current);
 
   // Список изменений версий
   const changelogData = [
@@ -539,6 +545,15 @@ const HomePage = () => {
             console.log('Media cleanup attempt');
           });
         }
+      });
+
+      // ОНЛАЙН СТАТУСЫ ПОЛЬЗОВАТЕЛЕЙ
+      socketRef.current.on('user-status-update', ({ userId, username, isOnline, status, lastSeen }) => {
+        setUserStatuses(prev => ({
+          ...prev,
+          [userId]: { username, isOnline, status, lastSeen: new Date(lastSeen) }
+        }));
+        console.log(`👤 ${username} is now ${status}`);
       });
     };
 
@@ -1535,7 +1550,22 @@ const HomePage = () => {
                       onClick={() => { setActiveChat(chat); loadMessages(chat._id); }}
                     >
                       <div className="chat-info">
-                        <div className="chat-name">{chat.name}</div>
+                        <div className="chat-header-row">
+                          <div className="chat-name">{chat.name}</div>
+                          {chat.participants && chat.participants.length === 2 && (() => {
+                            const otherUser = chat.participants.find(p => p._id !== user._id && p._id !== user.id);
+                            const userStatus = getUserStatus(otherUser?._id);
+                            return (
+                              <OnlineStatus
+                                userId={otherUser?._id}
+                                isOnline={userStatus.isOnline}
+                                lastSeen={userStatus.lastSeen}
+                                showText={false}
+                                size="small"
+                              />
+                            );
+                          })()}
+                        </div>
                         {chat.lastMessage && (
                           <div className="chat-last-message">
                             {chat.lastMessage.sender.username}: {chat.lastMessage.content.substring(0, 30)}...
@@ -1565,7 +1595,23 @@ const HomePage = () => {
                   </div>
                   <div className="chat-header">
                     <div className="chat-header-content">
-                      <h3>{activeChat.name}</h3>
+                      <div className="chat-title-section">
+                        <h3>{activeChat.name}</h3>
+                        {/* Онлайн статус собеседника */}
+                        {activeChat.participants && activeChat.participants.length === 2 && (() => {
+                          const otherUser = activeChat.participants.find(p => p._id !== user._id && p._id !== user.id);
+                          const userStatus = getUserStatus(otherUser?._id);
+                          return (
+                            <OnlineStatus
+                              userId={otherUser?._id}
+                              isOnline={userStatus.isOnline}
+                              lastSeen={userStatus.lastSeen}
+                              showText={true}
+                              size="medium"
+                            />
+                          );
+                        })()}
+                      </div>
                       <div className="chat-call-buttons">
                         <button 
                           onClick={() => initiateCall('audio')}

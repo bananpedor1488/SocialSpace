@@ -14,6 +14,8 @@ const CallInterface = ({
   const [isVideoEnabled, setIsVideoEnabled] = useState(call?.type === 'video');
   const [callDuration, setCallDuration] = useState(0);
   const [callStatus, setCallStatus] = useState(call?.status || 'pending');
+  const [networkQuality, setNetworkQuality] = useState('good'); // 'excellent', 'good', 'poor', 'bad'
+  const [connectionStats, setConnectionStats] = useState(null);
   
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
@@ -57,6 +59,91 @@ const CallInterface = ({
     }
   }, [call, isIncoming, socket, callStatus]);
 
+  // Мониторинг качества сети (улучшенная версия)
+  const updateNetworkQuality = async () => {
+    if (!peerConnectionRef.current) return;
+    
+    try {
+      const stats = await peerConnectionRef.current.getStats();
+      let bytesReceived = 0;
+      let bytesSent = 0;
+      let packetsLost = 0;
+      let packetsReceived = 0;
+      let jitter = 0;
+      let roundTripTime = 0;
+      let audioBytes = 0;
+      let videoBytes = 0;
+      let connectionType = 'unknown';
+      
+      stats.forEach(stat => {
+        // Входящий трафик
+        if (stat.type === 'inbound-rtp') {
+          bytesReceived += stat.bytesReceived || 0;
+          packetsLost += stat.packetsLost || 0;
+          packetsReceived += stat.packetsReceived || 0;
+          jitter = Math.max(jitter, stat.jitter || 0);
+          
+          if (stat.mediaType === 'audio') {
+            audioBytes += stat.bytesReceived || 0;
+          } else if (stat.mediaType === 'video') {
+            videoBytes += stat.bytesReceived || 0;
+          }
+        }
+        
+        // Исходящий трафик
+        if (stat.type === 'outbound-rtp') {
+          bytesSent += stat.bytesSent || 0;
+        }
+        
+        // Информация о соединении
+        if (stat.type === 'candidate-pair' && stat.state === 'succeeded') {
+          roundTripTime = stat.currentRoundTripTime * 1000 || 0; // в миллисекундах
+        }
+        
+        // Тип соединения
+        if (stat.type === 'local-candidate' && stat.candidateType) {
+          connectionType = stat.candidateType; // 'host', 'srflx', 'relay'
+        }
+      });
+      
+      const lossRate = packetsReceived > 0 ? (packetsLost / packetsReceived) * 100 : 0;
+      
+      // Улучшенная логика определения качества
+      let quality = 'excellent';
+      if (lossRate > 8 || roundTripTime > 300 || jitter > 0.03) {
+        quality = 'poor';
+      } else if (lossRate > 4 || roundTripTime > 200 || jitter > 0.02) {
+        quality = 'fair';
+      } else if (lossRate > 1 || roundTripTime > 100 || jitter > 0.01) {
+        quality = 'good';
+      }
+      
+      setNetworkQuality(quality);
+      setConnectionStats({ 
+        bytesReceived, 
+        bytesSent, 
+        packetsLost, 
+        lossRate: Math.round(lossRate * 100) / 100,
+        jitter: Math.round(jitter * 1000 * 100) / 100, // в миллисекундах
+        roundTripTime: Math.round(roundTripTime),
+        audioBytes,
+        videoBytes,
+        connectionType
+      });
+      
+    } catch (error) {
+      console.log('Stats error:', error);
+    }
+  };
+
+  // Периодическое обновление статистики
+  useEffect(() => {
+    if (callStatus === 'accepted') {
+      const interval = setInterval(updateNetworkQuality, 2000);
+      return () => clearInterval(interval);
+    }
+  }, [callStatus]);
+
   // Очистка при размонтировании компонента
   useEffect(() => {
     return () => {
@@ -75,6 +162,7 @@ const CallInterface = ({
     socket.on('callAccepted', handleCallAccepted);
     socket.on('callDeclined', handleCallDeclined);
     socket.on('callEnded', handleCallEnded);
+    socket.on('call-video-upgrade', handleVideoUpgrade);
 
     return () => {
       socket.off('webrtc-offer', handleReceiveOffer);
@@ -83,8 +171,17 @@ const CallInterface = ({
       socket.off('callAccepted', handleCallAccepted);
       socket.off('callDeclined', handleCallDeclined);
       socket.off('callEnded', handleCallEnded);
+      socket.off('call-video-upgrade', handleVideoUpgrade);
     };
   }, [socket, call]);
+
+  const handleVideoUpgrade = ({ callId, userId }) => {
+    if (callId !== call?._id) return;
+    
+    console.log('Участник звонка включил видео:', userId);
+    // Показываем уведомление или обновляем UI
+    // В будущем можно добавить всплывающее уведомление
+  };
 
   const handleReceiveOffer = async ({ callId, offer, fromUserId }) => {
     if (callId !== call?._id) return;
@@ -408,8 +505,57 @@ const CallInterface = ({
     }
   };
 
-  const toggleVideo = () => {
-    if (localStreamRef.current && call?.type === 'video') {
+  const toggleVideo = async () => {
+    if (call?.type === 'audio' && !isVideoEnabled) {
+      // Включаем камеру в аудио звонке
+      try {
+        console.log('Upgrading audio call to video');
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          audio: true, 
+          video: { width: 640, height: 480, frameRate: 30 } 
+        });
+        
+        // Заменяем старый stream
+        if (localStreamRef.current) {
+          localStreamRef.current.getTracks().forEach(track => track.stop());
+        }
+        localStreamRef.current = stream;
+        
+        // Обновляем peer connection
+        if (peerConnectionRef.current) {
+          const videoTrack = stream.getVideoTracks()[0];
+          const sender = peerConnectionRef.current.getSenders().find(s => 
+            s.track && s.track.kind === 'video'
+          );
+          
+          if (sender) {
+            await sender.replaceTrack(videoTrack);
+          } else {
+            peerConnectionRef.current.addTrack(videoTrack, stream);
+          }
+        }
+        
+        // Показываем локальное видео
+        if (localVideoRef.current) {
+          localVideoRef.current.srcObject = stream;
+          localVideoRef.current.muted = true;
+          localVideoRef.current.play().catch(e => console.log('Local video autoplay prevented'));
+        }
+        
+        setIsVideoEnabled(true);
+        
+        // Уведомляем другого пользователя
+        socket.emit('call-video-upgrade', {
+          callId: call._id,
+          targetUserId: getTargetUserId()
+        });
+        
+      } catch (error) {
+        console.error('Failed to enable video:', error);
+        alert('Не удалось включить камеру');
+      }
+    } else if (localStreamRef.current) {
+      // Обычное переключение видео
       const videoTrack = localStreamRef.current.getVideoTracks()[0];
       if (videoTrack) {
         videoTrack.enabled = !videoTrack.enabled;
@@ -472,13 +618,46 @@ const CallInterface = ({
             <div className="call-details">
               <h3 className="call-username">{getCallerName()}</h3>
               <p className="call-status">{getCallStatusText()}</p>
+              
+              {/* Индикатор качества сети */}
+              {callStatus === 'accepted' && (
+                <div className={`network-quality ${networkQuality}`}>
+                  <div className="signal-bars">
+                    <div className="bar"></div>
+                    <div className="bar"></div>
+                    <div className="bar"></div>
+                    <div className="bar"></div>
+                  </div>
+                  <div className="quality-info">
+                    <span className="quality-text">
+                      {networkQuality === 'excellent' && 'Отличное'}
+                      {networkQuality === 'good' && 'Хорошее'}
+                      {networkQuality === 'fair' && 'Среднее'}
+                      {networkQuality === 'poor' && 'Слабое'}
+                    </span>
+                    {connectionStats && (
+                      <div className="connection-details">
+                        {connectionStats.roundTripTime > 0 && (
+                          <span className="stat">Ping: {connectionStats.roundTripTime}мс</span>
+                        )}
+                        {connectionStats.lossRate > 0 && (
+                          <span className="stat">Потери: {connectionStats.lossRate}%</span>
+                        )}
+                        {connectionStats.jitter > 0 && (
+                          <span className="stat">Jitter: {connectionStats.jitter}мс</span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
           
-          {call.type === 'video' && callStatus === 'accepted' && (
+          {((call.type === 'video') || (call.type === 'audio' && isVideoEnabled)) && callStatus === 'accepted' && (
             <div className="call-type-indicator">
               <Video size={16} />
-              <span>Видео звонок</span>
+              <span>{call.type === 'audio' ? 'Видео включено' : 'Видео звонок'}</span>
             </div>
           )}
         </div>
@@ -490,7 +669,7 @@ const CallInterface = ({
           style={{ display: 'none' }}
         />
 
-        {call.type === 'video' && callStatus === 'accepted' && (
+        {((call.type === 'video') || (call.type === 'audio' && isVideoEnabled)) && callStatus === 'accepted' && (
           <div className="video-container">
             <video
               ref={remoteVideoRef}
@@ -505,6 +684,11 @@ const CallInterface = ({
               playsInline
               muted
             />
+            {call.type === 'audio' && (
+              <div className="upgraded-call-indicator">
+                <span>Видео включено</span>
+              </div>
+            )}
           </div>
         )}
 
@@ -534,15 +718,23 @@ const CallInterface = ({
                 {isAudioEnabled ? <Mic size={20} /> : <MicOff size={20} />}
               </button>
               
-              {call.type === 'video' && (
-                <button 
-                  onClick={toggleVideo}
-                  className={`call-control-btn ${isVideoEnabled ? 'active' : 'inactive'}`}
-                  title={isVideoEnabled ? 'Выключить камеру' : 'Включить камеру'}
-                >
-                  {isVideoEnabled ? <Video size={20} /> : <VideoOff size={20} />}
-                </button>
-              )}
+              {/* Кнопка видео для всех типов звонков */}
+              <button 
+                onClick={toggleVideo}
+                className={`call-control-btn ${isVideoEnabled ? 'active' : 'inactive'} ${call.type === 'audio' && !isVideoEnabled ? 'upgrade-btn' : ''}`}
+                title={
+                  call.type === 'audio' && !isVideoEnabled 
+                    ? 'Включить камеру (улучшить до видео)' 
+                    : isVideoEnabled 
+                      ? 'Выключить камеру' 
+                      : 'Включить камеру'
+                }
+              >
+                {isVideoEnabled ? <Video size={20} /> : <VideoOff size={20} />}
+                {call.type === 'audio' && !isVideoEnabled && (
+                  <span className="upgrade-text">Видео</span>
+                )}
+              </button>
               
               {/* Кнопка для принудительного включения звука */}
               <button 
