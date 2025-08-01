@@ -1011,6 +1011,8 @@ const HomePage = () => {
     setMessagesLoading(true);
     try {
       const res = await axios.get(`https://server-u9ji.onrender.com/api/messages/chats/${chatId}/messages`);
+      console.log('Messages loaded for chat:', res.data);
+      console.log('Call messages found:', res.data.filter(msg => msg.type === 'call')); // Отладка звонков
       setMessages(prev => ({ ...prev, [chatId]: res.data }));
       
       // Загружаем онлайн статусы участников чата
@@ -1751,7 +1753,9 @@ const HomePage = () => {
                       <>
                         {(messages[activeChat._id] || []).map(message => {
                           // Проверяем, является ли сообщение записью о звонке
+                          console.log('Message type check:', message.type, message); // Отладка
                           if (message.type === 'call') {
+                            console.log('Rendering CallMessage for:', message); // Отладка
                             return (
                               <CallMessage
                                 key={message._id}

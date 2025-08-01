@@ -77,44 +77,126 @@ const CallMessage = ({
   
   const shouldShowRetry = (isMissed || isDeclined) && onRetryCall;
   
+  // Добавим логирование для отладки
+  console.log('CallMessage rendering:', { isOwn, callData, shouldShowRetry });
+
+  // Inline стили для гарантии отображения  
+  const wrapperStyle = {
+    margin: '8px 0',
+    display: 'flex',
+    alignItems: 'flex-start',
+    width: '100%'
+  };
+
+  const bubbleStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    maxWidth: '280px',
+    margin: '0',
+    padding: '12px 16px',
+    borderRadius: '18px',
+    background: isOwn 
+      ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+      : 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+    color: 'white',
+    border: isOwn ? '1px solid #667eea' : '1px solid #f093fb',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+    transition: 'all 0.2s ease',
+    position: 'relative',
+    marginLeft: isOwn ? 'auto' : '0',
+    marginRight: isOwn ? '0' : 'auto',
+    cursor: shouldShowRetry ? 'pointer' : 'default'
+  };
+
   return (
-    <div className={`call-message-wrapper`}>
-      <div className={`call-message-bubble ${isOwn ? 'own' : 'other'} ${shouldShowRetry ? 'clickable' : ''}`}
-           onClick={shouldShowRetry ? handleRetryCall : undefined}>
-      <div className="call-message-header">
-        <div className="call-icon-wrapper" style={{ color: getIconColor() }}>
-          {getCallIcon()}
-        </div>
-        <div className="call-status-text">
-          {getCallStatusText()}
-        </div>
-      </div>
-      
-      <div className="call-message-details">
-        {isAnswered && callData?.duration ? (
-          <div className="call-duration">
-            <span className="duration-text">{formatDuration(callData.duration)}</span>
+    <div className="call-message-wrapper" style={wrapperStyle}>
+      <div 
+        className={`call-message-bubble ${isOwn ? 'own' : 'other'} ${shouldShowRetry ? 'clickable' : ''}`}
+        style={bubbleStyle}
+        onClick={shouldShowRetry ? handleRetryCall : undefined}>
+        <div className="call-message-header" style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          marginBottom: '6px'
+        }}>
+          <div className="call-icon-wrapper" style={{ 
+            color: getIconColor(),
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '32px',
+            height: '32px',
+            borderRadius: '50%',
+            background: 'rgba(255, 255, 255, 0.25)',
+            backdropFilter: 'blur(10px)'
+          }}>
+            {getCallIcon()}
           </div>
-        ) : (
-          <div className="call-no-answer">
-            {isMissed ? 'Не отвечен' : isDeclined ? 'Отклонен' : 'Не отвечен'}
+          <div className="call-status-text" style={{
+            fontWeight: '600',
+            fontSize: '14px',
+            lineHeight: '1.2'
+          }}>
+            {getCallStatusText()}
+          </div>
+        </div>
+        
+        <div className="call-message-details" style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: '12px'
+        }}>
+          {isAnswered && callData?.duration ? (
+            <div className="call-duration" style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}>
+              <span className="duration-text" style={{
+                fontWeight: '700',
+                fontSize: '16px',
+                fontFamily: 'Courier New, monospace'
+              }}>{formatDuration(callData.duration)}</span>
+            </div>
+          ) : (
+            <div className="call-no-answer" style={{
+              fontSize: '13px',
+              opacity: '0.9',
+              fontStyle: 'italic'
+            }}>
+              {isMissed ? 'Не отвечен' : isDeclined ? 'Отклонен' : 'Не отвечен'}
+            </div>
+          )}
+          
+          <div className="call-time" style={{
+            fontSize: '12px',
+            opacity: '0.8',
+            whiteSpace: 'nowrap'
+          }}>
+            {new Date(message.createdAt).toLocaleTimeString('ru-RU', {
+              hour: '2-digit',
+              minute: '2-digit'
+            })}
+          </div>
+        </div>
+        
+        {shouldShowRetry && (
+          <div className="call-retry-hint" style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            marginTop: '8px',
+            paddingTop: '8px',
+            borderTop: '1px solid rgba(255, 255, 255, 0.2)',
+            fontSize: '12px',
+            opacity: '0.9'
+          }}>
+            <Phone size={14} />
+            <span style={{ fontSize: '11px' }}>Нажмите для повторного звонка</span>
           </div>
         )}
-        
-        <div className="call-time">
-          {new Date(message.createdAt).toLocaleTimeString('ru-RU', {
-            hour: '2-digit',
-            minute: '2-digit'
-          })}
-        </div>
-      </div>
-      
-      {shouldShowRetry && (
-        <div className="call-retry-hint">
-          <Phone size={14} />
-          <span>Нажмите для повторного звонка</span>
-        </div>
-      )}
       </div>
     </div>
   );
