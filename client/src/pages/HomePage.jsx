@@ -821,12 +821,70 @@ const HomePage = () => {
     }
   };
 
+  const logCallToChat = async (callData) => {
+    if (!currentCall) return;
+    
+    // Находим чат с участником звонка
+    const otherUserId = currentCall.caller?._id === (user._id || user.id) ? 
+                       currentCall.callee?._id : currentCall.caller?._id;
+    
+    const targetChat = chats.find(chat => 
+      chat.participants.some(p => p._id === otherUserId)
+    );
+    
+    if (!targetChat) return;
+    
+    try {
+      const callMessage = {
+        type: 'call',
+        content: 'Звонок',
+        callData: {
+          direction: callData.direction, // 'incoming' or 'outgoing'
+          status: callData.status, // 'answered', 'declined', 'missed', 'ended'
+          duration: callData.duration || 0,
+          callType: currentCall.type // 'audio' or 'video'
+        }
+      };
+      
+      // Отправляем на сервер как специальное сообщение
+      const response = await axios.post(`https://server-u9ji.onrender.com/api/messages/chats/${targetChat._id}/messages`, callMessage);
+      
+      // Добавляем в локальные сообщения
+      const callMsg = {
+        ...response.data,
+        type: 'call',
+        callData: callMessage.callData,
+        sender: {
+          _id: user._id || user.id,
+          username: user.username
+        },
+        createdAt: new Date().toISOString()
+      };
+      
+      setMessages(prev => ({
+        ...prev,
+        [targetChat._id]: [...(prev[targetChat._id] || []), callMsg]
+      }));
+      
+    } catch (error) {
+      console.error('Ошибка записи звонка в чат:', error);
+    }
+  };
+
   const acceptCall = async () => {
     if (!currentCall) return;
     
     try {
       await axios.post(`https://server-u9ji.onrender.com/api/calls/accept/${currentCall.callId}`);
       console.log('Call accepted');
+      
+      // Логируем принятый входящий звонок
+      await logCallToChat({
+        direction: 'incoming',
+        status: 'answered',
+        duration: 0
+      });
+      
     } catch (err) {
       console.error('Ошибка принятия звонка:', err);
     }
@@ -837,6 +895,14 @@ const HomePage = () => {
     
     try {
       await axios.post(`https://server-u9ji.onrender.com/api/calls/decline/${currentCall.callId}`);
+      
+      // Логируем отклоненный входящий звонок
+      await logCallToChat({
+        direction: 'incoming',
+        status: 'declined',
+        duration: 0
+      });
+      
       setCurrentCall(null);
       setIsIncomingCall(false);
     } catch (err) {
@@ -1682,31 +1748,87 @@ const HomePage = () => {
                       <div className="messages-loading">Загрузка сообщений...</div>
                     ) : (
                       <>
-                        {(messages[activeChat._id] || []).map(message => (
-                          <div 
-                            key={message._id} 
-                            className={`message ${message.sender._id === (user._id || user.id) ? 'own' : 'other'}`}
-                          >
-                            <div className="message-header">
-                              <span className="message-sender">{message.sender.username}</span>
-                              <span className="message-time">
-                                {new Date(message.createdAt).toLocaleTimeString('ru-RU', {
-                                  hour: '2-digit',
-                                  minute: '2-digit'
-                                })}
-                              </span>
-                              {message.sender._id === (user._id || user.id) && (
-                                <button 
-                                  onClick={() => deleteMessage(message._id)}
-                                  className="delete-message-btn"
-                                >
-                                  <Trash2 size={14} />
-                                </button>
-                              )}
+                        {(messages[activeChat._id] || []).map(message => {
+                          // Проверяем, является ли сообщение записью о звонке
+                          if (message.type === 'call') {
+                            return (
+                              <div 
+                                key={message._id} 
+                                className={`message call-message ${message.sender._id === (user._id || user.id) ? 'own' : 'other'}`}
+                                onClick={() => {
+                                  if (message.callData?.status !== 'answered') {
+                                    // Перезвонить при клике на пропущенный/отклоненный звонок
+                                    const otherUser = activeChat.participants.find(p => p._id !== (user._id || user.id));
+                                    if (otherUser) {
+                                      initiateCall(otherUser._id, 'audio');
+                                    }
+                                  }
+                                }}
+                              >
+                                <div className="call-message-content">
+                                  <div className="call-icon">
+                                    {message.callData?.direction === 'incoming' ? (
+                                      message.callData?.status === 'answered' ? '📞' : 
+                                      message.callData?.status === 'missed' ? '📵' : '📞'
+                                    ) : (
+                                      message.callData?.status === 'answered' ? '📱' : 
+                                      message.callData?.status === 'declined' ? '📵' : '📱'
+                                    )}
+                                  </div>
+                                  <div className="call-details">
+                                    <div className="call-type">
+                                      {message.callData?.direction === 'incoming' ? 
+                                        (message.callData?.status === 'answered' ? 'Входящий звонок' : 
+                                         message.callData?.status === 'missed' ? 'Пропущенный звонок' : 'Входящий звонок') :
+                                        (message.callData?.status === 'answered' ? 'Исходящий звонок' : 
+                                         message.callData?.status === 'declined' ? 'Отклоненный звонок' : 'Исходящий звонок')
+                                      }
+                                    </div>
+                                    <div className="call-duration">
+                                      {message.callData?.duration ? 
+                                        `${Math.floor(message.callData.duration / 60)}:${(message.callData.duration % 60).toString().padStart(2, '0')}` : 
+                                        'Не отвечен'
+                                      }
+                                    </div>
+                                  </div>
+                                  <div className="call-time">
+                                    {new Date(message.createdAt).toLocaleTimeString('ru-RU', {
+                                      hour: '2-digit',
+                                      minute: '2-digit'
+                                    })}
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          }
+                          
+                          // Обычное сообщение
+                          return (
+                            <div 
+                              key={message._id} 
+                              className={`message ${message.sender._id === (user._id || user.id) ? 'own' : 'other'}`}
+                            >
+                              <div className="message-header">
+                                <span className="message-sender">{message.sender.username}</span>
+                                <span className="message-time">
+                                  {new Date(message.createdAt).toLocaleTimeString('ru-RU', {
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  })}
+                                </span>
+                                {message.sender._id === (user._id || user.id) && (
+                                  <button 
+                                    onClick={() => deleteMessage(message._id)}
+                                    className="delete-message-btn"
+                                  >
+                                    <Trash2 size={14} />
+                                  </button>
+                                )}
+                              </div>
+                              <div className="message-content">{message.content}</div>
                             </div>
-                            <div className="message-content">{message.content}</div>
-                          </div>
-                        ))}
+                          );
+                        })}
                         {typingUsers[activeChat?._id] && (
                           <div className="typing-indicator">
                             {typingUsers[activeChat._id].username} печатает...
