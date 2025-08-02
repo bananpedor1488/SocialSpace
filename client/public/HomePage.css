@@ -1829,6 +1829,34 @@ body {
   font-style: italic;
   font-size: 14px;
 }
+
+.load-more-messages {
+  display: flex;
+  justify-content: center;
+  padding: 15px;
+  margin-bottom: 10px;
+}
+
+.load-more-btn {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #3b82f6;
+  padding: 8px 16px;
+  border-radius: 16px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.load-more-btn:hover:not(:disabled) {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+.load-more-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 .delete-message-btn {
   background: none;
   border: none;

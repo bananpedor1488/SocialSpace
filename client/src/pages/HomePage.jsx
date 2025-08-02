@@ -46,6 +46,8 @@ const HomePage = () => {
   const [messages, setMessages] = useState({});
   const [newMessage, setNewMessage] = useState('');
   const [messagesLoading, setMessagesLoading] = useState(false);
+  const [messagesPagination, setMessagesPagination] = useState({});
+  const [loadingOlderMessages, setLoadingOlderMessages] = useState(false);
   const [totalUnread, setTotalUnread] = useState(0);
   const messagesEndRef = useRef(null);
   // СОСТОЯНИЯ ДЛЯ ЗВОНКОВ
@@ -959,8 +961,10 @@ const HomePage = () => {
     // Не загружаем, если уже есть сообщения этого чата в стейте
     if (messages[chatId]) return;
     try {
-      const res = await axios.get(`https://server-u9ji.onrender.com/api/messages/chats/${chatId}/messages`);
-      setMessages(prev => ({ ...prev, [chatId]: res.data }));
+      const res = await axios.get(`https://server-u9ji.onrender.com/api/messages/chats/${chatId}/messages?page=1&limit=20`);
+      const { messages: newMessages, pagination } = res.data;
+      setMessages(prev => ({ ...prev, [chatId]: newMessages }));
+      setMessagesPagination(prev => ({ ...prev, [chatId]: pagination }));
     } catch (err) {
       console.error('Ошибка предзагрузки сообщений:', err);
     }
@@ -1005,14 +1009,29 @@ const HomePage = () => {
     }
   };
 
-  const loadMessages = async (chatId) => {
-    if (messagesLoading || messages[chatId]) return;
+  const loadMessages = async (chatId, page = 1) => {
+    if (messagesLoading) return;
     
     setMessagesLoading(true);
     try {
-      const res = await axios.get(`https://server-u9ji.onrender.com/api/messages/chats/${chatId}/messages`);
+      const res = await axios.get(`https://server-u9ji.onrender.com/api/messages/chats/${chatId}/messages?page=${page}&limit=20`);
       console.log('Messages loaded for chat:', res.data);
-      setMessages(prev => ({ ...prev, [chatId]: res.data }));
+      
+      const { messages: newMessages, pagination } = res.data;
+      
+      if (page === 1) {
+        // Первая загрузка - заменяем сообщения
+        setMessages(prev => ({ ...prev, [chatId]: newMessages }));
+      } else {
+        // Загрузка старых сообщений - добавляем в начало
+        setMessages(prev => ({ 
+          ...prev, 
+          [chatId]: [...newMessages, ...(prev[chatId] || [])] 
+        }));
+      }
+      
+      // Обновляем информацию о пагинации
+      setMessagesPagination(prev => ({ ...prev, [chatId]: pagination }));
       
       // Загружаем онлайн статусы участников чата
       const currentChat = chats.find(chat => chat._id === chatId);
@@ -1094,6 +1113,34 @@ const HomePage = () => {
       console.error('Ошибка отправки сообщения:', err);
       // В случае ошибки возвращаем текст обратно
       setNewMessage(messageContent);
+    }
+  };
+
+  // Функция для загрузки старых сообщений
+  const loadOlderMessages = async (chatId) => {
+    const currentPagination = messagesPagination[chatId];
+    if (!currentPagination || !currentPagination.hasMore || loadingOlderMessages) return;
+    
+    setLoadingOlderMessages(true);
+    try {
+      const nextPage = currentPagination.page + 1;
+      const res = await axios.get(`https://server-u9ji.onrender.com/api/messages/chats/${chatId}/messages?page=${nextPage}&limit=20`);
+      
+      const { messages: olderMessages, pagination } = res.data;
+      
+      // Добавляем старые сообщения в начало списка
+      setMessages(prev => ({ 
+        ...prev, 
+        [chatId]: [...olderMessages, ...(prev[chatId] || [])] 
+      }));
+      
+      // Обновляем пагинацию
+      setMessagesPagination(prev => ({ ...prev, [chatId]: pagination }));
+      
+    } catch (err) {
+      console.error('Ошибка загрузки старых сообщений:', err);
+    } finally {
+      setLoadingOlderMessages(false);
     }
   };
 
@@ -1854,6 +1901,19 @@ const HomePage = () => {
                       <div className="messages-loading">Загрузка сообщений...</div>
                     ) : (
                       <>
+                        {/* Кнопка загрузки старых сообщений */}
+                        {messagesPagination[activeChat._id]?.hasMore && (
+                          <div className="load-more-messages">
+                            <button 
+                              onClick={() => loadOlderMessages(activeChat._id)}
+                              disabled={loadingOlderMessages}
+                              className="load-more-btn"
+                            >
+                              {loadingOlderMessages ? 'Загрузка...' : 'Загрузить старые сообщения'}
+                            </button>
+                          </div>
+                        )}
+                        
                         {(messages[activeChat._id] || []).map(message => {
                           // Пропускаем сообщения о звонках - не отображаем их
                           if (message.type === 'call') {
