@@ -695,9 +695,11 @@ const HomePage = () => {
     if (savedTheme === 'dark') {
       setIsDarkTheme(true);
       loadCSS('HomePage.css');
+      document.body.className = 'dark-theme';
     } else {
       setIsDarkTheme(false);
       loadCSS('HomePage1.css');
+      document.body.className = 'light-theme';
     }
   }, []);
 
@@ -709,8 +711,10 @@ const HomePage = () => {
     
     if (newTheme) {
       loadCSS('HomePage.css');
+      document.body.className = 'dark-theme';
     } else {
       loadCSS('HomePage1.css');
+      document.body.className = 'light-theme';
     }
   };
 

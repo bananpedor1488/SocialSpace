@@ -25,8 +25,9 @@
   color: var(--text-color, #2d3748);
 }
 
-/* Темная тема для модального окна */
-[data-theme="dark"] .profile-settings-modal {
+/* Стили для темной темы (HomePage.css) */
+body:has(link[href*="HomePage.css"]) .profile-settings-modal,
+.dark-theme .profile-settings-modal {
   --modal-bg: #1e293b;
   --text-color: #e2e8f0;
   --border-color: #374151;
@@ -39,6 +40,23 @@
   --btn-hover: #4b5563;
   --btn-text: #e2e8f0;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Стили для светлой темы (HomePage1.css) */
+body:has(link[href*="HomePage1.css"]) .profile-settings-modal,
+.light-theme .profile-settings-modal {
+  --modal-bg: white;
+  --text-color: #1f2937;
+  --border-color: #e5e7eb;
+  --input-bg: white;
+  --input-text: #1f2937;
+  --label-color: #374151;
+  --hint-color: #6b7280;
+  --avatar-border: #e5e7eb;
+  --btn-bg: #f9fafb;
+  --btn-hover: #f3f4f6;
+  --btn-text: #1f2937;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
 .profile-settings-header {
