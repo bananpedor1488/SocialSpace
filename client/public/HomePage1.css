@@ -2724,7 +2724,7 @@ body {
 
 .post-author {
   font-weight: 600;
-  color: white;
+  color: #1f2937;
   cursor: pointer;
   transition: color 0.2s;
 }
@@ -2735,12 +2735,12 @@ body {
 
 .post-username {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(31, 41, 55, 0.7);
 }
 
 .post-date {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(31, 41, 55, 0.6);
   margin-left: auto;
 }
 
@@ -2754,18 +2754,18 @@ body {
 
 .suggestion-display-name {
   font-weight: 600;
-  color: white;
+  color: #1f2937;
   display: block;
 }
 
 .suggestion-username {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(31, 41, 55, 0.7);
   display: block;
 }
 
 .suggestion-stats {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(31, 41, 55, 0.6);
   display: block;
 }

@@ -2842,14 +2842,9 @@ body {
 
 .post-author {
   font-weight: 600;
-  color: #2d3748;
+  color: white;
   cursor: pointer;
   transition: color 0.2s;
-}
-
-/* Исправление цвета автора поста в темной теме */
-[data-theme="dark"] .post-author {
-  color: #e2e8f0;
 }
 
 .post-author:hover {
@@ -2858,12 +2853,12 @@ body {
 
 .post-username {
   font-size: 13px;
-  color: #718096;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .post-date {
   font-size: 13px;
-  color: #a0aec0;
+  color: rgba(255, 255, 255, 0.6);
   margin-left: auto;
 }
 
@@ -2877,23 +2872,18 @@ body {
 
 .suggestion-display-name {
   font-weight: 600;
-  color: #2d3748;
+  color: white;
   display: block;
-}
-
-/* Исправление цвета имени в рекомендациях в темной теме */
-[data-theme="dark"] .suggestion-display-name {
-  color: #e2e8f0;
 }
 
 .suggestion-username {
   font-size: 13px;
-  color: #718096;
+  color: rgba(255, 255, 255, 0.7);
   display: block;
 }
 
 .suggestion-stats {
   font-size: 12px;
-  color: #a0aec0;
+  color: rgba(255, 255, 255, 0.6);
   display: block;
 }
