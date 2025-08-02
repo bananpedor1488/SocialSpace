@@ -24,18 +24,19 @@ const Avatar = ({
       onClick={onClick}
     >
       <div className="avatar-wrapper">
-        {src ? (
+        {src && src.trim() ? (
           <img 
-            src={src} 
+            src={src.startsWith('data:') ? src : `data:image/jpeg;base64,${src}`} 
             alt={alt || 'Avatar'} 
             className="avatar-image"
             onError={(e) => {
+
               e.target.style.display = 'none';
               e.target.nextSibling.style.display = 'flex';
             }}
           />
         ) : null}
-        <div className="avatar-fallback" style={{ display: src ? 'none' : 'flex' }}>
+        <div className="avatar-fallback" style={{ display: (src && src.trim()) ? 'none' : 'flex' }}>
           <User size={size === 'small' ? 16 : size === 'medium' ? 20 : size === 'large' ? 28 : 36} />
         </div>
       </div>

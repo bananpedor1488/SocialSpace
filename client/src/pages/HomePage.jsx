@@ -1564,7 +1564,7 @@ const HomePage = () => {
                 {searchResults.map(searchUser => (
                   <div key={searchUser._id} className="header-search-result" onClick={() => handleSearchClick(searchUser)}>
                     <Avatar 
-                      src={searchUser.avatar}
+                      src={searchUser.avatar || null}
                       alt={searchUser.displayName || searchUser.username}
                       size="small"
                       className="search-result-avatar"
@@ -1697,7 +1697,7 @@ const HomePage = () => {
                         onClick={() => { setActiveChat(chat); loadMessages(chat._id); }}
                       >
                         <Avatar 
-                          src={otherUser?.avatar}
+                          src={otherUser?.avatar || null}
                           alt={otherUser?.displayName || otherUser?.username || chat.name}
                           size="medium"
                           className="chat-avatar"
