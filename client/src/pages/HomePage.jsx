@@ -1721,7 +1721,7 @@ const HomePage = () => {
                         )}
                       </div>
                     );
-                  }))
+                  })
                 ) : (
                   <div className="no-chats">Чатов пока нет</div>
                 )}
