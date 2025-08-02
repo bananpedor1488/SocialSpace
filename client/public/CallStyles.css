@@ -139,6 +139,22 @@
   font-weight: 500;
 }
 
+.call-connection-message {
+  font-size: 0.75rem;
+  color: #f59e0b;
+  margin-top: 0.25rem;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
 /* Метрики соединения в реальном времени */
 .connection-metrics {
   display: flex;

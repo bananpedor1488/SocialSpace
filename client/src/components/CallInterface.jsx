@@ -31,41 +31,37 @@ const CallInterface = ({
   // Профили ICE-серверов для переключения во время звонка
   const ICE_PROFILES = {
     auto: [
-      // Google STUN
+      // Google STUN серверы для быстрого P2P соединения
       { urls: 'stun:stun.l.google.com:19302' },
       { urls: 'stun:stun1.l.google.com:19302' },
-      { urls: 'stun:stun2.l.google.com:19302' },
-      { urls: 'stun:stun3.l.google.com:19302' },
-
-      // OpenRelay (Канада / NL)
-      { urls: 'turn:global.relay.metered.ca:80',   username: 'openrelayproject', credential: 'openrelayproject' },
-      { urls: 'turn:global.relay.metered.ca:443',  username: 'openrelayproject', credential: 'openrelayproject' },
+      
+      // OpenRelay TURN серверы (Канада) - основные для relay
+      { urls: 'turn:global.relay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
+      { urls: 'turn:global.relay.metered.ca:80?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' },
+      { urls: 'turn:global.relay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
       { urls: 'turn:global.relay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' },
-
-      // EXPRESSTURN (USA / EU) — демо-учётка 1 Мбит/с
-      { urls: 'turn:relay1.expressturn.com:3478',               username: 'ef727d', credential: 'webrtcdemo' },
-      { urls: 'turn:relay1.expressturn.com:443?transport=tcp',  username: 'ef727d', credential: 'webrtcdemo' },
-
-      // AnyFirewall (Германия) — общественный TCP-TURN
-      { urls: 'turn:turn.anyfirewall.com:443?transport=tcp',    username: 'webrtc', credential: 'webrtc' }
+      { urls: 'turns:global.relay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' }
     ],
     
     openrelay: [
-      { urls: 'stun:stun.l.google.com:19302' },
-      { urls: 'turn:global.relay.metered.ca:80',   username: 'openrelayproject', credential: 'openrelayproject' },
-      { urls: 'turn:global.relay.metered.ca:443',  username: 'openrelayproject', credential: 'openrelayproject' },
-      { urls: 'turn:global.relay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' }
+      // Только OpenRelay TURN серверы для гарантированного relay соединения
+      { urls: 'turn:global.relay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
+      { urls: 'turn:global.relay.metered.ca:80?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' },
+      { urls: 'turn:global.relay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
+      { urls: 'turn:global.relay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' },
+      { urls: 'turns:global.relay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' }
     ],
     
     expressturn: [
-      { urls: 'stun:stun.l.google.com:19302' },
-      { urls: 'turn:relay1.expressturn.com:3478',               username: 'ef727d', credential: 'webrtcdemo' },
-      { urls: 'turn:relay1.expressturn.com:443?transport=tcp',  username: 'ef727d', credential: 'webrtcdemo' }
+      // ExpressTURN серверы (США/EU)
+      { urls: 'turn:relay1.expressturn.com:3478', username: 'ef727d', credential: 'webrtcdemo' },
+      { urls: 'turn:relay1.expressturn.com:443?transport=tcp', username: 'ef727d', credential: 'webrtcdemo' },
+      { urls: 'turns:relay1.expressturn.com:443', username: 'ef727d', credential: 'webrtcdemo' }
     ],
     
     anyfirewall: [
-      { urls: 'stun:stun.l.google.com:19302' },
-      { urls: 'turn:turn.anyfirewall.com:443?transport=tcp',    username: 'webrtc', credential: 'webrtc' }
+      // AnyFirewall TURN сервер (Германия) - только TCP для сложных сетей
+      { urls: 'turn:turn.anyfirewall.com:443?transport=tcp', username: 'webrtc', credential: 'webrtc' }
     ]
   };
 
@@ -77,11 +73,26 @@ const CallInterface = ({
   const [showAdvancedMetrics, setShowAdvancedMetrics] = useState(false);
   const [showServerSelector, setShowServerSelector] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [iceConnectionAttempts, setIceConnectionAttempts] = useState(0);
+  const [forceRelay, setForceRelay] = useState(false);
+  const [connectionMessage, setConnectionMessage] = useState('');
   
-  // Динамическая ICE-конфигурация
-  const currentIceConfig = useMemo(() => ({
-    iceServers: ICE_PROFILES[serverKey] || ICE_PROFILES.auto
-  }), [serverKey]);
+  // Динамическая ICE-конфигурация с улучшенной поддержкой TURN
+  const currentIceConfig = useMemo(() => {
+    const config = {
+      iceServers: ICE_PROFILES[serverKey] || ICE_PROFILES.auto,
+      iceCandidatePoolSize: 10,
+      bundlePolicy: 'max-bundle',
+      rtcpMuxPolicy: 'require'
+    };
+    
+    // Если принудительно используем relay (TURN)
+    if (forceRelay) {
+      config.iceTransportPolicy = 'relay';
+    }
+    
+    return config;
+  }, [serverKey, forceRelay]);
 
   useEffect(() => {
     if (callStatus === 'accepted') {
@@ -332,7 +343,49 @@ const CallInterface = ({
   };
 
   const createPeerConnection = async () => {
+    console.log('Creating peer connection with config:', currentIceConfig);
     peerConnectionRef.current = new RTCPeerConnection(currentIceConfig);
+
+    // Отслеживаем состояние ICE соединения
+    peerConnectionRef.current.oniceconnectionstatechange = () => {
+      const state = peerConnectionRef.current.iceConnectionState;
+      console.log('ICE connection state:', state);
+      
+      if (state === 'failed') {
+        console.log('ICE connection failed, attempts:', iceConnectionAttempts);
+        
+        // Если это первая попытка и мы не на relay - переключаемся на TURN
+        if (iceConnectionAttempts < 1 && !forceRelay) {
+          console.log('Switching to TURN relay mode...');
+          setConnectionMessage('Переключение на TURN сервер для стабильного соединения...');
+          setIceConnectionAttempts(prev => prev + 1);
+          setForceRelay(true);
+          
+          // Переинициализируем соединение с TURN
+          setTimeout(() => {
+            if (serverKey === 'auto') {
+              switchIceProfile('openrelay');
+            } else {
+              // Пересоздаем соединение с relay
+              restartConnection();
+            }
+          }, 1000);
+        } else {
+          setConnectionMessage('Не удалось установить соединение. Проверьте интернет-соединение.');
+        }
+      } else if (state === 'connected' || state === 'completed') {
+        console.log('ICE connection established successfully');
+        // Определяем тип соединения
+        detectConnectionType();
+        
+        // Очищаем сообщение через 3 секунды после успешного соединения
+        setTimeout(() => {
+          setConnectionMessage('');
+        }, 3000);
+      } else if (state === 'checking') {
+        setConnectionMessage('Установка соединения...');
+      }
+    };
 
     peerConnectionRef.current.onicecandidate = (event) => {
       if (event.candidate) {
@@ -597,11 +650,69 @@ const CallInterface = ({
   };
 
   // Функция переключения ICE-профиля во время звонка
+  // Функция для определения типа соединения
+  const detectConnectionType = async () => {
+    if (!peerConnectionRef.current) return;
+    
+    try {
+      const stats = await peerConnectionRef.current.getStats();
+      stats.forEach(stat => {
+        if (stat.type === 'candidate-pair' && stat.state === 'succeeded') {
+          const localCandidate = stat.localCandidateId;
+          const remoteCandidate = stat.remoteCandidateId;
+          
+          stats.forEach(candidate => {
+            if (candidate.id === localCandidate) {
+              console.log('Connection type:', candidate.candidateType);
+              setConnectionType(candidate.candidateType);
+            }
+          });
+        }
+      });
+    } catch (error) {
+      console.error('Error detecting connection type:', error);
+    }
+  };
+
+  // Функция для перезапуска соединения с новыми настройками
+  const restartConnection = async () => {
+    console.log('Restarting connection with relay policy...');
+    
+    try {
+      if (peerConnectionRef.current) {
+        peerConnectionRef.current.close();
+      }
+      
+      await createPeerConnection();
+      
+      if (localStreamRef.current) {
+        localStreamRef.current.getTracks().forEach(track => {
+          peerConnectionRef.current.addTrack(track, localStreamRef.current);
+        });
+      }
+      
+      const offer = await peerConnectionRef.current.createOffer({ iceRestart: true });
+      await peerConnectionRef.current.setLocalDescription(offer);
+      
+      socket.emit('webrtc-offer', {
+        callId: call._id,
+        offer: offer,
+        targetUserId: getTargetUserId()
+      });
+    } catch (error) {
+      console.error('Error restarting connection:', error);
+    }
+  };
+
   const switchIceProfile = async (newKey) => {
     if (newKey === serverKey || callStatus !== 'accepted') return;
     
     console.log(`Switching ICE profile from ${serverKey} to ${newKey}`);
     setServerKey(newKey);
+    
+    // Сбрасываем принудительный relay при смене профиля
+    setForceRelay(false);
+    setIceConnectionAttempts(0);
 
     const targetUserId = getTargetUserId();
 
@@ -868,6 +979,9 @@ const CallInterface = ({
             <div className="call-details">
               <h3 className="call-username">{getCallerName()}</h3>
               <p className="call-status">{getCallStatusText()}</p>
+              {connectionMessage && (
+                <p className="call-connection-message">{connectionMessage}</p>
+              )}
               
               {/* Контролы в правом верхнем углу */}
               {callStatus === 'accepted' && (
