@@ -1992,7 +1992,7 @@ const HomePage = () => {
                     onClick={() => toggleFollow(suggestionUser._id)}
                     className="suggestion-follow-btn"
                   >
-                    <Users size={14} /> Подписаться
+                    <Users size={14} />
                   </button>
                 </div>
               </div>
