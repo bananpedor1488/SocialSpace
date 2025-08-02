@@ -11,17 +11,6 @@ const Avatar = ({
   className = '',
   onClick 
 }) => {
-  // Логирование для отладки
-  if (className && className.includes('search-result-avatar')) {
-    console.log('🖼️ AVATAR В ПОИСКЕ:', {
-      src: src,
-      srcType: typeof src,
-      srcLength: src ? src.length : 0,
-      alt: alt,
-      hasData: src && src.startsWith && src.startsWith('data:'),
-      isEmpty: !src || !src.trim()
-    });
-  }
   const sizeClasses = {
     small: 'avatar-small',
     medium: 'avatar-medium', 

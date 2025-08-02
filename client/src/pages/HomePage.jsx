@@ -1259,19 +1259,6 @@ const HomePage = () => {
     if (query.trim()) {
       try {
         const res = await axios.get(`https://server-u9ji.onrender.com/api/users/search?query=${query}`);
-        
-        console.log('🔍 ОТВЕТ ПОИСКА НА ФРОНТЕНДЕ:', {
-          query: query,
-          найдено: res.data.length,
-          пользователи: res.data.map(u => ({
-            username: u.username,
-            displayName: u.displayName,
-            avatarExists: !!u.avatar,
-            avatarLength: u.avatar ? u.avatar.length : 0,
-            avatarValue: u.avatar ? 'ЕСТЬ' : 'НЕТ'
-          }))
-        });
-        
         setSearchResults(res.data);
       } catch (err) {
         console.error('Ошибка поиска пользователей:', err);
