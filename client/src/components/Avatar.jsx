@@ -26,7 +26,7 @@ const Avatar = ({
     // Очистка предыдущего изображения
     setImageError(false);
     
-    console.log('Avatar received src:', src, 'alt:', alt);
+
     
     if (src && src.trim()) {
       // Оптимизация для Android: создаем новый URL для изображения

@@ -13,10 +13,12 @@ import CallInterface from '../components/CallInterface';
 import OnlineStatus from '../components/OnlineStatus';
 import ProfileSettings from '../components/ProfileSettings';
 import Avatar from '../components/Avatar';
+import { cacheUserAvatar, getCachedUserAvatar, removeCachedUserAvatar } from '../utils/avatarCache';
 import useOnlineStatus from '../hooks/useOnlineStatus';
 
 const HomePage = () => {
   const [user, setUser] = useState(null);
+  const [cachedUserAvatar, setCachedUserAvatar] = useState(null);
   const [activeTab, setActiveTab] = useState('home');
   const [postText, setPostText] = useState('');
   const [showProfileSettings, setShowProfileSettings] = useState(false);
@@ -748,6 +750,20 @@ const HomePage = () => {
         setUser(res.data.user);
         localStorage.setItem('user', JSON.stringify(res.data.user));
         
+        // Кеширование аватарки пользователя
+        const userId = res.data.user._id || res.data.user.id;
+        if (res.data.user.avatar) {
+          cacheUserAvatar(userId, res.data.user.avatar);
+          setCachedUserAvatar(res.data.user.avatar);
+        } else {
+          // Проверяем есть ли кешированная аватарка
+          const cached = getCachedUserAvatar(userId);
+          if (cached) {
+            setCachedUserAvatar(cached);
+            console.log('🎯 Using cached avatar for current user');
+          }
+        }
+        
         // Очищаем любые "зависшие" звонки при загрузке
         try {
           await axios.get('https://server-u9ji.onrender.com/api/calls/active');
@@ -842,6 +858,19 @@ const HomePage = () => {
   // Обновление профиля пользователя
   const handleProfileUpdate = (updatedUser) => {
     setUser(updatedUser);
+    
+    // Обновляем кеш аватарки при изменении профиля
+    const userId = updatedUser._id || updatedUser.id;
+    if (updatedUser.avatar) {
+      cacheUserAvatar(userId, updatedUser.avatar);
+      setCachedUserAvatar(updatedUser.avatar);
+      console.log('🔄 Avatar cache updated for user:', userId);
+    } else {
+      // Если аватарка удалена, убираем из кеша
+      removeCachedUserAvatar(userId);
+      setCachedUserAvatar(null);
+    }
+    
     // Также обновляем profile если это текущий пользователь
     if (profile?._id === updatedUser._id || profile?.id === updatedUser.id) {
       setProfile(updatedUser);
@@ -1044,9 +1073,7 @@ const HomePage = () => {
     const messageContent = newMessage.trim();
     setNewMessage(''); // Сразу очищаем поле ввода
     
-    // Отладка: проверяем данные пользователя
-    console.log('Current user data before sending message:', user);
-    console.log('User avatar:', user?.avatar);
+
     
     try {
       const response = await axios.post(`https://server-u9ji.onrender.com/api/messages/chats/${activeChat._id}/messages`, {
@@ -1061,13 +1088,13 @@ const HomePage = () => {
           _id: user._id || user.id,
           username: user.username,
           displayName: user.displayName,
-          avatar: user.avatar || '/logo192.png' // тестовая аватарка
+          avatar: cachedUserAvatar || user.avatar
         },
         createdAt: new Date().toISOString(),
         isRead: false
       };
       
-      console.log('Created newMsg with sender data:', newMsg.sender);
+
       
       setMessages(prev => ({
         ...prev,
@@ -1853,7 +1880,7 @@ const HomePage = () => {
                               className={`message ${message.sender._id === (user._id || user.id) ? 'own' : 'other'}`}
                             >
                               <div className="message-avatar">
-                                {console.log('Rendering avatar for message:', message._id, 'sender:', message.sender)}
+
                                 <Avatar 
                                   src={message.sender?.avatar || null}
                                   alt={message.sender?.displayName || message.sender?.username || 'Unknown'}
