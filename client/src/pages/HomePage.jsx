@@ -1475,7 +1475,7 @@ const HomePage = () => {
                 {(comments[post.isRepost ? post.originalPost?._id || post._id : post._id] || []).map(comment => (
                   <div key={comment._id} className="comment">
                     <Avatar 
-                      src={comment.author?.avatar}
+                      src={comment.author?.avatar || null}
                       alt={comment.author?.displayName || comment.author?.username || 'Unknown'}
                       size="small"
                       className="comment-avatar"
@@ -1801,24 +1801,34 @@ const HomePage = () => {
                               key={message._id} 
                               className={`message ${message.sender._id === (user._id || user.id) ? 'own' : 'other'}`}
                             >
-                              <div className="message-header">
-                                <span className="message-sender">{message.sender.username}</span>
-                                <span className="message-time">
-                                  {new Date(message.createdAt).toLocaleTimeString('ru-RU', {
-                                    hour: '2-digit',
-                                    minute: '2-digit'
-                                  })}
-                                </span>
-                                {message.sender._id === (user._id || user.id) && (
-                                  <button 
-                                    onClick={() => deleteMessage(message._id)}
-                                    className="delete-message-btn"
-                                  >
-                                    <Trash2 size={14} />
-                                  </button>
-                                )}
+                              <div className="message-avatar">
+                                <Avatar 
+                                  src={message.sender?.avatar || null}
+                                  alt={message.sender?.displayName || message.sender?.username || 'Unknown'}
+                                  size="small"
+                                  className="chat-message-avatar"
+                                />
                               </div>
-                              <div className="message-content">{message.content}</div>
+                              <div className="message-body">
+                                <div className="message-header">
+                                  <span className="message-sender">{message.sender.username}</span>
+                                  <span className="message-time">
+                                    {new Date(message.createdAt).toLocaleTimeString('ru-RU', {
+                                      hour: '2-digit',
+                                      minute: '2-digit'
+                                    })}
+                                  </span>
+                                  {message.sender._id === (user._id || user.id) && (
+                                    <button 
+                                      onClick={() => deleteMessage(message._id)}
+                                      className="delete-message-btn"
+                                    >
+                                      <Trash2 size={14} />
+                                    </button>
+                                  )}
+                                </div>
+                                <div className="message-content">{message.content}</div>
+                              </div>
                             </div>
                           );
                         })}
@@ -1875,7 +1885,7 @@ const HomePage = () => {
                 <div className="profile-main-info">
                   <div className="profile-avatar-section">
                     <Avatar 
-                      src={profile.avatar} 
+                      src={profile.avatar || null} 
                       alt={profile.displayName || profile.username}
                       size="xlarge"
                     />
@@ -2004,7 +2014,7 @@ const HomePage = () => {
               <div key={suggestionUser._id} className="user-suggestion">
                 <div className="suggestion-info">
                   <Avatar 
-                    src={suggestionUser.avatar}
+                    src={suggestionUser.avatar || null}
                     alt={suggestionUser.displayName || suggestionUser.username}
                     size="medium"
                   />
