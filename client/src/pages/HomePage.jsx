@@ -13,12 +13,12 @@ import CallInterface from '../components/CallInterface';
 import OnlineStatus from '../components/OnlineStatus';
 import ProfileSettings from '../components/ProfileSettings';
 import Avatar from '../components/Avatar';
-import { cacheUserAvatar, getCachedUserAvatar, removeCachedUserAvatar } from '../utils/avatarCache';
+
 import useOnlineStatus from '../hooks/useOnlineStatus';
 
 const HomePage = () => {
   const [user, setUser] = useState(null);
-  const [cachedUserAvatar, setCachedUserAvatar] = useState(null);
+
   const [activeTab, setActiveTab] = useState('home');
   const [postText, setPostText] = useState('');
   const [showProfileSettings, setShowProfileSettings] = useState(false);
@@ -745,33 +745,14 @@ const HomePage = () => {
           const parsedUser = JSON.parse(savedUser);
           setUser(parsedUser);
           
-          // Загружаем кешированную аватарку сразу
-          const userId = parsedUser._id || parsedUser.id;
-          const cached = getCachedUserAvatar(userId);
-          if (cached) {
-            setCachedUserAvatar(cached);
-            console.log('🚀 Preloaded cached avatar for user');
-          }
+
         }
 
         const res = await axios.get('https://server-u9ji.onrender.com/api/me');
         console.log('Current user data:', res.data.user);
+        console.log('User avatar from server:', res.data.user.avatar);
         setUser(res.data.user);
         localStorage.setItem('user', JSON.stringify(res.data.user));
-        
-        // Кеширование аватарки пользователя
-        const userId = res.data.user._id || res.data.user.id;
-        if (res.data.user.avatar) {
-          cacheUserAvatar(userId, res.data.user.avatar);
-          setCachedUserAvatar(res.data.user.avatar);
-        } else {
-          // Проверяем есть ли кешированная аватарка
-          const cached = getCachedUserAvatar(userId);
-          if (cached) {
-            setCachedUserAvatar(cached);
-            console.log('🎯 Using cached avatar for current user');
-          }
-        }
         
         // Очищаем любые "зависшие" звонки при загрузке
         try {
@@ -867,18 +848,6 @@ const HomePage = () => {
   // Обновление профиля пользователя
   const handleProfileUpdate = (updatedUser) => {
     setUser(updatedUser);
-    
-    // Обновляем кеш аватарки при изменении профиля
-    const userId = updatedUser._id || updatedUser.id;
-    if (updatedUser.avatar) {
-      cacheUserAvatar(userId, updatedUser.avatar);
-      setCachedUserAvatar(updatedUser.avatar);
-      console.log('🔄 Avatar cache updated for user:', userId);
-    } else {
-      // Если аватарка удалена, убираем из кеша
-      removeCachedUserAvatar(userId);
-      setCachedUserAvatar(null);
-    }
     
     // Также обновляем profile если это текущий пользователь
     if (profile?._id === updatedUser._id || profile?.id === updatedUser.id) {
@@ -1090,11 +1059,8 @@ const HomePage = () => {
       });
       
       // Добавляем сообщение локально (оно также придет через Socket.IO, но так быстрее)
-      console.log('💬 Sending message with avatar:', {
-        cachedUserAvatar,
-        userAvatar: user.avatar,
-        finalAvatar: cachedUserAvatar || user.avatar
-      });
+      console.log('📤 Sending message, user data:', user);
+      console.log('📤 User avatar before sending:', user.avatar);
       
       const newMsg = {
         _id: response.data._id || Date.now().toString(),
@@ -1103,7 +1069,7 @@ const HomePage = () => {
           _id: user._id || user.id,
           username: user.username,
           displayName: user.displayName,
-          avatar: cachedUserAvatar || user.avatar || null
+          avatar: user.avatar
         },
         createdAt: new Date().toISOString(),
         isRead: false
