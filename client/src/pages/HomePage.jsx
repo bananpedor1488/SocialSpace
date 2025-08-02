@@ -742,7 +742,16 @@ const HomePage = () => {
       try {
         const savedUser = localStorage.getItem('user');
         if (savedUser) {
-          setUser(JSON.parse(savedUser));
+          const parsedUser = JSON.parse(savedUser);
+          setUser(parsedUser);
+          
+          // Загружаем кешированную аватарку сразу
+          const userId = parsedUser._id || parsedUser.id;
+          const cached = getCachedUserAvatar(userId);
+          if (cached) {
+            setCachedUserAvatar(cached);
+            console.log('🚀 Preloaded cached avatar for user');
+          }
         }
 
         const res = await axios.get('https://server-u9ji.onrender.com/api/me');
@@ -1081,6 +1090,12 @@ const HomePage = () => {
       });
       
       // Добавляем сообщение локально (оно также придет через Socket.IO, но так быстрее)
+      console.log('💬 Sending message with avatar:', {
+        cachedUserAvatar,
+        userAvatar: user.avatar,
+        finalAvatar: cachedUserAvatar || user.avatar
+      });
+      
       const newMsg = {
         _id: response.data._id || Date.now().toString(),
         content: messageContent,
@@ -1088,7 +1103,7 @@ const HomePage = () => {
           _id: user._id || user.id,
           username: user.username,
           displayName: user.displayName,
-          avatar: cachedUserAvatar || user.avatar
+          avatar: cachedUserAvatar || user.avatar || null
         },
         createdAt: new Date().toISOString(),
         isRead: false
