@@ -1120,6 +1120,7 @@ const HomePage = () => {
           _id: post._id,
           userId: post.author?._id || post.userId || post.author,
           username: username,
+          author: post.author, // Добавляем полный объект автора с аватаркой
           content: post.content,
           likes: Array.isArray(post.likes) ? post.likes.length : (post.likes || 0),
           liked: Array.isArray(post.likes) && user ? post.likes.includes(user._id || user.id) : false,
@@ -1298,6 +1299,7 @@ const HomePage = () => {
         _id: post._id,
         userId: post.author?._id || post.author,
         username: post.author?.username || 'Unknown',
+        author: post.author, // Добавляем полный объект автора с аватаркой
         content: post.content,
         likes: Array.isArray(post.likes) ? post.likes.length : (post.likes || 0),
         liked: Array.isArray(post.likes) && user ? post.likes.includes(user._id || user.id) : false,
