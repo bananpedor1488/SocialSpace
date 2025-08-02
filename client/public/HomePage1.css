@@ -1902,9 +1902,12 @@ body {
 
 /* Исправленные стили для рекомендаций пользователей */
 .user-suggestion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   background: rgba(249, 250, 251, 0.8);
   border-radius: 12px;
-  padding: 12px;
+  padding: 15px;
   margin-bottom: 10px;
   border: 1px solid rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
@@ -1924,10 +1927,9 @@ body {
 
 .suggestion-info {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 10px;
-  width: 100%;
+  gap: 12px;
+  flex: 1;
 }
 
 .suggestion-user-details {
@@ -2713,6 +2715,7 @@ body {
 
 .post-avatar {
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 .post-author-info {
@@ -2768,4 +2771,24 @@ body {
   font-size: 12px;
   color: rgba(31, 41, 55, 0.6);
   display: block;
+}
+
+/* Стили для кнопки удаления поста */
+.delete-btn {
+  background: none;
+  border: none;
+  color: rgba(31, 41, 55, 0.6);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-btn:hover {
+  background: rgba(255, 0, 0, 0.1);
+  color: #ff4757;
+  transform: scale(1.1);
 }

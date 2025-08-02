@@ -792,7 +792,7 @@ const HomePage = () => {
   const loadSuggestions = async () => {
     try {
       const res = await axios.get('https://server-u9ji.onrender.com/api/users/suggestions');
-      setSuggestions(res.data.slice(0, 5));
+      setSuggestions(res.data.slice(0, 3));
     } catch (err) {
       console.error('Ошибка загрузки рекомендаций:', err);
       setSuggestions([]);
@@ -1969,29 +1969,29 @@ const HomePage = () => {
           {suggestions.length > 0 ? (
             suggestions.map(suggestionUser => (
               <div key={suggestionUser._id} className="user-suggestion">
-                                      <div className="suggestion-info">
-                        <Avatar 
-                          src={suggestionUser.avatar}
-                          alt={suggestionUser.displayName || suggestionUser.username}
-                          size="medium"
-                        />
-                        <div className="suggestion-user-details">
-                          <span className="suggestion-display-name">
-                            {suggestionUser.displayName || suggestionUser.username}
-                          </span>
-                          <span className="suggestion-username">@{suggestionUser.username}</span>
-                          <span className="suggestion-stats">
-                            {suggestionUser.followersCount || 0} подписчиков
-                          </span>
-                        </div>
-                  <div className="suggestion-actions">
-                    <button 
-                      onClick={() => toggleFollow(suggestionUser._id)}
-                      className="suggestion-follow-btn"
-                    >
-                      <Users size={14} /> Подписаться
-                    </button>
+                <div className="suggestion-info">
+                  <Avatar 
+                    src={suggestionUser.avatar}
+                    alt={suggestionUser.displayName || suggestionUser.username}
+                    size="medium"
+                  />
+                  <div className="suggestion-user-details">
+                    <span className="suggestion-display-name">
+                      {suggestionUser.displayName || suggestionUser.username}
+                    </span>
+                    <span className="suggestion-username">@{suggestionUser.username}</span>
+                    <span className="suggestion-stats">
+                      {suggestionUser.followersCount || 0} подписчиков
+                    </span>
                   </div>
+                </div>
+                <div className="suggestion-actions">
+                  <button 
+                    onClick={() => toggleFollow(suggestionUser._id)}
+                    className="suggestion-follow-btn"
+                  >
+                    <Users size={14} /> Подписаться
+                  </button>
                 </div>
               </div>
             ))
