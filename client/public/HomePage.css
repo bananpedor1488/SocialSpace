@@ -1721,6 +1721,7 @@ body {
 .chat-info {
   flex: 1;
   min-width: 0;
+  margin-left: 8px;
 }
 
 .chat-name {
@@ -2908,6 +2909,50 @@ body {
   background: rgba(255, 0, 0, 0.1);
   color: #ff4757;
   transform: scale(1.1);
+}
+
+/* Стили для комментариев */
+.comment {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 10px;
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 8px;
+  border: 1px solid rgba(71, 85, 105, 0.3);
+}
+
+.comment-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.comment-header {
+  margin-bottom: 4px;
+}
+
+.comment-info {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.comment-username {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.comment-date {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+}
+
+.comment-content {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  line-height: 1.4;
+  word-wrap: break-word;
 }
 
 /* Стили для поиска пользователей */

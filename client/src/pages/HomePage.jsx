@@ -1474,18 +1474,26 @@ const HomePage = () => {
               <div className="comments-list">
                 {(comments[post.isRepost ? post.originalPost?._id || post._id : post._id] || []).map(comment => (
                   <div key={comment._id} className="comment">
-                    <div className="comment-header">
-                      <div className="comment-info">
-                        <span className="comment-username">
-                          @{comment.author?.username || 'Unknown'}
-                        </span>
-                        <span className="comment-date">
-                          {new Date(comment.createdAt).toLocaleDateString('ru-RU')}
-                        </span>
+                    <Avatar 
+                      src={comment.author?.avatar}
+                      alt={comment.author?.displayName || comment.author?.username || 'Unknown'}
+                      size="small"
+                      className="comment-avatar"
+                    />
+                    <div className="comment-body">
+                      <div className="comment-header">
+                        <div className="comment-info">
+                          <span className="comment-username">
+                            @{comment.author?.username || 'Unknown'}
+                          </span>
+                          <span className="comment-date">
+                            {new Date(comment.createdAt).toLocaleDateString('ru-RU')}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                    <div className="comment-content">
-                      {comment.content}
+                      <div className="comment-content">
+                        {comment.content}
+                      </div>
                     </div>
                   </div>
                 ))}
