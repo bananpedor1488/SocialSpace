@@ -214,6 +214,16 @@ const CallInterface = ({
     };
   }, []);
 
+  // Автоматическое закрытие при ошибке
+  useEffect(() => {
+    if (callStatus === 'failed') {
+      console.log('Call failed, closing interface in 3 seconds');
+      setTimeout(() => {
+        onEndCall();
+      }, 3000);
+    }
+  }, [callStatus, onEndCall]);
+
   useEffect(() => {
     if (!socket || !call) return;
 
@@ -291,7 +301,17 @@ const CallInterface = ({
   };
 
   const handleCallAccepted = () => {
+    console.log('Call accepted event received');
     setCallStatus('accepted');
+    
+    // Запускаем таймер продолжительности звонка
+    if (!callStartTimeRef.current) {
+      callStartTimeRef.current = Date.now();
+      durationIntervalRef.current = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - callStartTimeRef.current) / 1000);
+        setCallDuration(elapsed);
+      }, 1000);
+    }
   };
 
   const handleCallDeclined = () => {
@@ -327,73 +347,97 @@ const CallInterface = ({
     };
 
     peerConnectionRef.current.ontrack = (event) => {
-      console.log('Received remote track:', event.track.kind, event.streams[0]);
+      console.log('🎵 Received remote track:', event.track.kind, 'from streams:', event.streams.length);
       console.log('Track enabled:', event.track.enabled);
       console.log('Track readyState:', event.track.readyState);
       
       if (event.streams[0]) {
-        console.log('Stream has audio tracks:', event.streams[0].getAudioTracks().length);
-        console.log('Stream has video tracks:', event.streams[0].getVideoTracks().length);
+        const remoteStream = event.streams[0];
+        console.log('Remote stream ID:', remoteStream.id);
+        console.log('Stream has audio tracks:', remoteStream.getAudioTracks().length);
+        console.log('Stream has video tracks:', remoteStream.getVideoTracks().length);
         
         // Для видео звонков
-        if (call?.type === 'video' && remoteVideoRef.current) {
-          remoteVideoRef.current.srcObject = event.streams[0];
-          console.log('Remote video assigned');
+        if (call?.type === 'video' && remoteVideoRef.current && remoteStream.getVideoTracks().length > 0) {
+          console.log('🎥 Assigning remote video stream');
+          remoteVideoRef.current.srcObject = remoteStream;
+          remoteVideoRef.current.autoplay = true;
+          remoteVideoRef.current.playsInline = true;
           
           // Принудительно включаем воспроизведение
-          remoteVideoRef.current.play().catch(e => {
-            console.log('Video autoplay prevented, user interaction required');
+          remoteVideoRef.current.play().then(() => {
+            console.log('✅ Remote video playing successfully');
+          }).catch(e => {
+            console.log('❌ Video autoplay prevented:', e.message);
           });
         }
         
         // Для аудио (всегда, включая видео звонки)
-        if (remoteAudioRef.current) {
-          remoteAudioRef.current.srcObject = event.streams[0];
+        if (remoteAudioRef.current && remoteStream.getAudioTracks().length > 0) {
+          console.log('🔊 Assigning remote audio stream');
+          remoteAudioRef.current.srcObject = remoteStream;
           remoteAudioRef.current.volume = 1.0;
-          console.log('Remote audio assigned');
+          remoteAudioRef.current.autoplay = true;
           
           // Принудительно включаем воспроизведение звука
-          remoteAudioRef.current.play().catch(e => {
-            console.log('Audio autoplay prevented, user interaction required');
+          remoteAudioRef.current.play().then(() => {
+            console.log('✅ Remote audio playing successfully');
+          }).catch(e => {
+            console.log('❌ Audio autoplay prevented:', e.message);
+            // Показываем пользователю кнопку для включения звука
+            setCallStatus('needs-interaction');
           });
         }
+      } else {
+        console.warn('⚠️ No streams received in ontrack event');
       }
     };
   };
 
   const getUserMedia = async () => {
     try {
+      console.log('Getting user media for call type:', call?.type);
+      
       // Проверяем поддержку WebRTC
       checkWebRTCSupport();
 
       const constraints = getOptimalConstraints(call?.type);
       console.log('Requesting media with constraints:', constraints);
       
+      // Запрашиваем разрешения явно
+      await requestMediaPermissions(constraints);
+      
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       localStreamRef.current = stream;
 
-      console.log('Media stream obtained:', stream);
-      console.log('Audio tracks:', stream.getAudioTracks());
-      console.log('Video tracks:', stream.getVideoTracks());
+      console.log('Media stream obtained successfully:', stream);
+      console.log('Audio tracks:', stream.getAudioTracks().length);
+      console.log('Video tracks:', stream.getVideoTracks().length);
 
       // Настраиваем локальное видео
-      if (localVideoRef.current && call?.type === 'video') {
+      if (localVideoRef.current && call?.type === 'video' && stream.getVideoTracks().length > 0) {
         localVideoRef.current.srcObject = stream;
         localVideoRef.current.muted = true; // Важно для локального видео
-        localVideoRef.current.play().catch(e => console.log('Local video autoplay prevented'));
+        localVideoRef.current.play().catch(e => console.log('Local video autoplay prevented:', e));
         console.log('Local video assigned');
       }
       
       // Проверяем треки
-      stream.getAudioTracks().forEach(track => {
-        console.log('Audio track enabled:', track.enabled);
-        console.log('Audio track muted:', track.muted);
+      stream.getAudioTracks().forEach((track, index) => {
+        console.log(`Audio track ${index} - enabled:`, track.enabled, 'muted:', track.muted);
+        track.enabled = isAudioEnabled; // Применяем текущее состояние
+      });
+      
+      stream.getVideoTracks().forEach((track, index) => {
+        console.log(`Video track ${index} - enabled:`, track.enabled, 'muted:', track.muted);
+        track.enabled = isVideoEnabled; // Применяем текущее состояние
       });
 
       return stream;
     } catch (error) {
       console.error('Error accessing media devices:', error);
-      alert(handleWebRTCError(error));
+      const errorMessage = handleWebRTCError(error);
+      alert(`Ошибка доступа к микрофону/камере: ${errorMessage}`);
       throw error;
     }
   };
@@ -452,25 +496,36 @@ const CallInterface = ({
   };
 
   const processStoredOffer = async () => {
-    if (!pendingOfferRef.current) return;
+    if (!pendingOfferRef.current) {
+      console.log('No pending offer to process');
+      return;
+    }
     
     const { offer, fromUserId } = pendingOfferRef.current;
     
     try {
       console.log('Processing stored offer after call acceptance');
+      
+      // Очищаем существующее соединение если есть
+      if (peerConnectionRef.current) {
+        console.log('Closing existing peer connection before creating new one');
+        peerConnectionRef.current.close();
+        peerConnectionRef.current = null;
+      }
+      
       await createPeerConnection();
       
-      console.log('Setting remote description...');
-      await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(offer));
-      
-      console.log('Getting user media after accepting call...');
+      console.log('Getting user media BEFORE setting remote description...');
       const stream = await getUserMedia();
       
-      console.log('Adding tracks...');
+      console.log('Adding tracks BEFORE setting remote description...');
       stream.getTracks().forEach(track => {
         console.log('Adding track:', track.kind, track);
         peerConnectionRef.current.addTrack(track, stream);
       });
+      
+      console.log('Setting remote description...');
+      await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(offer));
 
       console.log('Creating answer...');
       const answer = await peerConnectionRef.current.createAnswer();
@@ -485,8 +540,11 @@ const CallInterface = ({
       
       // Очищаем сохраненный offer
       pendingOfferRef.current = null;
+      
+      console.log('Stored offer processed successfully');
     } catch (error) {
       console.error('Error processing stored offer:', error);
+      setCallStatus('failed');
     }
   };
 
@@ -523,6 +581,18 @@ const CallInterface = ({
       console.error('Error ending call:', error);
       // Принудительно очищаем всё равно
       cleanupCall();
+    }
+  };
+
+  const enableAudio = async () => {
+    try {
+      if (remoteAudioRef.current) {
+        await remoteAudioRef.current.play();
+        console.log('✅ Audio enabled successfully by user interaction');
+        setCallStatus('accepted');
+      }
+    } catch (error) {
+      console.error('Failed to enable audio:', error);
     }
   };
 
@@ -738,6 +808,10 @@ const CallInterface = ({
         return 'Звонок отклонен';
       case 'ended':
         return 'Звонок завершен';
+      case 'failed':
+        return 'Ошибка соединения';
+      case 'needs-interaction':
+        return 'Нажмите для включения звука';
       default:
         return 'Звонок';
     }
@@ -962,6 +1036,23 @@ const CallInterface = ({
                 className="call-control-btn accept-btn"
               >
                 <Phone size={24} />
+              </button>
+            </div>
+          ) : callStatus === 'needs-interaction' ? (
+            <div className="interaction-needed-controls">
+              <button 
+                onClick={enableAudio}
+                className="call-control-btn accept-btn"
+                title="Включить звук"
+              >
+                <Volume2 size={24} />
+                <span>Включить звук</span>
+              </button>
+              <button 
+                onClick={endCall}
+                className="call-control-btn end-call-btn"
+              >
+                <PhoneOff size={24} />
               </button>
             </div>
           ) : callStatus === 'accepted' ? (

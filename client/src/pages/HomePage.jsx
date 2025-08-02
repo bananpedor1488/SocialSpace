@@ -523,9 +523,14 @@ const HomePage = () => {
       });
 
       socketRef.current.on('callAccepted', ({ callId }) => {
-        console.log('Call accepted:', callId);
-        if (currentCall?._id === callId) {
+        console.log('Call accepted event received:', callId);
+        console.log('Current call ID:', currentCall?._id || currentCall?.callId);
+        
+        if (currentCall?._id === callId || currentCall?.callId === callId) {
+          console.log('Updating call status to accepted');
           setCurrentCall(prev => ({ ...prev, status: 'accepted' }));
+        } else {
+          console.warn('Call accepted event ID does not match current call');
         }
       });
 
@@ -844,11 +849,20 @@ const HomePage = () => {
   };
 
   const acceptCall = async () => {
-    if (!currentCall) return;
+    if (!currentCall) {
+      console.error('No current call to accept');
+      return;
+    }
     
     try {
-      await axios.post(`https://server-u9ji.onrender.com/api/calls/accept/${currentCall.callId}`);
-      console.log('Call accepted');
+      console.log('Accepting call with ID:', currentCall.callId || currentCall._id);
+      const callId = currentCall.callId || currentCall._id;
+      
+      await axios.post(`https://server-u9ji.onrender.com/api/calls/accept/${callId}`);
+      console.log('Call accepted via API successfully');
+      
+      // НЕ изменяем состояние здесь - пусть это делает socket событие
+      // setCurrentCall(prev => ({ ...prev, status: 'accepted' }));
       
       // Логируем принятый входящий звонок
       await logCallToChat({
@@ -859,6 +873,10 @@ const HomePage = () => {
       
     } catch (err) {
       console.error('Ошибка принятия звонка:', err);
+      alert('Не удалось принять звонок. Попробуйте еще раз.');
+      // При ошибке сбрасываем звонок
+      setCurrentCall(null);
+      setIsIncomingCall(false);
     }
   };
 
