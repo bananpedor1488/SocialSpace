@@ -964,14 +964,20 @@ const HomePage = () => {
   const loadChats = async () => {
     try {
       const res = await axios.get('https://server-u9ji.onrender.com/api/messages/chats');
-      setChats(res.data);
+      // Сортируем чаты по времени последнего сообщения
+      const sortedChats = res.data.sort((a, b) => {
+        const aTime = a.lastMessage?.createdAt || a.lastMessageTime || a.createdAt;
+        const bTime = b.lastMessage?.createdAt || b.lastMessageTime || b.createdAt;
+        return new Date(bTime) - new Date(aTime);
+      });
+      setChats(sortedChats);
 
       // Предзагружаем сообщения для каждого чата, чтобы они были сразу доступны
-      res.data.forEach(chat => preloadMessages(chat._id));
+      sortedChats.forEach(chat => preloadMessages(chat._id));
       
       // Собираем ID всех участников всех чатов для загрузки онлайн статусов
       const allParticipantIds = new Set();
-      res.data.forEach(chat => {
+      sortedChats.forEach(chat => {
         if (chat.participants) {
           chat.participants.forEach(participant => {
             if (participant._id !== user._id && participant._id !== user.id) {
@@ -1049,7 +1055,9 @@ const HomePage = () => {
         content: messageContent,
         sender: {
           _id: user._id || user.id,
-          username: user.username
+          username: user.username,
+          displayName: user.displayName,
+          avatar: user.avatar
         },
         createdAt: new Date().toISOString(),
         isRead: false
@@ -1058,6 +1066,18 @@ const HomePage = () => {
       setMessages(prev => ({
         ...prev,
         [activeChat._id]: [...(prev[activeChat._id] || []), newMsg]
+      }));
+      
+      // Обновляем чаты в боковом меню
+      setChats(prev => prev.map(chat => {
+        if (chat._id === activeChat._id) {
+          return {
+            ...chat,
+            lastMessage: newMsg,
+            lastMessageTime: new Date().toISOString()
+          };
+        }
+        return chat;
       }));
       
     } catch (err) {
@@ -1702,7 +1722,14 @@ const HomePage = () => {
               
               <div className="chats-list">
                 {chats.length > 0 ? (
-                  chats.map(chat => {
+                  chats
+                    .sort((a, b) => {
+                      // Сортируем по времени последнего сообщения (новые вверху)
+                      const aTime = a.lastMessage?.createdAt || a.lastMessageTime || a.createdAt;
+                      const bTime = b.lastMessage?.createdAt || b.lastMessageTime || b.createdAt;
+                      return new Date(bTime) - new Date(aTime);
+                    })
+                    .map(chat => {
                     // Находим собеседника для получения его аватарки
                     const otherUser = chat.participants && chat.participants.length === 2 
                       ? chat.participants.find(p => p._id !== user._id && p._id !== user.id)
