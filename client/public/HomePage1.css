@@ -2651,3 +2651,121 @@ body {
   gap: 12px;
   margin-top: 15px;
 }
+
+/* Стили для новых полей профиля - аватарка, отображаемое имя, био */
+.profile-avatar-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-right: 20px;
+}
+
+.profile-header-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.profile-display-name {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-settings-btn {
+  background: none;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  color: white;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-settings-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.profile-bio {
+  margin: 8px 0 16px 0;
+  color: #1f2937;
+  font-size: 14px;
+  line-height: 1.5;
+  opacity: 0.9;
+}
+
+/* Стили для постов с аватарками в светлой теме */
+.post-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.post-avatar {
+  cursor: pointer;
+}
+
+.post-author-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.post-author {
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.post-author:hover {
+  color: #667eea;
+}
+
+.post-username {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.post-date {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-left: auto;
+}
+
+/* Стили для рекомендаций с аватарками в светлой теме */
+.suggestion-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.suggestion-display-name {
+  font-weight: 600;
+  color: white;
+  display: block;
+}
+
+.suggestion-username {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  display: block;
+}
+
+.suggestion-stats {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  display: block;
+}
