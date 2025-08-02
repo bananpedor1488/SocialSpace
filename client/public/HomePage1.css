@@ -2791,3 +2791,24 @@ body {
   color: #ff4757;
   transform: scale(1.1);
 }
+
+/* Стили для поиска пользователей */
+.header-search-result {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.search-result-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.header-search-name {
+  font-size: 12px;
+  color: rgba(31, 41, 55, 0.7);
+}

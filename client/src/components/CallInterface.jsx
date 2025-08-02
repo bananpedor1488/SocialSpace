@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Phone, PhoneOff, Mic, MicOff, Video, VideoOff, Volume2, Settings, Info, ChevronDown } from 'lucide-react';
 import { checkWebRTCSupport, requestMediaPermissions, getOptimalConstraints, handleWebRTCError } from '../utils/webrtc';
+import Avatar from './Avatar';
 
 const CallInterface = ({ 
   call, 
@@ -756,6 +757,18 @@ const CallInterface = ({
     }
   };
 
+  const getCallerAvatar = () => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const currentUserId = user?._id || user?.id;
+    
+    // Получаем аватарку собеседника
+    if (call?.caller?._id === currentUserId) {
+      return call?.callee?.avatar;
+    } else {
+      return call?.caller?.avatar;
+    }
+  };
+
   if (!call) return null;
 
   return (
@@ -763,8 +776,13 @@ const CallInterface = ({
       <div className="call-interface" style={{ position: 'relative' }}>
         <div className="call-header">
           <div className="call-user-info">
-            <div className={`call-avatar ${callStatus === 'pending' ? 'calling' : ''} ${isSpeaking ? 'speaking' : ''}`}>
-              {getCallerName().charAt(0).toUpperCase()}
+            <div className={`call-avatar-container ${callStatus === 'pending' ? 'calling' : ''} ${isSpeaking ? 'speaking' : ''}`}>
+              <Avatar 
+                src={getCallerAvatar()}
+                alt={getCallerName()}
+                size="xlarge"
+                className="call-avatar"
+              />
             </div>
             <div className="call-details">
               <h3 className="call-username">{getCallerName()}</h3>

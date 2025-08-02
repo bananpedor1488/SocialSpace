@@ -1555,7 +1555,18 @@ const HomePage = () => {
               <div className="header-search-results">
                 {searchResults.map(searchUser => (
                   <div key={searchUser._id} className="header-search-result" onClick={() => handleSearchClick(searchUser)}>
-                    <span className="header-search-username">@{searchUser.username}</span>
+                    <Avatar 
+                      src={searchUser.avatar}
+                      alt={searchUser.displayName || searchUser.username}
+                      size="small"
+                      className="search-result-avatar"
+                    />
+                    <div className="search-result-info">
+                      <span className="header-search-username">@{searchUser.username}</span>
+                      {searchUser.displayName && (
+                        <span className="header-search-name">{searchUser.displayName}</span>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -1665,40 +1676,52 @@ const HomePage = () => {
               
               <div className="chats-list">
                 {chats.length > 0 ? (
-                  chats.map(chat => (
-                    <div 
-                      key={chat._id} 
-                      className={`chat-item ${activeChat?._id === chat._id ? 'active' : ''}`}
-                      onClick={() => { setActiveChat(chat); loadMessages(chat._id); }}
-                    >
-                      <div className="chat-info">
-                        <div className="chat-header-row">
-                          <div className="chat-name">{chat.name}</div>
-                          {chat.participants && chat.participants.length === 2 && (() => {
-                            const otherUser = chat.participants.find(p => p._id !== user._id && p._id !== user.id);
-                            const userStatus = getUserStatus(otherUser?._id);
-                            return (
-                              <OnlineStatus
-                                userId={otherUser?._id}
-                                isOnline={userStatus.isOnline}
-                                lastSeen={userStatus.lastSeen}
-                                showText={false}
-                                size="small"
-                              />
-                            );
-                          })()}
-                        </div>
-                        {chat.lastMessage && (
-                          <div className="chat-last-message">
-                            {chat.lastMessage.sender.username}: {chat.lastMessage.content.substring(0, 30)}...
+                  chats.map(chat => {
+                    // Находим собеседника для получения его аватарки
+                    const otherUser = chat.participants && chat.participants.length === 2 
+                      ? chat.participants.find(p => p._id !== user._id && p._id !== user.id)
+                      : null;
+                    
+                    return (
+                      <div 
+                        key={chat._id} 
+                        className={`chat-item ${activeChat?._id === chat._id ? 'active' : ''}`}
+                        onClick={() => { setActiveChat(chat); loadMessages(chat._id); }}
+                      >
+                        <Avatar 
+                          src={otherUser?.avatar}
+                          alt={otherUser?.displayName || otherUser?.username || chat.name}
+                          size="medium"
+                          className="chat-avatar"
+                        />
+                        <div className="chat-info">
+                          <div className="chat-header-row">
+                            <div className="chat-name">{chat.name}</div>
+                            {otherUser && (() => {
+                              const userStatus = getUserStatus(otherUser._id);
+                              return (
+                                <OnlineStatus
+                                  userId={otherUser._id}
+                                  isOnline={userStatus.isOnline}
+                                  lastSeen={userStatus.lastSeen}
+                                  showText={false}
+                                  size="small"
+                                />
+                              );
+                            })()}
                           </div>
+                          {chat.lastMessage && (
+                            <div className="chat-last-message">
+                              {chat.lastMessage.sender.username}: {chat.lastMessage.content.substring(0, 30)}...
+                            </div>
+                          )}
+                        </div>
+                        {chat.unreadCount > 0 && (
+                          <span className="chat-unread">{chat.unreadCount}</span>
                         )}
                       </div>
-                      {chat.unreadCount > 0 && (
-                        <span className="chat-unread">{chat.unreadCount}</span>
-                      )}
-                    </div>
-                  ))
+                    );
+                  }))
                 ) : (
                   <div className="no-chats">Чатов пока нет</div>
                 )}
