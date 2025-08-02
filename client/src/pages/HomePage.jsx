@@ -1044,6 +1044,10 @@ const HomePage = () => {
     const messageContent = newMessage.trim();
     setNewMessage(''); // Сразу очищаем поле ввода
     
+    // Отладка: проверяем данные пользователя
+    console.log('Current user data before sending message:', user);
+    console.log('User avatar:', user?.avatar);
+    
     try {
       const response = await axios.post(`https://server-u9ji.onrender.com/api/messages/chats/${activeChat._id}/messages`, {
         content: messageContent
@@ -1057,11 +1061,13 @@ const HomePage = () => {
           _id: user._id || user.id,
           username: user.username,
           displayName: user.displayName,
-          avatar: user.avatar
+          avatar: user.avatar || '/logo192.png' // тестовая аватарка
         },
         createdAt: new Date().toISOString(),
         isRead: false
       };
+      
+      console.log('Created newMsg with sender data:', newMsg.sender);
       
       setMessages(prev => ({
         ...prev,
@@ -1847,6 +1853,7 @@ const HomePage = () => {
                               className={`message ${message.sender._id === (user._id || user.id) ? 'own' : 'other'}`}
                             >
                               <div className="message-avatar">
+                                {console.log('Rendering avatar for message:', message._id, 'sender:', message.sender)}
                                 <Avatar 
                                   src={message.sender?.avatar || null}
                                   alt={message.sender?.displayName || message.sender?.username || 'Unknown'}
