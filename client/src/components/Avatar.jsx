@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { User } from 'lucide-react';
 import './Avatar.css';
 
@@ -11,11 +11,49 @@ const Avatar = ({
   className = '',
   onClick 
 }) => {
+  const [imageError, setImageError] = useState(false);
+  const [imageSrc, setImageSrc] = useState(null);
+  const imgRef = useRef(null);
+
   const sizeClasses = {
     small: 'avatar-small',
     medium: 'avatar-medium', 
     large: 'avatar-large',
     xlarge: 'avatar-xlarge'
+  };
+
+  useEffect(() => {
+    // Очистка предыдущего изображения
+    setImageError(false);
+    
+    if (src && src.trim()) {
+      // Оптимизация для Android: создаем новый URL для изображения
+      if (src.startsWith('data:')) {
+        setImageSrc(src);
+      } else {
+        // Для base64 строк добавляем префикс
+        setImageSrc(`data:image/jpeg;base64,${src}`);
+      }
+    } else {
+      setImageSrc(null);
+    }
+
+    // Очистка при размонтировании
+    return () => {
+      // Освобождаем память от изображения
+      if (imgRef.current) {
+        imgRef.current.src = '';
+      }
+      setImageSrc(null);
+    };
+  }, [src]);
+
+  const handleImageError = () => {
+    setImageError(true);
+    // Очищаем src для освобождения памяти
+    if (imgRef.current) {
+      imgRef.current.src = '';
+    }
   };
 
   return (
@@ -24,19 +62,18 @@ const Avatar = ({
       onClick={onClick}
     >
       <div className="avatar-wrapper">
-        {src && src.trim() ? (
+        {imageSrc && !imageError ? (
           <img 
-            src={src.startsWith('data:') ? src : `data:image/jpeg;base64,${src}`} 
+            ref={imgRef}
+            src={imageSrc} 
             alt={alt || 'Avatar'} 
             className="avatar-image"
-            onError={(e) => {
-
-              e.target.style.display = 'none';
-              e.target.nextSibling.style.display = 'flex';
-            }}
+            onError={handleImageError}
+            loading="lazy"
+            decoding="async"
           />
         ) : null}
-        <div className="avatar-fallback" style={{ display: (src && src.trim()) ? 'none' : 'flex' }}>
+        <div className="avatar-fallback" style={{ display: (!imageSrc || imageError) ? 'flex' : 'none' }}>
           <User size={size === 'small' ? 16 : size === 'medium' ? 20 : size === 'large' ? 28 : 36} />
         </div>
       </div>

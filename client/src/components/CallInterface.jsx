@@ -664,6 +664,7 @@ const CallInterface = ({
         console.log('Stopping remote track:', track.kind);
         track.stop();
       });
+      remoteVideoRef.current.srcObject = null;
     }
     
     if (remoteAudioRef.current && remoteAudioRef.current.srcObject) {
@@ -672,6 +673,12 @@ const CallInterface = ({
         console.log('Stopping remote audio track:', track.kind);
         track.stop();
       });
+      remoteAudioRef.current.srcObject = null;
+    }
+    
+    // Очищаем ссылки на DOM элементы для предотвращения утечек памяти
+    if (localVideoRef.current) {
+      localVideoRef.current.srcObject = null;
     }
     
     // Закрываем peer connection
@@ -831,7 +838,7 @@ const CallInterface = ({
     }
   };
 
-  const getCallerAvatar = () => {
+  const getCallerAvatar = useMemo(() => {
     const user = JSON.parse(localStorage.getItem('user'));
     const currentUserId = user?._id || user?.id;
     
@@ -841,7 +848,7 @@ const CallInterface = ({
     } else {
       return call?.caller?.avatar;
     }
-  };
+  }, [call?.caller?._id, call?.caller?.avatar, call?.callee?._id, call?.callee?.avatar]);
 
   if (!call) return null;
 
@@ -852,7 +859,7 @@ const CallInterface = ({
           <div className="call-user-info">
             <div className={`call-avatar-container ${callStatus === 'pending' ? 'calling' : ''} ${isSpeaking ? 'speaking' : ''}`}>
               <Avatar 
-                src={getCallerAvatar()}
+                src={getCallerAvatar}
                 alt={getCallerName()}
                 size="xlarge"
                 className="call-avatar"
