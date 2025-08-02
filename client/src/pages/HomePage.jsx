@@ -749,8 +749,6 @@ const HomePage = () => {
         }
 
         const res = await axios.get('https://server-u9ji.onrender.com/api/me');
-        console.log('Current user data:', res.data.user);
-        console.log('User avatar from server:', res.data.user.avatar);
         setUser(res.data.user);
         localStorage.setItem('user', JSON.stringify(res.data.user));
         
@@ -1059,8 +1057,6 @@ const HomePage = () => {
       });
       
       // Добавляем сообщение локально (оно также придет через Socket.IO, но так быстрее)
-      console.log('📤 Sending message, user data:', user);
-      console.log('📤 User avatar before sending:', user.avatar);
       
       const newMsg = {
         _id: response.data._id || Date.now().toString(),
@@ -1807,20 +1803,30 @@ const HomePage = () => {
                   </div>
                   <div className="chat-header">
                     <div className="chat-header-content">
-                      <div className="chat-title-section">
-                        <h3>{activeChat.name}</h3>
-                        {/* Онлайн статус собеседника */}
+                      <div className="chat-user-info">
+                        {/* Аватарка и информация о собеседнике */}
                         {activeChat.participants && activeChat.participants.length === 2 && (() => {
                           const otherUser = activeChat.participants.find(p => p._id !== user._id && p._id !== user.id);
                           const userStatus = getUserStatus(otherUser?._id);
                           return (
-                            <OnlineStatus
-                              userId={otherUser?._id}
-                              isOnline={userStatus.isOnline}
-                              lastSeen={userStatus.lastSeen}
-                              showText={true}
-                              size="medium"
-                            />
+                            <div className="chat-user-section">
+                              <Avatar 
+                                src={otherUser?.avatar || null}
+                                alt={otherUser?.displayName || otherUser?.username || 'User'}
+                                size="medium"
+                                className="chat-header-avatar"
+                              />
+                              <div className="chat-title-section">
+                                <h3>{activeChat.name}</h3>
+                                <OnlineStatus
+                                  userId={otherUser?._id}
+                                  isOnline={userStatus.isOnline}
+                                  lastSeen={userStatus.lastSeen}
+                                  showText={true}
+                                  size="small"
+                                />
+                              </div>
+                            </div>
                           );
                         })()}
                       </div>

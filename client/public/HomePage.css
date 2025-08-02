@@ -1802,6 +1802,22 @@ body {
   width: 100%;
 }
 
+.chat-user-info {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.chat-user-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.chat-header-avatar {
+  flex-shrink: 0;
+}
+
 .chat-title-section {
   display: flex;
   flex-direction: column;
