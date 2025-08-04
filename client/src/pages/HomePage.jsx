@@ -1753,8 +1753,6 @@ const HomePage = () => {
           <div className="user-info">
             <span>Hello, {user?.username}!</span>
             
-            <Points />
-            
             <button onClick={toggleTheme} className="theme-toggle">
               <div className="theme-icon">
                 {isDarkTheme ? <Sun size={18} /> : <Moon size={18} />}
@@ -2346,6 +2344,8 @@ const HomePage = () => {
           onProfileUpdate={handleProfileUpdate}
         />
       )}
+      
+      <Points />
     </div>
   );
 };
