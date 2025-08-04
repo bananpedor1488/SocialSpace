@@ -6,7 +6,7 @@ import { io } from 'socket.io-client';
 import {
   Home, MessageCircle, User, LogOut, Plus,
   Heart, MessageSquare, Repeat, Pencil, Trash2, Users, UserCheck, Send, X, ChevronDown,
-  Moon, Sun, Wifi, WifiOff, Flame, Clock, Phone, Settings
+  Moon, Sun, Wifi, WifiOff, Flame, Clock, Phone, Settings, Trophy
 } from 'lucide-react';
 
 import CallInterface from '../components/CallInterface';
@@ -50,6 +50,8 @@ const HomePage = () => {
   const [messagesPagination, setMessagesPagination] = useState({});
   const [loadingOlderMessages, setLoadingOlderMessages] = useState(false);
   const [totalUnread, setTotalUnread] = useState(0);
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [leaderboardLoading, setLeaderboardLoading] = useState(false);
   const messagesEndRef = useRef(null);
   
   // Функция для прокрутки вниз чата
@@ -1291,6 +1293,19 @@ const HomePage = () => {
     }
   };
 
+  // Функция загрузки рейтинга пользователей
+  const loadLeaderboard = async () => {
+    try {
+      setLeaderboardLoading(true);
+      const response = await axios.get('https://server-u9ji.onrender.com/api/points/leaderboard');
+      setLeaderboard(response.data.leaderboard);
+    } catch (error) {
+      console.error('Error loading leaderboard:', error);
+    } finally {
+      setLeaderboardLoading(false);
+    }
+  };
+
   const fetchComments = async (postId) => {
     try {
       const res = await axios.get(`https://server-u9ji.onrender.com/api/posts/${postId}/comments`);
@@ -1737,6 +1752,10 @@ const HomePage = () => {
             Сообщения
             {totalUnread > 0 && <span className="unread-badge">{totalUnread}</span>}
           </button></li>
+          <li><button className={getNavItemClass('leaderboard')} onClick={() => { setActiveTab('leaderboard'); loadLeaderboard(); }}>
+            <Trophy size={18} /> 
+            Топ игроков
+          </button></li>
           <li><button className={getNavItemClass('profile')} onClick={() => { setActiveTab('profile'); if(user) loadUserProfile(user._id || user.id); }}><User size={18} /> Профиль</button></li>
         </ul>
       </nav>
@@ -2133,6 +2152,61 @@ const HomePage = () => {
                   'У вас пока нет постов. Создайте свой первый пост!' : 
                   `У @${profile.username} пока нет постов`
                 }
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'leaderboard' && (
+          <div className="leaderboard-view">
+            <div className="leaderboard-header">
+              <h2>
+                <Trophy size={24} /> 
+                Топ игроков по баллам
+              </h2>
+              <p className="leaderboard-description">
+                Рейтинг пользователей по количеству накопленных баллов
+              </p>
+            </div>
+
+            {leaderboardLoading ? (
+              <div className="loading-container">
+                <div className="loading">Загрузка рейтинга...</div>
+              </div>
+            ) : leaderboard.length > 0 ? (
+              <div className="leaderboard-list">
+                {leaderboard.map(user => (
+                  <div key={user._id} className="leaderboard-item">
+                    <div className="leaderboard-position">
+                      {user.position === 1 ? '🥇' : user.position === 2 ? '🥈' : user.position === 3 ? '🥉' : user.position}
+                    </div>
+                    
+                    <div className="leaderboard-avatar">
+                      <Avatar 
+                        src={user.avatar}
+                        alt={user.displayName || user.username}
+                        size="medium"
+                      />
+                    </div>
+                    
+                    <div className="leaderboard-info">
+                      <div className="leaderboard-name">
+                        {user.displayName || user.username}
+                      </div>
+                      <div className="leaderboard-username">
+                        @{user.username}
+                      </div>
+                    </div>
+                    
+                    <div className="leaderboard-points">
+                      {new Intl.NumberFormat('ru-RU').format(user.points)} баллов
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="no-leaderboard">
+                <p>Рейтинг пока пуст</p>
               </div>
             )}
           </div>

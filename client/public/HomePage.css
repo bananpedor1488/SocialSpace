@@ -3607,3 +3607,237 @@ body {
     font-size: 11px;
   }
 }
+
+/* Новые стили для выпадающего меню баллов */
+.points-balance.clickable {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.points-balance.clickable:hover {
+  background: rgba(51, 65, 85, 0.3);
+  border-radius: 8px;
+}
+
+.points-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(71, 85, 105, 0.3);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  margin-top: 5px;
+  overflow: hidden;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 16px;
+  background: none;
+  border: none;
+  color: #e2e8f0;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background: rgba(51, 65, 85, 0.3);
+}
+
+.dropdown-item:first-child {
+  border-radius: 8px 8px 0 0;
+}
+
+.dropdown-item:last-child {
+  border-radius: 0 0 8px 8px;
+}
+
+/* Стили для страницы рейтинга */
+.leaderboard-view {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.leaderboard-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.leaderboard-header h2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 28px;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin-bottom: 10px;
+}
+
+.leaderboard-description {
+  color: #94a3b8;
+  font-size: 16px;
+  margin: 0;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+.leaderboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.leaderboard-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 16px 20px;
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid rgba(71, 85, 105, 0.2);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.leaderboard-item:hover {
+  background: rgba(30, 41, 59, 0.8);
+  border-color: rgba(71, 85, 105, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.leaderboard-item:first-child {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 215, 0, 0.05) 100%);
+  border-color: rgba(255, 215, 0, 0.3);
+}
+
+.leaderboard-item:nth-child(2) {
+  background: linear-gradient(135deg, rgba(192, 192, 192, 0.1) 0%, rgba(192, 192, 192, 0.05) 100%);
+  border-color: rgba(192, 192, 192, 0.3);
+}
+
+.leaderboard-item:nth-child(3) {
+  background: linear-gradient(135deg, rgba(205, 127, 50, 0.1) 0%, rgba(205, 127, 50, 0.05) 100%);
+  border-color: rgba(205, 127, 50, 0.3);
+}
+
+.leaderboard-position {
+  font-size: 20px;
+  font-weight: 700;
+  min-width: 40px;
+  text-align: center;
+  color: #f1f5f9;
+}
+
+.leaderboard-avatar {
+  flex-shrink: 0;
+}
+
+.leaderboard-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.leaderboard-name {
+  font-weight: 600;
+  color: #f1f5f9;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.leaderboard-username {
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.leaderboard-points {
+  font-weight: 700;
+  color: #10b981;
+  font-size: 16px;
+  text-align: right;
+}
+
+.no-leaderboard {
+  text-align: center;
+  padding: 40px 20px;
+  color: #94a3b8;
+}
+
+/* Адаптивность для рейтинга */
+@media (max-width: 768px) {
+  .leaderboard-view {
+    padding: 15px;
+  }
+  
+  .leaderboard-header h2 {
+    font-size: 24px;
+  }
+  
+  .leaderboard-item {
+    padding: 12px 16px;
+    gap: 12px;
+  }
+  
+  .leaderboard-position {
+    font-size: 18px;
+    min-width: 35px;
+  }
+  
+  .leaderboard-name {
+    font-size: 15px;
+  }
+  
+  .leaderboard-points {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .leaderboard-view {
+    padding: 10px;
+  }
+  
+  .leaderboard-header h2 {
+    font-size: 20px;
+  }
+  
+  .leaderboard-description {
+    font-size: 14px;
+  }
+  
+  .leaderboard-item {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+  
+  .leaderboard-position {
+    font-size: 16px;
+    min-width: 30px;
+  }
+  
+  .leaderboard-name {
+    font-size: 14px;
+  }
+  
+  .leaderboard-username {
+    font-size: 12px;
+  }
+  
+  .leaderboard-points {
+    font-size: 14px;
+  }
+}

@@ -7,9 +7,9 @@ const Points = () => {
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState([]);
   const [leaderboard, setLeaderboard] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
   const [showTransfer, setShowTransfer] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
-  const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [loading, setLoading] = useState(false);
   const [transferData, setTransferData] = useState({
     recipientUsername: '',
@@ -113,48 +113,48 @@ const Points = () => {
 
   return (
     <div className="points-container">
-      {/* Основная информация о баллах */}
+      {/* Основная информация о баллах с выпадающим меню */}
       <div className="points-header">
-        <div className="points-balance">
+        <div 
+          className="points-balance clickable"
+          onClick={() => setShowDropdown(!showDropdown)}
+        >
           <Coins size={24} className="points-icon" />
           <div className="balance-info">
             <span className="balance-label">Ваши баллы</span>
             <span className="balance-amount">{formatAmount(balance)}</span>
           </div>
+          {showDropdown ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
         </div>
-        
-        <div className="points-actions">
+      </div>
+
+      {/* Выпадающее меню */}
+      {showDropdown && (
+        <div className="points-dropdown">
           <button 
-            onClick={() => setShowTransfer(!showTransfer)}
-            className="points-action-btn transfer-btn"
+            onClick={() => {
+              setShowTransfer(!showTransfer);
+              setShowHistory(false);
+            }}
+            className="dropdown-item"
           >
             <Send size={16} />
-            Перевести
+            Перевести баллы
           </button>
           
           <button 
             onClick={() => {
               setShowHistory(!showHistory);
+              setShowTransfer(false);
               if (!showHistory) loadTransactions();
             }}
-            className="points-action-btn history-btn"
+            className="dropdown-item"
           >
             <History size={16} />
-            История
-          </button>
-          
-          <button 
-            onClick={() => {
-              setShowLeaderboard(!showLeaderboard);
-              if (!showLeaderboard) loadLeaderboard();
-            }}
-            className="points-action-btn leaderboard-btn"
-          >
-            <Trophy size={16} />
-            Рейтинг
+            История транзакций
           </button>
         </div>
-      </div>
+      )}
 
       {/* Форма перевода */}
       {showTransfer && (
@@ -271,52 +271,6 @@ const Points = () => {
           ) : (
             <div className="no-transactions">История транзакций пуста</div>
           )}
-        </div>
-      )}
-
-      {/* Рейтинг пользователей */}
-      {showLeaderboard && (
-        <div className="leaderboard">
-          <div className="leaderboard-header">
-            <h3>Рейтинг по баллам</h3>
-            <button 
-              onClick={() => setShowLeaderboard(false)}
-              className="close-btn"
-            >
-              <X size={16} />
-            </button>
-          </div>
-          
-          <div className="leaderboard-list">
-            {leaderboard.map(user => (
-              <div key={user._id} className="leaderboard-item">
-                <div className="leaderboard-position">
-                  {user.position === 1 ? '🥇' : user.position === 2 ? '🥈' : user.position === 3 ? '🥉' : user.position}
-                </div>
-                
-                <div className="leaderboard-avatar">
-                  <Avatar 
-                    src={user.avatar}
-                    alt={user.displayName || user.username}
-                    size="small"
-                  />
-                </div>
-                
-                <div className="leaderboard-info">
-                  <div className="leaderboard-name">
-                    {user.displayName || user.username}
-                  </div>
-                  <div className="leaderboard-username">
-                    @{user.username}
-                  </div>
-                </div>
-                
-                <div className="leaderboard-points">
-                  {formatAmount(user.points)} баллов
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
       )}
     </div>
