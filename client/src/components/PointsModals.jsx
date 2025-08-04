@@ -267,7 +267,7 @@ const PointsModals = () => {
             
             {loading ? (
               <div className="loading">Загрузка...</div>
-            ) : transactions.length > 0 ? (
+            ) : Array.isArray(transactions) && transactions.length > 0 ? (
               <div className="transactions-list">
                 {transactions.map(transaction => (
                   <div 

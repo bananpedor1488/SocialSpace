@@ -27,13 +27,19 @@ export const PointsProvider = ({ children }) => {
   const loadTransactions = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
-      const response = await axios.get('/api/transactions', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setTransactions(response.data);
+      const response = await axios.get('https://server-u9ji.onrender.com/api/points/transactions');
+      console.log('Ответ сервера:', response.data);
+      // Проверяем структуру ответа и устанавливаем правильный массив
+      if (response.data && response.data.transactions) {
+        setTransactions(response.data.transactions);
+      } else if (Array.isArray(response.data)) {
+        setTransactions(response.data);
+      } else {
+        setTransactions([]);
+      }
     } catch (error) {
       console.error('Ошибка загрузки транзакций:', error);
+      setTransactions([]);
     } finally {
       setLoading(false);
     }
