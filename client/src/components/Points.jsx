@@ -190,7 +190,17 @@ const Points = () => {
 
   // Обработчик клика по транзакции
   const handleTransactionClick = (transaction) => {
+    setSelectedTransaction(transaction);
+    setShowTransactionDetails(true);
     loadTransactionDetails(transaction.transactionCode);
+    
+    // Добавляем класс для анимации после небольшой задержки
+    setTimeout(() => {
+      const modal = document.querySelector('.transaction-details-modal');
+      if (modal) {
+        modal.classList.add('show');
+      }
+    }, 10);
   };
 
   useEffect(() => {
@@ -217,13 +227,14 @@ const Points = () => {
 
       {/* Выпадающее меню */}
       {showDropdown && (
-        <div className="points-dropdown">
+        <div className="points-dropdown show">
           <button 
             onClick={() => {
               setShowTransfer(!showTransfer);
               setShowHistory(false);
               setShowPremium(false);
               setShowGiftPremium(false);
+              setShowDropdown(false); // Закрываем выпадающее меню
             }}
             className="dropdown-item"
           >
@@ -237,6 +248,7 @@ const Points = () => {
               setShowTransfer(false);
               setShowPremium(false);
               setShowGiftPremium(false);
+              setShowDropdown(false); // Закрываем выпадающее меню
               if (!showHistory) loadTransactions();
             }}
             className="dropdown-item"
@@ -251,6 +263,7 @@ const Points = () => {
               setShowTransfer(false);
               setShowHistory(false);
               setShowGiftPremium(false);
+              setShowDropdown(false); // Закрываем выпадающее меню
             }}
             className="dropdown-item"
           >
@@ -264,6 +277,7 @@ const Points = () => {
               setShowTransfer(false);
               setShowHistory(false);
               setShowPremium(false);
+              setShowDropdown(false); // Закрываем выпадающее меню
             }}
             className="dropdown-item"
           >
@@ -275,11 +289,19 @@ const Points = () => {
 
       {/* Форма перевода */}
       {showTransfer && (
-        <div className="transfer-form">
+        <div className="transfer-form show">
           <div className="form-header">
             <h3>Перевод баллов</h3>
             <button 
-              onClick={() => setShowTransfer(false)}
+              onClick={() => {
+                const form = document.querySelector('.transfer-form');
+                if (form) {
+                  form.classList.remove('show');
+                  setTimeout(() => {
+                    setShowTransfer(false);
+                  }, 300);
+                }
+              }}
               className="close-btn"
             >
               <X size={16} />
@@ -338,11 +360,19 @@ const Points = () => {
 
       {/* История транзакций */}
       {showHistory && (
-        <div className="transactions-history">
+        <div className="transactions-history show">
           <div className="form-header">
             <h3>История транзакций</h3>
             <button 
-              onClick={() => setShowHistory(false)}
+              onClick={() => {
+                const form = document.querySelector('.transactions-history');
+                if (form) {
+                  form.classList.remove('show');
+                  setTimeout(() => {
+                    setShowHistory(false);
+                  }, 300);
+                }
+              }}
               className="close-btn"
             >
               <X size={16} />
@@ -398,11 +428,19 @@ const Points = () => {
 
       {/* Премиум форма */}
       {showPremium && (
-        <div className="premium-form">
+        <div className="premium-form show">
           <div className="form-header">
             <h3>Премиум</h3>
             <button 
-              onClick={() => setShowPremium(false)}
+              onClick={() => {
+                const form = document.querySelector('.premium-form');
+                if (form) {
+                  form.classList.remove('show');
+                  setTimeout(() => {
+                    setShowPremium(false);
+                  }, 300);
+                }
+              }}
               className="close-btn"
             >
               <X size={16} />
@@ -444,11 +482,19 @@ const Points = () => {
 
       {/* Форма дарения премиума */}
       {showGiftPremium && (
-        <div className="gift-premium-form">
+        <div className="gift-premium-form show">
           <div className="form-header">
             <h3>Подарить премиум</h3>
             <button 
-              onClick={() => setShowGiftPremium(false)}
+              onClick={() => {
+                const form = document.querySelector('.gift-premium-form');
+                if (form) {
+                  form.classList.remove('show');
+                  setTimeout(() => {
+                    setShowGiftPremium(false);
+                  }, 300);
+                }
+              }}
               className="close-btn"
             >
               <X size={16} />
@@ -494,8 +540,14 @@ const Points = () => {
             <h3>Детали транзакции</h3>
             <button 
               onClick={() => {
-                setShowTransactionDetails(false);
-                setSelectedTransaction(null);
+                const modal = document.querySelector('.transaction-details-modal');
+                if (modal) {
+                  modal.classList.remove('show');
+                  setTimeout(() => {
+                    setShowTransactionDetails(false);
+                    setSelectedTransaction(null);
+                  }, 300);
+                }
               }}
               className="close-btn"
             >

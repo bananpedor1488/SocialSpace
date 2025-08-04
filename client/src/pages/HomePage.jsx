@@ -278,6 +278,8 @@ const HomePage = () => {
       // Новый пост
       socketRef.current.on('newPost', (newPost) => {
         console.log('New post received:', newPost);
+        console.log('Author data:', newPost.author);
+        console.log('User data:', user);
         const formattedPost = {
           _id: newPost._id,
           userId: newPost.author?._id || newPost.author,
