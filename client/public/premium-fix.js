@@ -7,22 +7,22 @@
     const premiumForms = document.querySelectorAll('.premium-form, .gift-premium-form');
     
     premiumForms.forEach(form => {
-      // Принудительно устанавливаем стили
-      form.style.position = 'fixed';
-      form.style.top = '50%';
-      form.style.left = '50%';
-      form.style.transform = 'translate(-50%, -50%)';
-      form.style.zIndex = '999999';
-      form.style.pointerEvents = 'auto';
-      
-      // Если форма показана, устанавливаем полный размер
-      if (form.classList.contains('show')) {
-        form.style.transform = 'translate(-50%, -50%) scale(1)';
-        form.style.opacity = '1';
-      } else {
-        form.style.transform = 'translate(-50%, -50%) scale(0.8)';
-        form.style.opacity = '0';
-      }
+                    // Принудительно устанавливаем стили
+              form.style.position = 'fixed';
+              form.style.top = '50vh';
+              form.style.left = '50vw';
+              form.style.transform = 'translate(-50%, -50%)';
+              form.style.zIndex = '999999';
+              form.style.pointerEvents = 'auto';
+
+              // Если форма показана, устанавливаем полный размер
+              if (form.classList.contains('show')) {
+                form.style.transform = 'translate(-50%, -50%) scale(1)';
+                form.style.opacity = '1';
+              } else {
+                form.style.transform = 'translate(-50%, -50%) scale(0.8)';
+                form.style.opacity = '0';
+              }
     });
   }
   

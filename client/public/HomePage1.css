@@ -4,16 +4,24 @@
   box-sizing: border-box;
 }
 
+/* Ensure proper viewport height for all elements */
+html, body, #root {
+  height: 100vh;
+  min-height: 100vh;
+  max-height: 100vh;
+}
+
 html {
   font-size: 16px;
-  height: 100%;
+  height: 100vh;
+  min-height: 100vh;
 }
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
-  height: 100%;
+  height: 100vh;
   color: #1f2937;
   overflow-x: hidden;
   padding: 0;
@@ -3861,8 +3869,8 @@ body {
 /* Стили для премиума */
 .premium-form {
   position: fixed !important;
-  top: 50% !important;
-  left: 50% !important;
+  top: 50vh !important;
+  left: 50vw !important;
   transform: translate(-50%, -50%) scale(0.8) !important;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(30px);
@@ -4154,8 +4162,8 @@ body {
 
 .gift-premium-form {
   position: fixed !important;
-  top: 50% !important;
-  left: 50% !important;
+  top: 50vh !important;
+  left: 50vw !important;
   transform: translate(-50%, -50%) scale(0.8) !important;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(30px);
@@ -4178,8 +4186,8 @@ body {
   transform: translate(-50%, -50%) scale(1) !important;
   opacity: 1;
   position: fixed !important;
-  top: 50% !important;
-  left: 50% !important;
+  top: 50vh !important;
+  left: 50vw !important;
 }
 
 .gift-premium-form::before {
@@ -4555,5 +4563,45 @@ body {
   
   .detail-value {
     font-size: 13px;
+  }
+}
+
+/* Абсолютная гарантия центрирования форм премиума */
+.premium-form,
+.gift-premium-form {
+  position: fixed !important;
+  top: 50vh !important;
+  left: 50vw !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 999999 !important;
+  pointer-events: auto !important;
+}
+
+.premium-form.show,
+.gift-premium-form.show {
+  transform: translate(-50%, -50%) scale(1) !important;
+  opacity: 1 !important;
+}
+
+/* Дополнительная гарантия для всех размеров экрана */
+@media (min-width: 768px) {
+  .premium-form,
+  .gift-premium-form {
+    position: fixed !important;
+    top: 50vh !important;
+    left: 50vw !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 999999 !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .premium-form,
+  .gift-premium-form {
+    position: fixed !important;
+    top: 50vh !important;
+    left: 50vw !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 999999 !important;
   }
 }

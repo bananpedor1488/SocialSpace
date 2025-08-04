@@ -4,8 +4,8 @@
 .premium-form,
 .gift-premium-form {
   position: fixed !important;
-  top: 50% !important;
-  left: 50% !important;
+  top: 50vh !important;
+  left: 50vw !important;
   transform: translate(-50%, -50%) scale(0.8) !important;
   z-index: 999999 !important;
   pointer-events: auto !important;
@@ -19,8 +19,8 @@
   transform: translate(-50%, -50%) scale(1) !important;
   opacity: 1 !important;
   position: fixed !important;
-  top: 50% !important;
-  left: 50% !important;
+  top: 50vh !important;
+  left: 50vw !important;
   z-index: 999999 !important;
 }
 
