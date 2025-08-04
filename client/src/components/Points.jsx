@@ -430,7 +430,7 @@ const Points = () => {
       {showPremium && (
         <div className="premium-form show">
           <div className="form-header">
-            <h3>Премиум</h3>
+            <h3>🌟 Премиум подписка</h3>
             <button 
               onClick={() => {
                 const form = document.querySelector('.premium-form');
@@ -450,19 +450,55 @@ const Points = () => {
           {premiumInfo.active ? (
             <div className="premium-active">
               <div className="premium-status">
-                <Crown size={24} className="premium-icon" />
-                <h5>Премиум активен</h5>
-                <p>Действует до: {premiumInfo.expiresAt ? new Date(premiumInfo.expiresAt).toLocaleDateString('ru-RU') : 'Неизвестно'}</p>
+                <Crown size={32} className="premium-icon" />
+                <h5>🎉 Премиум активен!</h5>
+                <p className="premium-expires">Действует до: {premiumInfo.expiresAt ? new Date(premiumInfo.expiresAt).toLocaleDateString('ru-RU') : 'Неизвестно'}</p>
+                
+                <div className="premium-benefits">
+                  <h6>✨ Ваши премиум возможности:</h6>
+                  <ul>
+                    <li>🌟 Золотая корона в профиле</li>
+                    <li>💎 Приоритет в поиске</li>
+                    <li>🎨 Специальные анимации</li>
+                    <li>📈 Расширенная статистика</li>
+                    <li>🎁 Возможность дарить премиум</li>
+                  </ul>
+                </div>
               </div>
             </div>
           ) : (
             <div className="premium-buy">
               <div className="premium-info">
-                <Crown size={32} className="premium-icon" />
-                <h5>Купить премиум</h5>
-                <p>Стоимость: 300 баллов</p>
-                <p>Длительность: 30 дней</p>
-                <p>Ваш баланс: {formatAmount(balance)} баллов</p>
+                <Crown size={48} className="premium-icon" />
+                <h5>💎 Купить премиум</h5>
+                
+                <div className="premium-details">
+                  <div className="premium-cost">
+                    <span className="cost-label">Стоимость:</span>
+                    <span className="cost-amount">300 баллов</span>
+                  </div>
+                  <div className="premium-duration">
+                    <span className="duration-label">Длительность:</span>
+                    <span className="duration-amount">30 дней</span>
+                  </div>
+                  <div className="premium-balance">
+                    <span className="balance-label">Ваш баланс:</span>
+                    <span className="balance-amount">{formatAmount(balance)} баллов</span>
+                  </div>
+                </div>
+
+                <div className="premium-benefits">
+                  <h6>🎁 Что включено в премиум:</h6>
+                  <ul>
+                    <li>🌟 Золотая корона в профиле</li>
+                    <li>💎 Приоритет в поиске пользователей</li>
+                    <li>🎨 Специальные анимации и эффекты</li>
+                    <li>📈 Расширенная статистика профиля</li>
+                    <li>🎁 Возможность дарить премиум друзьям</li>
+                    <li>⚡ Приоритетная поддержка</li>
+                    <li>🎯 Эксклюзивные функции</li>
+                  </ul>
+                </div>
               </div>
               
               {error && <div className="error-message">{error}</div>}
@@ -473,7 +509,7 @@ const Points = () => {
                 disabled={loading || balance < 300}
                 className="buy-premium-btn"
               >
-                {loading ? 'Покупка...' : 'Купить премиум'}
+                {loading ? '🔄 Покупка...' : balance < 300 ? '❌ Недостаточно баллов' : '💎 Купить премиум'}
               </button>
             </div>
           )}
@@ -484,7 +520,7 @@ const Points = () => {
       {showGiftPremium && (
         <div className="gift-premium-form show">
           <div className="form-header">
-            <h3>Подарить премиум</h3>
+            <h3>🎁 Подарить премиум</h3>
             <button 
               onClick={() => {
                 const form = document.querySelector('.gift-premium-form');
@@ -503,7 +539,7 @@ const Points = () => {
           
           <form onSubmit={handleGiftPremium}>
             <div className="form-group">
-              <label>Получатель (username):</label>
+              <label>👤 Получатель (username):</label>
               <input
                 type="text"
                 value={giftData.recipientUsername}
@@ -514,9 +550,32 @@ const Points = () => {
             </div>
             
             <div className="gift-info">
-              <Gift size={20} className="gift-icon" />
-              <p>Стоимость подарка: 300 баллов</p>
-              <p>Ваш баланс: {formatAmount(balance)} баллов</p>
+              <Gift size={24} className="gift-icon" />
+              <div className="gift-details">
+                <div className="gift-cost">
+                  <span className="cost-label">Стоимость подарка:</span>
+                  <span className="cost-amount">300 баллов</span>
+                </div>
+                <div className="gift-duration">
+                  <span className="duration-label">Длительность:</span>
+                  <span className="duration-amount">30 дней</span>
+                </div>
+                <div className="gift-balance">
+                  <span className="balance-label">Ваш баланс:</span>
+                  <span className="balance-amount">{formatAmount(balance)} баллов</span>
+                </div>
+              </div>
+              
+              <div className="gift-benefits">
+                <h6>🎁 Что получит пользователь:</h6>
+                <ul>
+                  <li>🌟 Золотая корона в профиле</li>
+                  <li>💎 Приоритет в поиске</li>
+                  <li>🎨 Специальные анимации</li>
+                  <li>📈 Расширенная статистика</li>
+                  <li>🎁 Возможность дарить премиум</li>
+                </ul>
+              </div>
             </div>
             
             {error && <div className="error-message">{error}</div>}
@@ -527,7 +586,7 @@ const Points = () => {
               disabled={loading || balance < 300}
               className="submit-btn"
             >
-              {loading ? 'Дарение...' : 'Подарить премиум'}
+              {loading ? '🔄 Дарение...' : balance < 300 ? '❌ Недостаточно баллов' : '🎁 Подарить премиум'}
             </button>
           </form>
         </div>
