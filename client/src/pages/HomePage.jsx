@@ -13,6 +13,7 @@ import CallInterface from '../components/CallInterface';
 import OnlineStatus from '../components/OnlineStatus';
 import ProfileSettings from '../components/ProfileSettings';
 import Avatar from '../components/Avatar';
+import Points from '../components/Points';
 
 import useOnlineStatus from '../hooks/useOnlineStatus';
 
@@ -68,6 +69,17 @@ const HomePage = () => {
 
   // Список изменений версий
   const changelogData = [
+    {
+      version: '1.7',
+      date: '2 августа 2025',
+      changes: [
+        '💰 Система баллов как внутренняя валюта',
+        '🔄 Переводы баллов между пользователями',
+        '📊 Рейтинг пользователей по баллам',
+        '📜 История транзакций с уникальными кодами',
+        '🎯 Отображение баланса в хедере'
+      ]
+    },
     {
       version: '1.6',
       date: '1 августа 2025',
@@ -1698,6 +1710,8 @@ const HomePage = () => {
           </div>
           <div className="user-info">
             <span>Hello, {user?.username}!</span>
+            
+            <Points />
             
             <button onClick={toggleTheme} className="theme-toggle">
               <div className="theme-icon">

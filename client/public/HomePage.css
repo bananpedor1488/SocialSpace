@@ -3143,3 +3143,467 @@ body {
   font-size: 12px;
   color: rgba(255, 255, 255, 0.7);
 }
+
+/* Points Component Styles */
+.points-container {
+  position: relative;
+  display: inline-block;
+}
+
+.points-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.points-balance {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(51, 65, 85, 0.7);
+  border: 1px solid rgba(71, 85, 105, 0.5);
+  border-radius: 20px;
+  padding: 8px 12px;
+  transition: all 0.3s ease;
+}
+
+.points-balance:hover {
+  background: rgba(71, 85, 105, 0.8);
+  border-color: rgba(100, 116, 139, 0.7);
+}
+
+.points-icon {
+  color: #fbbf24;
+}
+
+.balance-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.balance-label {
+  font-size: 10px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.balance-amount {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f1f5f9;
+}
+
+.points-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.points-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(51, 65, 85, 0.7);
+  border: 1px solid rgba(71, 85, 105, 0.5);
+  border-radius: 16px;
+  padding: 6px 10px;
+  color: #e2e8f0;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.points-action-btn:hover {
+  background: rgba(71, 85, 105, 0.8);
+  border-color: rgba(100, 116, 139, 0.7);
+  transform: translateY(-1px);
+}
+
+.transfer-btn {
+  color: #10b981;
+}
+
+.history-btn {
+  color: #3b82f6;
+}
+
+.leaderboard-btn {
+  color: #f59e0b;
+}
+
+/* Transfer Form */
+.transfer-form {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 320px;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(71, 85, 105, 0.5);
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 10px;
+  z-index: 1000;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.transfer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.transfer-header h3 {
+  color: #f1f5f9;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.3s ease;
+}
+
+.close-btn:hover {
+  color: #e2e8f0;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  color: #e2e8f0;
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-input {
+  width: 100%;
+  background: rgba(51, 65, 85, 0.7);
+  border: 1px solid rgba(71, 85, 105, 0.5);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #e2e8f0;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background: rgba(71, 85, 105, 0.8);
+}
+
+.form-input::placeholder {
+  color: #64748b;
+}
+
+.error-message {
+  color: #ef4444;
+  font-size: 12px;
+  margin-top: 8px;
+  padding: 8px;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: 6px;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.success-message {
+  color: #10b981;
+  font-size: 12px;
+  margin-top: 8px;
+  padding: 8px;
+  background: rgba(16, 185, 129, 0.1);
+  border-radius: 6px;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.submit-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Transactions History */
+.transactions-history {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 400px;
+  max-height: 500px;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(71, 85, 105, 0.5);
+  border-radius: 12px;
+  margin-top: 10px;
+  z-index: 1000;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+}
+
+.history-header h3 {
+  color: #f1f5f9;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.transactions-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.transaction-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.2);
+  transition: background-color 0.3s ease;
+}
+
+.transaction-item:hover {
+  background: rgba(51, 65, 85, 0.3);
+}
+
+.transaction-item:last-child {
+  border-bottom: none;
+}
+
+.transaction-avatar {
+  flex-shrink: 0;
+}
+
+.transaction-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.transaction-user {
+  color: #f1f5f9;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.transaction-description {
+  color: #94a3b8;
+  font-size: 12px;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.transaction-date {
+  color: #64748b;
+  font-size: 11px;
+}
+
+.transaction-amount {
+  font-weight: 600;
+  font-size: 14px;
+  margin-right: 8px;
+}
+
+.transaction-amount.outgoing {
+  color: #ef4444;
+}
+
+.transaction-amount.incoming {
+  color: #10b981;
+}
+
+.transaction-code {
+  color: #64748b;
+  font-size: 10px;
+  font-family: monospace;
+  background: rgba(51, 65, 85, 0.5);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.no-transactions {
+  padding: 40px 20px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.loading {
+  padding: 40px 20px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+/* Leaderboard */
+.leaderboard {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 350px;
+  max-height: 500px;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(71, 85, 105, 0.5);
+  border-radius: 12px;
+  margin-top: 10px;
+  z-index: 1000;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.leaderboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+}
+
+.leaderboard-header h3 {
+  color: #f1f5f9;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.leaderboard-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.leaderboard-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.2);
+  transition: background-color 0.3s ease;
+}
+
+.leaderboard-item:hover {
+  background: rgba(51, 65, 85, 0.3);
+}
+
+.leaderboard-item:last-child {
+  border-bottom: none;
+}
+
+.leaderboard-position {
+  flex-shrink: 0;
+  width: 24px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 14px;
+  color: #f1f5f9;
+}
+
+.leaderboard-avatar {
+  flex-shrink: 0;
+}
+
+.leaderboard-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.leaderboard-name {
+  color: #f1f5f9;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.leaderboard-username {
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.leaderboard-points {
+  color: #fbbf24;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .points-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .points-actions {
+    justify-content: center;
+  }
+  
+  .transfer-form,
+  .transactions-history,
+  .leaderboard {
+    width: 300px;
+    right: -50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .transfer-form,
+  .transactions-history,
+  .leaderboard {
+    width: 280px;
+    right: -80px;
+  }
+  
+  .points-balance {
+    padding: 6px 10px;
+  }
+  
+  .balance-amount {
+    font-size: 12px;
+  }
+  
+  .points-action-btn {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+}
