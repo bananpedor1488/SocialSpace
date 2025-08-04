@@ -3904,28 +3904,7 @@ body {
   fill: currentColor;
 }
 
-/* Адаптивность для премиума */
-@media (max-width: 480px) {
-  .premium-form,
-  .gift-premium-form {
-    width: 95%;
-    padding: 20px;
-  }
-  
-  .premium-header h3,
-  .gift-header h3 {
-    font-size: 18px;
-  }
-  
-  .premium-info h4 {
-    font-size: 16px;
-  }
-  
-  .buy-premium-btn {
-    padding: 10px 20px;
-    font-size: 14px;
-  }
-}
+
 
 /* Стили для кликабельных транзакций */
 .transaction-item.clickable {

@@ -4486,45 +4486,7 @@ body {
   }
 }
 
-/* Абсолютная гарантия центрирования форм премиума */
-.premium-form,
-.gift-premium-form {
-  position: fixed !important;
-  top: 50vh !important;
-  left: 50vw !important;
-  transform: translate(-50%, -50%) !important;
-  z-index: 999999 !important;
-  pointer-events: auto !important;
-}
 
-.premium-form.show,
-.gift-premium-form.show {
-  transform: translate(-50%, -50%) scale(1) !important;
-  opacity: 1 !important;
-}
-
-/* Дополнительная гарантия для всех размеров экрана */
-@media (min-width: 768px) {
-  .premium-form,
-  .gift-premium-form {
-    position: fixed !important;
-    top: 50vh !important;
-    left: 50vw !important;
-    transform: translate(-50%, -50%) !important;
-    z-index: 999999 !important;
-  }
-}
-
-@media (max-width: 767px) {
-  .premium-form,
-  .gift-premium-form {
-    position: fixed !important;
-    top: 50vh !important;
-    left: 50vw !important;
-    transform: translate(-50%, -50%) !important;
-    z-index: 999999 !important;
-  }
-}
 
 /* Новые стили для модальных окон */
 .modal-overlay {
