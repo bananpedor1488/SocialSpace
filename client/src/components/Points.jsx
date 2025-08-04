@@ -28,6 +28,8 @@ const Points = () => {
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const [showTransactionDetails, setShowTransactionDetails] = useState(false);
 
   // Загрузить баланс
   const loadBalance = async () => {
@@ -172,6 +174,23 @@ const Points = () => {
   // Форматировать сумму
   const formatAmount = (amount) => {
     return new Intl.NumberFormat('ru-RU').format(amount);
+  };
+
+  // Загрузить детали транзакции
+  const loadTransactionDetails = async (transactionCode) => {
+    try {
+      const response = await axios.get(`https://server-u9ji.onrender.com/api/points/transaction/${transactionCode}`);
+      setSelectedTransaction(response.data.transaction);
+      setShowTransactionDetails(true);
+    } catch (error) {
+      console.error('Error loading transaction details:', error);
+      setError('Ошибка загрузки деталей транзакции');
+    }
+  };
+
+  // Обработчик клика по транзакции
+  const handleTransactionClick = (transaction) => {
+    loadTransactionDetails(transaction.transactionCode);
   };
 
   useEffect(() => {
@@ -335,7 +354,12 @@ const Points = () => {
           ) : transactions.length > 0 ? (
             <div className="transactions-list">
               {transactions.map(transaction => (
-                <div key={transaction._id} className="transaction-item">
+                <div 
+                  key={transaction._id} 
+                  className="transaction-item clickable"
+                  onClick={() => handleTransactionClick(transaction)}
+                  style={{ cursor: 'pointer' }}
+                >
                   <div className="transaction-avatar">
                     <Avatar 
                       src={transaction.isOutgoing ? transaction.recipient.avatar : transaction.sender.avatar}
@@ -460,6 +484,98 @@ const Points = () => {
               {loading ? 'Дарение...' : 'Подарить премиум'}
             </button>
           </form>
+        </div>
+      )}
+
+      {/* Детали транзакции */}
+      {showTransactionDetails && selectedTransaction && (
+        <div className="transaction-details-modal">
+          <div className="transaction-details-header">
+            <h3>Детали транзакции</h3>
+            <button 
+              onClick={() => {
+                setShowTransactionDetails(false);
+                setSelectedTransaction(null);
+              }}
+              className="close-btn"
+            >
+              <X size={16} />
+            </button>
+          </div>
+          
+          <div className="transaction-details-content">
+            <div className="transaction-detail-row">
+              <span className="detail-label">Код транзакции:</span>
+              <span className="detail-value">{selectedTransaction.transactionCode}</span>
+            </div>
+            
+            <div className="transaction-detail-row">
+              <span className="detail-label">Тип:</span>
+              <span className="detail-value">
+                {selectedTransaction.type === 'transfer' && 'Перевод'}
+                {selectedTransaction.type === 'premium' && 'Покупка премиума'}
+                {selectedTransaction.type === 'premium_gift' && 'Подарок премиума'}
+                {selectedTransaction.type === 'reward' && 'Награда'}
+                {selectedTransaction.type === 'bonus' && 'Бонус'}
+                {selectedTransaction.type === 'system' && 'Системная'}
+              </span>
+            </div>
+            
+            <div className="transaction-detail-row">
+              <span className="detail-label">Сумма:</span>
+              <span className={`detail-value ${selectedTransaction.isOutgoing ? 'outgoing' : 'incoming'}`}>
+                {selectedTransaction.isOutgoing ? '-' : '+'}{formatAmount(selectedTransaction.amount)} баллов
+              </span>
+            </div>
+            
+            <div className="transaction-detail-row">
+              <span className="detail-label">Описание:</span>
+              <span className="detail-value">{selectedTransaction.description || 'Нет описания'}</span>
+            </div>
+            
+            <div className="transaction-detail-row">
+              <span className="detail-label">Статус:</span>
+              <span className={`detail-value status-${selectedTransaction.status}`}>
+                {selectedTransaction.status === 'completed' && '✅ Выполнено'}
+                {selectedTransaction.status === 'pending' && '⏳ В обработке'}
+                {selectedTransaction.status === 'failed' && '❌ Ошибка'}
+                {selectedTransaction.status === 'cancelled' && '🚫 Отменено'}
+              </span>
+            </div>
+            
+            <div className="transaction-detail-row">
+              <span className="detail-label">Дата:</span>
+              <span className="detail-value">{formatDate(selectedTransaction.createdAt)}</span>
+            </div>
+            
+            {selectedTransaction.sender && (
+              <div className="transaction-detail-row">
+                <span className="detail-label">Отправитель:</span>
+                <div className="detail-user">
+                  <Avatar 
+                    src={selectedTransaction.sender.avatar}
+                    alt={selectedTransaction.sender.displayName}
+                    size="small"
+                  />
+                  <span>{selectedTransaction.sender.displayName}</span>
+                </div>
+              </div>
+            )}
+            
+            {selectedTransaction.recipient && (
+              <div className="transaction-detail-row">
+                <span className="detail-label">Получатель:</span>
+                <div className="detail-user">
+                  <Avatar 
+                    src={selectedTransaction.recipient.avatar}
+                    alt={selectedTransaction.recipient.displayName}
+                    size="small"
+                  />
+                  <span>{selectedTransaction.recipient.displayName}</span>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>
