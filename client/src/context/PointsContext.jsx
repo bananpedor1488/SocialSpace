@@ -67,6 +67,7 @@ export const PointsProvider = ({ children }) => {
     showTransactionDetails,
     setShowTransactionDetails,
     loading,
+    setLoading,
     loadTransactions,
     handleTransactionClick,
     openHistory,

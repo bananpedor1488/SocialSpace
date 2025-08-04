@@ -35,6 +35,7 @@ const PointsModals = () => {
     showTransactionDetails,
     setShowTransactionDetails,
     loading,
+    setLoading,
     handleTransactionClick
   } = usePoints();
 
