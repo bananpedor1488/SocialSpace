@@ -1717,7 +1717,8 @@ const HomePage = () => {
   }
 
   return (
-    <div className={`home-container ${activeTab === 'home' ? 'show-right-sidebar' : ''}`}>
+    <>
+      <div className={`home-container ${activeTab === 'home' ? 'show-right-sidebar' : ''}`}>
       <header className="header">
         <div className="header-content">
           <div className="logo"><h1><Flame size={24} /> SocialSpace</h1></div>
@@ -2344,9 +2345,10 @@ const HomePage = () => {
           onProfileUpdate={handleProfileUpdate}
         />
       )}
-      
-      <Points />
     </div>
+    
+    <Points />
+    </>
   );
 };
 
