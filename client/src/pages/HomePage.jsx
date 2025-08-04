@@ -277,9 +277,6 @@ const HomePage = () => {
       
       // Новый пост
       socketRef.current.on('newPost', (newPost) => {
-        console.log('New post received:', newPost);
-        console.log('Author data:', newPost.author);
-        console.log('User data:', user);
         const formattedPost = {
           _id: newPost._id,
           userId: newPost.author?._id || newPost.author,
@@ -300,7 +297,9 @@ const HomePage = () => {
           commentsCount: newPost.commentsCount || 0,
           isRepost: newPost.isRepost || false,
           originalPost: newPost.originalPost || null,
-          repostedBy: newPost.repostedBy || null
+          repostedBy: newPost.repostedBy || null,
+          // Добавляем полный объект автора для совместимости с renderPosts
+          author: newPost.author
         };
 
         setPosts(prev => [formattedPost, ...prev]);
@@ -308,7 +307,6 @@ const HomePage = () => {
 
       // Новый репост
       socketRef.current.on('newRepost', (repostData) => {
-        console.log('New repost received:', repostData);
         const formattedRepost = {
           _id: repostData._id,
           userId: repostData.repostedBy?._id || repostData.repostedBy,
@@ -334,7 +332,9 @@ const HomePage = () => {
             content: repostData.originalPost?.content,
             createdAt: repostData.originalPost?.createdAt
           },
-          repostedBy: repostData.repostedBy
+          repostedBy: repostData.repostedBy,
+          // Добавляем полный объект автора для совместимости с renderPosts
+          author: repostData.repostedBy
         };
 
         setPosts(prev => [formattedRepost, ...prev]);
@@ -1516,8 +1516,6 @@ const HomePage = () => {
     }
 
     return postsToRender.map(post => {
-      console.log('Rendering post:', post);
-      
       return (
         <div key={post._id} className="post">
           {post.isRepost && (
