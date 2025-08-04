@@ -3866,87 +3866,7 @@ body {
 
 
 
-/* Стили для премиума */
-.premium-form {
-  position: fixed !important;
-  top: 50vh !important;
-  left: 50vw !important;
-  transform: translate(-50%, -50%) scale(0.8) !important;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(30px);
-  border: 1px solid rgba(251, 191, 36, 0.2);
-  border-radius: 24px;
-  padding: 32px;
-  width: 90%;
-  max-width: 480px;
-  z-index: 999999 !important;
-  box-shadow: 
-    0 25px 50px rgba(0, 0, 0, 0.15),
-    0 0 0 1px rgba(251, 191, 36, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  opacity: 0;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  pointer-events: auto;
-}
-
-/* Backdrop overlay for premium forms */
-.premium-form::after,
-.gift-premium-form::after {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: -1;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.premium-form.show::after,
-.gift-premium-form.show::after {
-  opacity: 1;
-}
-
-/* Force forms to be on top of everything */
-.premium-form,
-.gift-premium-form {
-  position: fixed !important;
-  top: 50% !important;
-  left: 50% !important;
-  transform: translate(-50%, -50%) scale(0.8) !important;
-  z-index: 999999 !important;
-  pointer-events: auto !important;
-}
-
-.premium-form.show,
-.gift-premium-form.show {
-  transform: translate(-50%, -50%) scale(1) !important;
-  opacity: 1 !important;
-}
-
-.premium-form.show {
-  transform: translate(-50%, -50%) scale(1) !important;
-  opacity: 1;
-  position: fixed !important;
-  top: 50% !important;
-  left: 50% !important;
-}
-
-.premium-form::before {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  background: linear-gradient(135deg, #fbbf24, #f59e0b, #d97706);
-  border-radius: 26px;
-  z-index: -1;
-  opacity: 0.3;
-  filter: blur(8px);
-}
+/* Старые стили премиума удалены - заменены на новые модальные окна */
 
 .form-header {
   display: flex;
@@ -4323,8 +4243,8 @@ body {
     padding: 24px;
     max-width: 400px;
     position: fixed !important;
-    top: 50% !important;
-    left: 50% !important;
+    top: 50vh !important;
+    left: 50vw !important;
     transform: translate(-50%, -50%) scale(0.8) !important;
     z-index: 999999 !important;
   }
@@ -4603,5 +4523,672 @@ body {
     left: 50vw !important;
     transform: translate(-50%, -50%) !important;
     z-index: 999999 !important;
+  }
+}
+
+/* Новые стили для модальных окон */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+}
+
+.modal-content {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 32px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 
+    0 25px 50px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  position: relative;
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.modal-header h3 {
+  color: #1e293b;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #1e293b;
+}
+
+/* Стили для форм */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #374151;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 16px;
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #fbbf24;
+  box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.form-input::placeholder {
+  color: #9ca3af;
+}
+
+.error-message {
+  background: #fef2f2;
+  color: #dc2626;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border: 1px solid #fecaca;
+  font-size: 14px;
+}
+
+.success-message {
+  background: #f0fdf4;
+  color: #16a34a;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border: 1px solid #bbf7d0;
+  font-size: 14px;
+}
+
+.submit-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: #1e293b;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.submit-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.submit-btn:hover::before {
+  left: 100%;
+}
+
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(251, 191, 36, 0.3);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Стили для премиум модального окна */
+.premium-modal .modal-content {
+  max-width: 600px;
+}
+
+.premium-active {
+  text-align: center;
+}
+
+.premium-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.premium-icon {
+  color: #fbbf24;
+  filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.4));
+  animation: premium-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes premium-glow {
+  0% {
+    filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.4));
+  }
+  100% {
+    filter: drop-shadow(0 0 16px rgba(251, 191, 36, 0.6));
+  }
+}
+
+.premium-status h5 {
+  color: #fbbf24;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(251, 191, 36, 0.3);
+}
+
+.premium-expires {
+  color: #64748b;
+  font-size: 14px;
+  margin: 0;
+  background: rgba(251, 191, 36, 0.1);
+  padding: 8px 16px;
+  border-radius: 8px;
+}
+
+.premium-benefits {
+  text-align: left;
+  margin-top: 20px;
+}
+
+.premium-benefits h6 {
+  color: #1e293b;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+}
+
+.premium-benefits ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.premium-benefits li {
+  padding: 8px 0;
+  color: #374151;
+  font-size: 14px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.premium-benefits li:hover {
+  color: #1e293b;
+  background: rgba(251, 191, 36, 0.05);
+  padding-left: 8px;
+  border-radius: 4px;
+}
+
+.premium-buy {
+  text-align: center;
+}
+
+.premium-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.premium-info h5 {
+  color: #1e293b;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.premium-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.premium-cost, .premium-duration, .premium-balance {
+  background: rgba(251, 191, 36, 0.1);
+  padding: 16px;
+  border-radius: 12px;
+  text-align: center;
+  border: 1px solid rgba(251, 191, 36, 0.2);
+}
+
+.cost-label, .duration-label, .balance-label {
+  display: block;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cost-amount, .duration-amount, .balance-amount {
+  display: block;
+  color: #1e293b;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.cost-amount {
+  color: #dc2626;
+}
+
+.balance-amount {
+  color: #16a34a;
+}
+
+.buy-premium-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: #1e293b;
+  border: none;
+  border-radius: 12px;
+  padding: 16px 24px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.buy-premium-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.6s;
+}
+
+.buy-premium-btn:hover::before {
+  left: 100%;
+}
+
+.buy-premium-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(251, 191, 36, 0.4);
+}
+
+.buy-premium-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Стили для подарка премиума */
+.gift-modal .modal-content {
+  max-width: 600px;
+}
+
+.gift-info {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.gift-icon {
+  color: #fbbf24;
+  align-self: center;
+  filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.4));
+  animation: gift-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes gift-glow {
+  0% {
+    filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.4));
+  }
+  100% {
+    filter: drop-shadow(0 0 16px rgba(251, 191, 36, 0.6));
+  }
+}
+
+.gift-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+}
+
+.gift-cost, .gift-duration, .gift-balance {
+  background: rgba(251, 191, 36, 0.1);
+  padding: 16px;
+  border-radius: 12px;
+  text-align: center;
+  border: 1px solid rgba(251, 191, 36, 0.2);
+}
+
+.gift-benefits {
+  text-align: left;
+}
+
+.gift-benefits h6 {
+  color: #1e293b;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+}
+
+.gift-benefits ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.gift-benefits li {
+  padding: 8px 0;
+  color: #374151;
+  font-size: 14px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.gift-benefits li:hover {
+  color: #1e293b;
+  background: rgba(251, 191, 36, 0.05);
+  padding-left: 8px;
+  border-radius: 4px;
+}
+
+/* Стили для истории транзакций */
+.history-modal .modal-content {
+  max-width: 700px;
+  max-height: 80vh;
+}
+
+.transactions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.transaction-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.transaction-item:hover {
+  background: rgba(251, 191, 36, 0.05);
+  border-color: rgba(251, 191, 36, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.transaction-avatar {
+  flex-shrink: 0;
+}
+
+.transaction-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.transaction-user {
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 4px;
+}
+
+.transaction-description {
+  color: #64748b;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.transaction-date {
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+.transaction-amount {
+  font-weight: 700;
+  font-size: 16px;
+  margin-left: auto;
+}
+
+.transaction-amount.outgoing {
+  color: #dc2626;
+}
+
+.transaction-amount.incoming {
+  color: #16a34a;
+}
+
+.transaction-code {
+  color: #9ca3af;
+  font-size: 12px;
+  font-family: monospace;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.no-transactions {
+  text-align: center;
+  color: #64748b;
+  padding: 40px 20px;
+  font-size: 16px;
+}
+
+.loading {
+  text-align: center;
+  color: #64748b;
+  padding: 40px 20px;
+  font-size: 16px;
+}
+
+/* Стили для деталей транзакции */
+.transaction-modal .modal-content {
+  max-width: 600px;
+}
+
+.transaction-details-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.transaction-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.transaction-detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 14px;
+}
+
+.detail-value {
+  color: #1e293b;
+  font-size: 14px;
+  text-align: right;
+}
+
+.detail-value.outgoing {
+  color: #dc2626;
+}
+
+.detail-value.incoming {
+  color: #16a34a;
+}
+
+.detail-value.status-completed {
+  color: #16a34a;
+}
+
+.detail-value.status-pending {
+  color: #f59e0b;
+}
+
+.detail-value.status-failed {
+  color: #dc2626;
+}
+
+.detail-value.status-cancelled {
+  color: #64748b;
+}
+
+.detail-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.detail-user span {
+  color: #1e293b;
+  font-weight: 500;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .modal-overlay {
+    padding: 10px;
+  }
+  
+  .modal-content {
+    padding: 24px;
+    max-width: 100%;
+  }
+  
+  .modal-header h3 {
+    font-size: 20px;
+  }
+  
+  .premium-details,
+  .gift-details {
+    grid-template-columns: 1fr;
+  }
+  
+  .transaction-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .transaction-amount {
+    margin-left: 0;
+    align-self: flex-end;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    padding: 20px;
+  }
+  
+  .modal-header h3 {
+    font-size: 18px;
+  }
+  
+  .premium-info h5 {
+    font-size: 18px;
+  }
+  
+  .premium-details,
+  .gift-details {
+    gap: 12px;
+  }
+  
+  .premium-cost, .premium-duration, .premium-balance,
+  .gift-cost, .gift-duration, .gift-balance {
+    padding: 12px;
+  }
+  
+  .cost-label, .duration-label, .balance-label {
+    font-size: 11px;
+  }
+  
+  .cost-amount, .duration-amount, .balance-amount {
+    font-size: 14px;
+  }
+  
+  .buy-premium-btn {
+    padding: 14px 20px;
+    font-size: 14px;
   }
 }
