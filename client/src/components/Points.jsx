@@ -208,6 +208,25 @@ const Points = () => {
     loadPremiumInfo();
   }, []);
 
+  // Принудительное позиционирование форм премиума
+  useEffect(() => {
+    const forcePosition = () => {
+      if (window.forcePremiumFormPosition) {
+        window.forcePremiumFormPosition();
+      }
+    };
+
+    // Применяем позиционирование при изменении состояния форм
+    if (showPremium || showGiftPremium) {
+      setTimeout(forcePosition, 100);
+    }
+
+    // Периодически проверяем позиционирование
+    const interval = setInterval(forcePosition, 500);
+    
+    return () => clearInterval(interval);
+  }, [showPremium, showGiftPremium]);
+
   return (
     <div className="points-container">
       {/* Основная информация о баллах с выпадающим меню */}

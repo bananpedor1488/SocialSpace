@@ -1,0 +1,154 @@
+/* ПРИНУДИТЕЛЬНЫЕ СТИЛИ ДЛЯ ФОРМ ПРЕМИУМА - ГАРАНТИРОВАННОЕ ПОЗИЦИОНИРОВАНИЕ ПО ЦЕНТРУ */
+
+/* Основные стили для форм премиума */
+.premium-form,
+.gift-premium-form {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) scale(0.8) !important;
+  z-index: 999999 !important;
+  pointer-events: auto !important;
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Состояние показа для форм */
+.premium-form.show,
+.gift-premium-form.show {
+  transform: translate(-50%, -50%) scale(1) !important;
+  opacity: 1 !important;
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  z-index: 999999 !important;
+}
+
+/* Дополнительные стили для всех размеров экрана */
+@media (min-width: 768px) {
+  .premium-form,
+  .gift-premium-form {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) scale(0.8) !important;
+    z-index: 999999 !important;
+  }
+  
+  .premium-form.show,
+  .gift-premium-form.show {
+    transform: translate(-50%, -50%) scale(1) !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .premium-form,
+  .gift-premium-form {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) scale(0.8) !important;
+    z-index: 999999 !important;
+  }
+  
+  .premium-form.show,
+  .gift-premium-form.show {
+    transform: translate(-50%, -50%) scale(1) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .premium-form,
+  .gift-premium-form {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) scale(0.8) !important;
+    z-index: 999999 !important;
+    width: 95% !important;
+    max-width: 400px !important;
+  }
+  
+  .premium-form.show,
+  .gift-premium-form.show {
+    transform: translate(-50%, -50%) scale(1) !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .premium-form,
+  .gift-premium-form {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) scale(0.8) !important;
+    z-index: 999999 !important;
+    width: 98% !important;
+    max-width: 350px !important;
+  }
+  
+  .premium-form.show,
+  .gift-premium-form.show {
+    transform: translate(-50%, -50%) scale(1) !important;
+  }
+}
+
+/* Принудительное переопределение всех возможных конфликтов */
+* {
+  .premium-form,
+  .gift-premium-form {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) scale(0.8) !important;
+    z-index: 999999 !important;
+  }
+  
+  .premium-form.show,
+  .gift-premium-form.show {
+    transform: translate(-50%, -50%) scale(1) !important;
+    opacity: 1 !important;
+  }
+}
+
+/* Дополнительные гарантии позиционирования */
+html, body {
+  .premium-form,
+  .gift-premium-form {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) scale(0.8) !important;
+    z-index: 999999 !important;
+    pointer-events: auto !important;
+  }
+  
+  .premium-form.show,
+  .gift-premium-form.show {
+    transform: translate(-50%, -50%) scale(1) !important;
+    opacity: 1 !important;
+  }
+}
+
+/* Максимальный приоритет для форм премиума */
+.premium-form,
+.gift-premium-form {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) scale(0.8) !important;
+  z-index: 999999 !important;
+  pointer-events: auto !important;
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.premium-form.show,
+.gift-premium-form.show {
+  transform: translate(-50%, -50%) scale(1) !important;
+  opacity: 1 !important;
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  z-index: 999999 !important;
+} 

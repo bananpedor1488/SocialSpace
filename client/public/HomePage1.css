@@ -3860,10 +3860,10 @@ body {
 
 /* Стили для премиума */
 .premium-form {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0.8);
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) scale(0.8) !important;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(30px);
   border: 1px solid rgba(251, 191, 36, 0.2);
@@ -3871,7 +3871,7 @@ body {
   padding: 32px;
   width: 90%;
   max-width: 480px;
-  z-index: 999999;
+  z-index: 999999 !important;
   box-shadow: 
     0 25px 50px rgba(0, 0, 0, 0.15),
     0 0 0 1px rgba(251, 191, 36, 0.1),
@@ -3901,8 +3901,25 @@ body {
   opacity: 1;
 }
 
+/* Force forms to be on top of everything */
+.premium-form,
+.gift-premium-form {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) scale(0.8) !important;
+  z-index: 999999 !important;
+  pointer-events: auto !important;
+}
+
+.premium-form.show,
+.gift-premium-form.show {
+  transform: translate(-50%, -50%) scale(1) !important;
+  opacity: 1 !important;
+}
+
 .premium-form.show {
-  transform: translate(-50%, -50%) scale(1);
+  transform: translate(-50%, -50%) scale(1) !important;
   opacity: 1;
   position: fixed !important;
   top: 50% !important;
@@ -4136,10 +4153,10 @@ body {
 }
 
 .gift-premium-form {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0.8);
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) scale(0.8) !important;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(30px);
   border: 1px solid rgba(236, 72, 153, 0.2);
@@ -4147,7 +4164,7 @@ body {
   padding: 32px;
   width: 90%;
   max-width: 480px;
-  z-index: 999999;
+  z-index: 999999 !important;
   box-shadow: 
     0 25px 50px rgba(0, 0, 0, 0.15),
     0 0 0 1px rgba(236, 72, 153, 0.1),
@@ -4158,7 +4175,7 @@ body {
 }
 
 .gift-premium-form.show {
-  transform: translate(-50%, -50%) scale(1);
+  transform: translate(-50%, -50%) scale(1) !important;
   opacity: 1;
   position: fixed !important;
   top: 50% !important;
@@ -4297,6 +4314,11 @@ body {
     width: 95%;
     padding: 24px;
     max-width: 400px;
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) scale(0.8) !important;
+    z-index: 999999 !important;
   }
   
   .form-header h3 {
@@ -4343,6 +4365,11 @@ body {
   .premium-form,
   .gift-premium-form {
     padding: 20px;
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) scale(0.8) !important;
+    z-index: 999999 !important;
   }
   
   .form-header h3 {
@@ -4369,22 +4396,7 @@ body {
   }
 }
 
-/* Desktop-specific positioning fixes */
-@media (min-width: 768px) {
-  .premium-form,
-  .gift-premium-form {
-    position: fixed !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) scale(0.8) !important;
-    z-index: 999999 !important;
-  }
-  
-  .premium-form.show,
-  .gift-premium-form.show {
-    transform: translate(-50%, -50%) scale(1) !important;
-  }
-}
+/* Desktop-specific positioning fixes - REMOVED to avoid conflicts */
 
 /* Стили для кликабельных транзакций */
 .transaction-item.clickable {
