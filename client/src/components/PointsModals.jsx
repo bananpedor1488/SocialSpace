@@ -6,9 +6,7 @@ import { usePoints } from '../context/PointsContext';
 
 const PointsModals = () => {
   const [balance, setBalance] = useState(0);
-  const [transactions, setTransactions] = useState([]);
   const [leaderboard, setLeaderboard] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [premiumInfo, setPremiumInfo] = useState({
     active: false,
     expiresAt: null,
@@ -24,14 +22,20 @@ const PointsModals = () => {
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [selectedTransaction, setSelectedTransaction] = useState(null);
-  const [showTransactionDetails, setShowTransactionDetails] = useState(false);
   
   const { 
     showTransfer, setShowTransfer,
     showHistory, setShowHistory,
     showPremium, setShowPremium,
-    showGiftPremium, setShowGiftPremium
+    showGiftPremium, setShowGiftPremium,
+    // Добавляем состояния и функции транзакций из контекста
+    transactions,
+    selectedTransaction,
+    setSelectedTransaction,
+    showTransactionDetails,
+    setShowTransactionDetails,
+    loading,
+    handleTransactionClick
   } = usePoints();
 
   // Загрузить баланс
@@ -44,18 +48,7 @@ const PointsModals = () => {
     }
   };
 
-  // Загрузить историю транзакций
-  const loadTransactions = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get('https://server-u9ji.onrender.com/api/points/transactions');
-      setTransactions(response.data.transactions);
-    } catch (error) {
-      console.error('Error loading transactions:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+
 
   // Загрузить рейтинг
   const loadLeaderboard = async () => {
@@ -187,19 +180,9 @@ const PointsModals = () => {
     return amount.toLocaleString('ru-RU');
   };
 
-  const loadTransactionDetails = async (transactionCode) => {
-    try {
-      const response = await axios.get(`https://server-u9ji.onrender.com/api/points/transaction/${transactionCode}`);
-      setSelectedTransaction(response.data.transaction);
-      setShowTransactionDetails(true);
-    } catch (error) {
-      console.error('Error loading transaction details:', error);
-    }
-  };
 
-  const handleTransactionClick = (transaction) => {
-    loadTransactionDetails(transaction.transactionCode);
-  };
+
+
 
   useEffect(() => {
     loadBalance();
