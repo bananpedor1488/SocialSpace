@@ -3871,18 +3871,42 @@ body {
   padding: 32px;
   width: 90%;
   max-width: 480px;
-  z-index: 60000;
+  z-index: 999999;
   box-shadow: 
     0 25px 50px rgba(0, 0, 0, 0.15),
     0 0 0 1px rgba(251, 191, 36, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.8);
   opacity: 0;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: auto;
+}
+
+/* Backdrop overlay for premium forms */
+.premium-form::after,
+.gift-premium-form::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.premium-form.show::after,
+.gift-premium-form.show::after {
+  opacity: 1;
 }
 
 .premium-form.show {
   transform: translate(-50%, -50%) scale(1);
   opacity: 1;
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
 }
 
 .premium-form::before {
@@ -4123,18 +4147,22 @@ body {
   padding: 32px;
   width: 90%;
   max-width: 480px;
-  z-index: 60000;
+  z-index: 999999;
   box-shadow: 
     0 25px 50px rgba(0, 0, 0, 0.15),
     0 0 0 1px rgba(236, 72, 153, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.8);
   opacity: 0;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: auto;
 }
 
 .gift-premium-form.show {
   transform: translate(-50%, -50%) scale(1);
   opacity: 1;
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
 }
 
 .gift-premium-form::before {
@@ -4338,6 +4366,23 @@ body {
   .cost-label, .duration-label, .balance-label,
   .cost-amount, .duration-amount, .balance-amount {
     font-size: 13px;
+  }
+}
+
+/* Desktop-specific positioning fixes */
+@media (min-width: 768px) {
+  .premium-form,
+  .gift-premium-form {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) scale(0.8) !important;
+    z-index: 999999 !important;
+  }
+  
+  .premium-form.show,
+  .gift-premium-form.show {
+    transform: translate(-50%, -50%) scale(1) !important;
   }
 }
 
