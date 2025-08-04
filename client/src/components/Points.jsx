@@ -270,224 +270,222 @@ const Points = () => {
             <Gift size={16} />
             Подарить премиум
           </button>
+        </div>
+      )}
 
-          {/* Форма перевода внутри выпадающего меню */}
-          {showTransfer && (
-            <div className="dropdown-form">
-              <div className="form-header">
-                <h4>Перевод баллов</h4>
-                <button 
-                  onClick={() => setShowTransfer(false)}
-                  className="close-btn"
-                >
-                  <X size={16} />
-                </button>
-              </div>
-              
-              <form onSubmit={handleTransfer}>
-                <div className="form-group">
-                  <label>Получатель (username):</label>
-                  <input
-                    type="text"
-                    value={transferData.recipientUsername}
-                    onChange={(e) => setTransferData(prev => ({ ...prev, recipientUsername: e.target.value }))}
-                    placeholder="@username"
-                    className="form-input"
-                  />
-                </div>
-                
-                <div className="form-group">
-                  <label>Сумма:</label>
-                  <input
-                    type="number"
-                    value={transferData.amount}
-                    onChange={(e) => setTransferData(prev => ({ ...prev, amount: parseInt(e.target.value) || '' }))}
-                    placeholder="Введите сумму"
-                    min="1"
-                    max={balance}
-                    className="form-input"
-                  />
-                </div>
-                
-                <div className="form-group">
-                  <label>Описание (необязательно):</label>
-                  <input
-                    type="text"
-                    value={transferData.description}
-                    onChange={(e) => setTransferData(prev => ({ ...prev, description: e.target.value }))}
-                    placeholder="Описание перевода"
-                    className="form-input"
-                  />
-                </div>
-                
-                {error && <div className="error-message">{error}</div>}
-                {success && <div className="success-message">{success}</div>}
-                
-                <button 
-                  type="submit" 
-                  disabled={loading}
-                  className="submit-btn"
-                >
-                  {loading ? 'Выполняется...' : 'Перевести'}
-                </button>
-              </form>
+      {/* Форма перевода */}
+      {showTransfer && (
+        <div className="transfer-form">
+          <div className="form-header">
+            <h3>Перевод баллов</h3>
+            <button 
+              onClick={() => setShowTransfer(false)}
+              className="close-btn"
+            >
+              <X size={16} />
+            </button>
+          </div>
+          
+          <form onSubmit={handleTransfer}>
+            <div className="form-group">
+              <label>Получатель (username):</label>
+              <input
+                type="text"
+                value={transferData.recipientUsername}
+                onChange={(e) => setTransferData(prev => ({ ...prev, recipientUsername: e.target.value }))}
+                placeholder="@username"
+                className="form-input"
+              />
             </div>
-          )}
+            
+            <div className="form-group">
+              <label>Сумма:</label>
+              <input
+                type="number"
+                value={transferData.amount}
+                onChange={(e) => setTransferData(prev => ({ ...prev, amount: parseInt(e.target.value) || '' }))}
+                placeholder="Введите сумму"
+                min="1"
+                max={balance}
+                className="form-input"
+              />
+            </div>
+            
+            <div className="form-group">
+              <label>Описание (необязательно):</label>
+              <input
+                type="text"
+                value={transferData.description}
+                onChange={(e) => setTransferData(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Описание перевода"
+                className="form-input"
+              />
+            </div>
+            
+            {error && <div className="error-message">{error}</div>}
+            {success && <div className="success-message">{success}</div>}
+            
+            <button 
+              type="submit" 
+              disabled={loading}
+              className="submit-btn"
+            >
+              {loading ? 'Выполняется...' : 'Перевести'}
+            </button>
+          </form>
+        </div>
+      )}
 
-          {/* История транзакций внутри выпадающего меню */}
-          {showHistory && (
-            <div className="dropdown-form">
-              <div className="form-header">
-                <h4>История транзакций</h4>
-                <button 
-                  onClick={() => setShowHistory(false)}
-                  className="close-btn"
+      {/* История транзакций */}
+      {showHistory && (
+        <div className="transactions-history">
+          <div className="form-header">
+            <h3>История транзакций</h3>
+            <button 
+              onClick={() => setShowHistory(false)}
+              className="close-btn"
+            >
+              <X size={16} />
+            </button>
+          </div>
+          
+          {loading ? (
+            <div className="loading">Загрузка...</div>
+          ) : transactions.length > 0 ? (
+            <div className="transactions-list">
+              {transactions.map(transaction => (
+                <div 
+                  key={transaction._id} 
+                  className="transaction-item clickable"
+                  onClick={() => handleTransactionClick(transaction)}
+                  style={{ cursor: 'pointer' }}
                 >
-                  <X size={16} />
-                </button>
-              </div>
-              
-              {loading ? (
-                <div className="loading">Загрузка...</div>
-              ) : transactions.length > 0 ? (
-                <div className="transactions-list">
-                  {transactions.map(transaction => (
-                    <div 
-                      key={transaction._id} 
-                      className="transaction-item clickable"
-                      onClick={() => handleTransactionClick(transaction)}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      <div className="transaction-avatar">
-                        <Avatar 
-                          src={transaction.isOutgoing ? transaction.recipient.avatar : transaction.sender.avatar}
-                          alt={transaction.isOutgoing ? transaction.recipient.displayName : transaction.sender.displayName}
-                          size="small"
-                        />
-                      </div>
-                      
-                      <div className="transaction-info">
-                        <div className="transaction-user">
-                          {transaction.isOutgoing ? transaction.recipient.displayName : transaction.sender.displayName}
-                        </div>
-                        <div className="transaction-description">
-                          {transaction.description}
-                        </div>
-                        <div className="transaction-date">
-                          {formatDate(transaction.createdAt)}
-                        </div>
-                      </div>
-                      
-                      <div className={`transaction-amount ${transaction.isOutgoing ? 'outgoing' : 'incoming'}`}>
-                        {transaction.isOutgoing ? '-' : '+'}{formatAmount(transaction.amount)}
-                      </div>
-                      
-                      <div className="transaction-code">
-                        {transaction.transactionCode}
-                      </div>
+                  <div className="transaction-avatar">
+                    <Avatar 
+                      src={transaction.isOutgoing ? transaction.recipient.avatar : transaction.sender.avatar}
+                      alt={transaction.isOutgoing ? transaction.recipient.displayName : transaction.sender.displayName}
+                      size="small"
+                    />
+                  </div>
+                  
+                  <div className="transaction-info">
+                    <div className="transaction-user">
+                      {transaction.isOutgoing ? transaction.recipient.displayName : transaction.sender.displayName}
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="no-transactions">История транзакций пуста</div>
-              )}
-            </div>
-          )}
-
-          {/* Премиум форма внутри выпадающего меню */}
-          {showPremium && (
-            <div className="dropdown-form">
-              <div className="form-header">
-                <h4>Премиум</h4>
-                <button 
-                  onClick={() => setShowPremium(false)}
-                  className="close-btn"
-                >
-                  <X size={16} />
-                </button>
-              </div>
-              
-              {premiumInfo.active ? (
-                <div className="premium-active">
-                  <div className="premium-status">
-                    <Crown size={24} className="premium-icon" />
-                    <h5>Премиум активен</h5>
-                    <p>Действует до: {premiumInfo.expiresAt ? new Date(premiumInfo.expiresAt).toLocaleDateString('ru-RU') : 'Неизвестно'}</p>
-                  </div>
-                </div>
-              ) : (
-                <div className="premium-buy">
-                  <div className="premium-info">
-                    <Crown size={32} className="premium-icon" />
-                    <h5>Купить премиум</h5>
-                    <p>Стоимость: 300 баллов</p>
-                    <p>Длительность: 30 дней</p>
-                    <p>Ваш баланс: {formatAmount(balance)} баллов</p>
+                    <div className="transaction-description">
+                      {transaction.description}
+                    </div>
+                    <div className="transaction-date">
+                      {formatDate(transaction.createdAt)}
+                    </div>
                   </div>
                   
-                  {error && <div className="error-message">{error}</div>}
-                  {success && <div className="success-message">{success}</div>}
+                  <div className={`transaction-amount ${transaction.isOutgoing ? 'outgoing' : 'incoming'}`}>
+                    {transaction.isOutgoing ? '-' : '+'}{formatAmount(transaction.amount)}
+                  </div>
                   
-                  <button 
-                    onClick={handleBuyPremium}
-                    disabled={loading || balance < 300}
-                    className="buy-premium-btn"
-                  >
-                    {loading ? 'Покупка...' : 'Купить премиум'}
-                  </button>
+                  <div className="transaction-code">
+                    {transaction.transactionCode}
+                  </div>
                 </div>
-              )}
+              ))}
             </div>
+          ) : (
+            <div className="no-transactions">История транзакций пуста</div>
           )}
+        </div>
+      )}
 
-          {/* Форма дарения премиума внутри выпадающего меню */}
-          {showGiftPremium && (
-            <div className="dropdown-form">
-              <div className="form-header">
-                <h4>Подарить премиум</h4>
-                <button 
-                  onClick={() => setShowGiftPremium(false)}
-                  className="close-btn"
-                >
-                  <X size={16} />
-                </button>
+      {/* Премиум форма */}
+      {showPremium && (
+        <div className="premium-form">
+          <div className="form-header">
+            <h3>Премиум</h3>
+            <button 
+              onClick={() => setShowPremium(false)}
+              className="close-btn"
+            >
+              <X size={16} />
+            </button>
+          </div>
+          
+          {premiumInfo.active ? (
+            <div className="premium-active">
+              <div className="premium-status">
+                <Crown size={24} className="premium-icon" />
+                <h5>Премиум активен</h5>
+                <p>Действует до: {premiumInfo.expiresAt ? new Date(premiumInfo.expiresAt).toLocaleDateString('ru-RU') : 'Неизвестно'}</p>
+              </div>
+            </div>
+          ) : (
+            <div className="premium-buy">
+              <div className="premium-info">
+                <Crown size={32} className="premium-icon" />
+                <h5>Купить премиум</h5>
+                <p>Стоимость: 300 баллов</p>
+                <p>Длительность: 30 дней</p>
+                <p>Ваш баланс: {formatAmount(balance)} баллов</p>
               </div>
               
-              <form onSubmit={handleGiftPremium}>
-                <div className="form-group">
-                  <label>Получатель (username):</label>
-                  <input
-                    type="text"
-                    value={giftData.recipientUsername}
-                    onChange={(e) => setGiftData(prev => ({ ...prev, recipientUsername: e.target.value }))}
-                    placeholder="@username"
-                    className="form-input"
-                  />
-                </div>
-                
-                <div className="gift-info">
-                  <Gift size={20} className="gift-icon" />
-                  <p>Стоимость подарка: 300 баллов</p>
-                  <p>Ваш баланс: {formatAmount(balance)} баллов</p>
-                </div>
-                
-                {error && <div className="error-message">{error}</div>}
-                {success && <div className="success-message">{success}</div>}
-                
-                <button 
-                  type="submit" 
-                  disabled={loading || balance < 300}
-                  className="submit-btn"
-                >
-                  {loading ? 'Дарение...' : 'Подарить премиум'}
-                </button>
-              </form>
+              {error && <div className="error-message">{error}</div>}
+              {success && <div className="success-message">{success}</div>}
+              
+              <button 
+                onClick={handleBuyPremium}
+                disabled={loading || balance < 300}
+                className="buy-premium-btn"
+              >
+                {loading ? 'Покупка...' : 'Купить премиум'}
+              </button>
             </div>
           )}
         </div>
       )}
 
-
+      {/* Форма дарения премиума */}
+      {showGiftPremium && (
+        <div className="gift-premium-form">
+          <div className="form-header">
+            <h3>Подарить премиум</h3>
+            <button 
+              onClick={() => setShowGiftPremium(false)}
+              className="close-btn"
+            >
+              <X size={16} />
+            </button>
+          </div>
+          
+          <form onSubmit={handleGiftPremium}>
+            <div className="form-group">
+              <label>Получатель (username):</label>
+              <input
+                type="text"
+                value={giftData.recipientUsername}
+                onChange={(e) => setGiftData(prev => ({ ...prev, recipientUsername: e.target.value }))}
+                placeholder="@username"
+                className="form-input"
+              />
+            </div>
+            
+            <div className="gift-info">
+              <Gift size={20} className="gift-icon" />
+              <p>Стоимость подарка: 300 баллов</p>
+              <p>Ваш баланс: {formatAmount(balance)} баллов</p>
+            </div>
+            
+            {error && <div className="error-message">{error}</div>}
+            {success && <div className="success-message">{success}</div>}
+            
+            <button 
+              type="submit" 
+              disabled={loading || balance < 300}
+              className="submit-btn"
+            >
+              {loading ? 'Дарение...' : 'Подарить премиум'}
+            </button>
+          </form>
+        </div>
+      )}
 
       {/* Детали транзакции */}
       {showTransactionDetails && selectedTransaction && (

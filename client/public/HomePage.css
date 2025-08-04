@@ -3842,59 +3842,7 @@ body {
   }
 }
 
-/* Стили для форм внутри выпадающего меню */
-.dropdown-form {
-  background: rgba(15, 23, 42, 0.95);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(71, 85, 105, 0.3);
-  border-radius: 12px;
-  margin-top: 8px;
-  padding: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  animation: slideDown 0.3s ease-out;
-}
 
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.form-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid rgba(71, 85, 105, 0.3);
-}
-
-.form-header h4 {
-  margin: 0;
-  color: #e2e8f0;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.form-header .close-btn {
-  background: none;
-  border: none;
-  color: #94a3b8;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-}
-
-.form-header .close-btn:hover {
-  background: rgba(71, 85, 105, 0.3);
-  color: #e2e8f0;
-}
 
 /* Стили для премиума */
 .premium-form {
