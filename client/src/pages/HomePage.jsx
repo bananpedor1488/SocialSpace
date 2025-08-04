@@ -1752,7 +1752,7 @@ const HomePage = () => {
           </div>
           <div className="user-info">
             <span>Hello, {user?.username}!</span>
-            //bjh
+            
             <Points />
             
             <button onClick={toggleTheme} className="theme-toggle">
