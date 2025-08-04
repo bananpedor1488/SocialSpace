@@ -2410,15 +2410,7 @@ body {
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
 }
 
-.call-button.video-call {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
-}
 
-.call-button.video-call:hover {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-}
 
 /* Интерфейс звонка */
 .call-interface-overlay {

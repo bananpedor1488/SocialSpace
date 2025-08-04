@@ -6,7 +6,7 @@ import { io } from 'socket.io-client';
 import {
   Home, MessageCircle, User, LogOut, Plus,
   Heart, MessageSquare, Repeat, Pencil, Trash2, Users, UserCheck, Send, X, ChevronDown,
-  Moon, Sun, Wifi, WifiOff, Flame, Clock, Phone, Video, Settings
+  Moon, Sun, Wifi, WifiOff, Flame, Clock, Phone, Settings
 } from 'lucide-react';
 
 import CallInterface from '../components/CallInterface';
@@ -50,6 +50,11 @@ const HomePage = () => {
   const [loadingOlderMessages, setLoadingOlderMessages] = useState(false);
   const [totalUnread, setTotalUnread] = useState(0);
   const messagesEndRef = useRef(null);
+  
+  // Функция для прокрутки вниз чата
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
   // СОСТОЯНИЯ ДЛЯ ЗВОНКОВ
   const [currentCall, setCurrentCall] = useState(null);
   const [isIncomingCall, setIsIncomingCall] = useState(false);
@@ -68,9 +73,8 @@ const HomePage = () => {
       date: '1 августа 2025',
       changes: [
         '📞 Голосовые звонки через WebRTC',
-        '📹 Видео звонки с поддержкой камеры',
         '🎯 Красивые кнопки звонков в чатах',
-        '⚡ Управление микрофоном и камерой',
+        '⚡ Управление микрофоном',
         '🔔 Уведомления о входящих звонках',
         '✨ Анимации и современный дизайн интерфейса'
       ]
@@ -448,6 +452,13 @@ const HomePage = () => {
           ...prev,
           [chatId]: [...(prev[chatId] || []), message]
         }));
+
+        // Прокручиваем вниз если это активный чат
+        if (activeChat?._id === chatId) {
+          setTimeout(() => {
+            scrollToBottom();
+          }, 100);
+        }
 
         // Обновляем чаты
         setChats(prev => prev.map(chat => {
@@ -1033,6 +1044,11 @@ const HomePage = () => {
       // Обновляем информацию о пагинации
       setMessagesPagination(prev => ({ ...prev, [chatId]: pagination }));
       
+      // Прокручиваем вниз после загрузки сообщений
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100);
+      
       // Загружаем онлайн статусы участников чата
       const currentChat = chats.find(chat => chat._id === chatId);
       if (currentChat && currentChat.participants) {
@@ -1096,6 +1112,11 @@ const HomePage = () => {
         ...prev,
         [activeChat._id]: [...(prev[activeChat._id] || []), newMsg]
       }));
+      
+      // Прокручиваем вниз после отправки сообщения
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100);
       
       // Обновляем чаты в боковом меню
       setChats(prev => prev.map(chat => {
@@ -1884,13 +1905,6 @@ const HomePage = () => {
                           title="Голосовой звонок"
                         >
                           <Phone size={18} />
-                        </button>
-                        <button 
-                          onClick={() => initiateCall('video')}
-                          className="call-button video-call"
-                          title="Видео звонок"
-                        >
-                          <Video size={18} />
                         </button>
                       </div>
                     </div>
