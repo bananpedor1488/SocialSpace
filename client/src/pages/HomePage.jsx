@@ -14,6 +14,8 @@ import OnlineStatus from '../components/OnlineStatus';
 import ProfileSettings from '../components/ProfileSettings';
 import Avatar from '../components/Avatar';
 import Points from '../components/Points';
+import PointsModals from '../components/PointsModals';
+import { PointsProvider } from '../context/PointsContext';
 
 import useOnlineStatus from '../hooks/useOnlineStatus';
 
@@ -1717,8 +1719,9 @@ const HomePage = () => {
   }
 
   return (
-    <>
-      <div className={`home-container ${activeTab === 'home' ? 'show-right-sidebar' : ''}`}>
+    <PointsProvider>
+      <>
+        <div className={`home-container ${activeTab === 'home' ? 'show-right-sidebar' : ''}`}>
       <header className="header">
         <div className="header-content">
           <div className="logo"><h1><Flame size={24} /> SocialSpace</h1></div>
@@ -1752,6 +1755,7 @@ const HomePage = () => {
             )}
           </div>
           <div className="user-info">
+            <Points />
             <span>Hello, {user?.username}!</span>
             
             <button onClick={toggleTheme} className="theme-toggle">
@@ -2345,10 +2349,11 @@ const HomePage = () => {
           onProfileUpdate={handleProfileUpdate}
         />
       )}
+      
+      <PointsModals />
     </div>
-    
-    <Points />
     </>
+    </PointsProvider>
   );
 };
 
