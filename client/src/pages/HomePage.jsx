@@ -1535,6 +1535,22 @@ const HomePage = () => {
                   ? post.originalPost?.author?.displayName || post.originalPost?.author?.username || 'Unknown'
                   : post.author?.displayName || post.author?.username || post.displayName || post.username || 'Unknown'
                 }
+                {post.isRepost 
+                  ? post.originalPost?.author?.premium && (
+                    <span className="premium-badge">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
+                      </svg>
+                    </span>
+                  )
+                  : post.author?.premium && (
+                    <span className="premium-badge">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
+                      </svg>
+                    </span>
+                  )
+                }
               </span>
               <span className="post-username">
                 @{post.isRepost ? post.originalPost?.author?.username || 'Unknown' : post.author?.username || post.username || 'Unknown'}
@@ -1628,6 +1644,13 @@ const HomePage = () => {
                         <div className="comment-info">
                           <span className="comment-username">
                             @{comment.author?.username || 'Unknown'}
+                            {comment.author?.premium && (
+                              <span className="premium-badge">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                  <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
+                                </svg>
+                              </span>
+                            )}
                           </span>
                           <span className="comment-date">
                             {new Date(comment.createdAt).toLocaleDateString('ru-RU')}
@@ -1860,7 +1883,16 @@ const HomePage = () => {
                         />
                         <div className="chat-info">
                           <div className="chat-header-row">
-                            <div className="chat-name">{chat.name}</div>
+                            <div className="chat-name">
+                              {chat.name}
+                              {otherUser?.premium && (
+                                <span className="premium-badge">
+                                  <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
+                                  </svg>
+                                </span>
+                              )}
+                            </div>
                             {otherUser && (() => {
                               const userStatus = getUserStatus(otherUser._id);
                               return (
@@ -1918,7 +1950,16 @@ const HomePage = () => {
                                 className="chat-header-avatar"
                               />
                               <div className="chat-title-section">
-                                <h3>{activeChat.name}</h3>
+                                <h3>
+                                  {activeChat.name}
+                                  {otherUser?.premium && (
+                                    <span className="premium-badge">
+                                      <svg viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
+                                      </svg>
+                                    </span>
+                                  )}
+                                </h3>
                                 <OnlineStatus
                                   userId={otherUser?._id}
                                   isOnline={userStatus.isOnline}
@@ -1984,7 +2025,16 @@ const HomePage = () => {
                               </div>
                               <div className="message-body">
                                 <div className="message-header">
-                                  <span className="message-sender">{message.sender.username}</span>
+                                  <span className="message-sender">
+                                    {message.sender.username}
+                                    {message.sender.premium && (
+                                      <span className="premium-badge">
+                                        <svg viewBox="0 0 24 24" fill="currentColor">
+                                          <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
+                                        </svg>
+                                      </span>
+                                    )}
+                                  </span>
                                   <span className="message-time">
                                     {new Date(message.createdAt).toLocaleTimeString('ru-RU', {
                                       hour: '2-digit',

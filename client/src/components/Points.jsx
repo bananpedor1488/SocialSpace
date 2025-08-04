@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Coins, Send, History, Trophy, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { Coins, Send, History, Trophy, X, ChevronDown, ChevronUp, Crown, Gift } from 'lucide-react';
 import axios from 'axios';
 import Avatar from './Avatar';
 
@@ -10,11 +10,21 @@ const Points = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showTransfer, setShowTransfer] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [showPremium, setShowPremium] = useState(false);
+  const [showGiftPremium, setShowGiftPremium] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [premiumInfo, setPremiumInfo] = useState({
+    active: false,
+    expiresAt: null,
+    premiumCost: 300
+  });
   const [transferData, setTransferData] = useState({
     recipientUsername: '',
     amount: '',
     description: ''
+  });
+  const [giftData, setGiftData] = useState({
+    recipientUsername: ''
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -49,6 +59,63 @@ const Points = () => {
       setLeaderboard(response.data.leaderboard);
     } catch (error) {
       console.error('Error loading leaderboard:', error);
+    }
+  };
+
+  // Загрузить информацию о премиуме
+  const loadPremiumInfo = async () => {
+    try {
+      const response = await axios.get('https://server-u9ji.onrender.com/api/points/premium-info');
+      setPremiumInfo(response.data.premium);
+      setBalance(response.data.points);
+    } catch (error) {
+      console.error('Error loading premium info:', error);
+    }
+  };
+
+  // Купить премиум
+  const handleBuyPremium = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      const response = await axios.post('https://server-u9ji.onrender.com/api/points/buy-premium');
+      
+      setSuccess('Премиум успешно куплен!');
+      setPremiumInfo(response.data.premium);
+      setBalance(response.data.newBalance);
+      setShowPremium(false);
+      
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (error) {
+      setError(error.response?.data?.message || 'Ошибка покупки премиума');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Подарить премиум
+  const handleGiftPremium = async (e) => {
+    e.preventDefault();
+    if (!giftData.recipientUsername) {
+      setError('Укажите имя пользователя');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError('');
+      const response = await axios.post('https://server-u9ji.onrender.com/api/points/gift-premium', giftData);
+      
+      setSuccess('Премиум успешно подарен!');
+      setBalance(response.data.newBalance);
+      setGiftData({ recipientUsername: '' });
+      setShowGiftPremium(false);
+      
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (error) {
+      setError(error.response?.data?.message || 'Ошибка дарения премиума');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -109,6 +176,7 @@ const Points = () => {
 
   useEffect(() => {
     loadBalance();
+    loadPremiumInfo();
   }, []);
 
   return (
@@ -135,6 +203,8 @@ const Points = () => {
             onClick={() => {
               setShowTransfer(!showTransfer);
               setShowHistory(false);
+              setShowPremium(false);
+              setShowGiftPremium(false);
             }}
             className="dropdown-item"
           >
@@ -146,12 +216,40 @@ const Points = () => {
             onClick={() => {
               setShowHistory(!showHistory);
               setShowTransfer(false);
+              setShowPremium(false);
+              setShowGiftPremium(false);
               if (!showHistory) loadTransactions();
             }}
             className="dropdown-item"
           >
             <History size={16} />
             История транзакций
+          </button>
+
+          <button 
+            onClick={() => {
+              setShowPremium(!showPremium);
+              setShowTransfer(false);
+              setShowHistory(false);
+              setShowGiftPremium(false);
+            }}
+            className="dropdown-item"
+          >
+            <Crown size={16} />
+            {premiumInfo.active ? 'Премиум активен' : 'Купить премиум'}
+          </button>
+
+          <button 
+            onClick={() => {
+              setShowGiftPremium(!showGiftPremium);
+              setShowTransfer(false);
+              setShowHistory(false);
+              setShowPremium(false);
+            }}
+            className="dropdown-item"
+          >
+            <Gift size={16} />
+            Подарить премиум
           </button>
         </div>
       )}
@@ -271,6 +369,97 @@ const Points = () => {
           ) : (
             <div className="no-transactions">История транзакций пуста</div>
           )}
+        </div>
+      )}
+
+      {/* Премиум форма */}
+      {showPremium && (
+        <div className="premium-form">
+          <div className="premium-header">
+            <h3>Премиум</h3>
+            <button 
+              onClick={() => setShowPremium(false)}
+              className="close-btn"
+            >
+              <X size={16} />
+            </button>
+          </div>
+          
+          {premiumInfo.active ? (
+            <div className="premium-active">
+              <div className="premium-status">
+                <Crown size={24} className="premium-icon" />
+                <h4>Премиум активен</h4>
+                <p>Действует до: {premiumInfo.expiresAt ? new Date(premiumInfo.expiresAt).toLocaleDateString('ru-RU') : 'Неизвестно'}</p>
+              </div>
+            </div>
+          ) : (
+            <div className="premium-buy">
+              <div className="premium-info">
+                <Crown size={48} className="premium-icon" />
+                <h4>Купить премиум</h4>
+                <p>Стоимость: 300 баллов</p>
+                <p>Длительность: 30 дней</p>
+                <p>Ваш баланс: {formatAmount(balance)} баллов</p>
+              </div>
+              
+              {error && <div className="error-message">{error}</div>}
+              {success && <div className="success-message">{success}</div>}
+              
+              <button 
+                onClick={handleBuyPremium}
+                disabled={loading || balance < 300}
+                className="buy-premium-btn"
+              >
+                {loading ? 'Покупка...' : 'Купить премиум'}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Форма дарения премиума */}
+      {showGiftPremium && (
+        <div className="gift-premium-form">
+          <div className="gift-header">
+            <h3>Подарить премиум</h3>
+            <button 
+              onClick={() => setShowGiftPremium(false)}
+              className="close-btn"
+            >
+              <X size={16} />
+            </button>
+          </div>
+          
+          <form onSubmit={handleGiftPremium}>
+            <div className="form-group">
+              <label>Получатель (username):</label>
+              <input
+                type="text"
+                value={giftData.recipientUsername}
+                onChange={(e) => setGiftData(prev => ({ ...prev, recipientUsername: e.target.value }))}
+                placeholder="@username"
+                className="form-input"
+              />
+            </div>
+            
+            <div className="gift-info">
+              <Gift size={24} className="gift-icon" />
+              <p>Стоимость подарка: 300 баллов</p>
+              <p>Ваш баланс: {formatAmount(balance)} баллов</p>
+            </div>
+            
+            {error && <div className="error-message">{error}</div>}
+            {success && <div className="success-message">{success}</div>}
+            
+            <button 
+              type="submit" 
+              disabled={loading || balance < 300}
+              className="submit-btn"
+            >
+              {loading ? 'Дарение...' : 'Подарить премиум'}
+            </button>
+          </form>
         </div>
       )}
     </div>

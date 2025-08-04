@@ -179,7 +179,13 @@ const AuthPage = () => {
 
   return (
     <div className="auth-container">
-      <div className="form-wrapper">
+      <div className="particles">
+        {[...Array(50)].map((_, i) => (
+          <div key={i} className={`particle particle-${i % 5}`}></div>
+        ))}
+      </div>
+
+      <div className={`form-wrapper ${isLogin ? 'login-mode' : 'register-mode'}`}>
         <div className="mode-switcher">
           <div className="switcher-track">
             <div className={`switcher-thumb ${isLogin ? 'login-active' : 'register-active'}`}></div>
