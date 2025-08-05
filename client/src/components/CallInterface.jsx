@@ -949,6 +949,18 @@ const CallInterface = ({
     }
   };
 
+  const getCallerPremium = () => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const currentUserId = user?._id || user?.id;
+    
+    // Определяем премиум статус собеседника
+    if (call?.caller?._id === currentUserId) {
+      return call?.callee?.premium || false;
+    } else {
+      return call?.caller?.premium || false;
+    }
+  };
+
   const getCallerAvatar = useMemo(() => {
     const user = JSON.parse(localStorage.getItem('user'));
     const currentUserId = user?._id || user?.id;
@@ -977,7 +989,16 @@ const CallInterface = ({
               />
             </div>
             <div className="call-details">
-              <h3 className="call-username">{getCallerName()}</h3>
+              <h3 className="call-username">
+                {getCallerName()}
+                {getCallerPremium() && (
+                  <span className="premium-badge">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
+                    </svg>
+                  </span>
+                )}
+              </h3>
               <p className="call-status">{getCallStatusText()}</p>
               {connectionMessage && (
                 <p className="call-connection-message">{connectionMessage}</p>

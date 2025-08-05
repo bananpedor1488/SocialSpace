@@ -1746,7 +1746,16 @@ const HomePage = () => {
                     <div className="search-result-info">
                       <span className="header-search-username">@{searchUser.username}</span>
                       {searchUser.displayName && (
-                        <span className="header-search-name">{searchUser.displayName}</span>
+                        <span className="header-search-name">
+                          {searchUser.displayName}
+                          {searchUser.premium && (
+                            <span className="premium-badge">
+                              <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
+                              </svg>
+                            </span>
+                          )}
+                        </span>
                       )}
                     </div>
                   </div>
@@ -2124,6 +2133,13 @@ const HomePage = () => {
                     <div className="profile-header-row">
                       <h2 className="profile-display-name">
                         {profile.displayName || profile.username}
+                        {profile.premium && (
+                          <span className="premium-badge">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
+                            </svg>
+                          </span>
+                        )}
                         {isOwnProfile() && (
                           <span className="own-profile-badge">
                             <UserCheck size={16} /> Ваш профиль
@@ -2249,6 +2265,13 @@ const HomePage = () => {
                     <div className="leaderboard-info">
                       <div className="leaderboard-name">
                         {user.displayName || user.username}
+                        {user.premium && (
+                          <span className="premium-badge">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
+                            </svg>
+                          </span>
+                        )}
                       </div>
                       <div className="leaderboard-username">
                         @{user.username}
@@ -2306,6 +2329,13 @@ const HomePage = () => {
                   <div className="suggestion-user-details">
                     <span className="suggestion-display-name">
                       {suggestionUser.displayName || suggestionUser.username}
+                      {suggestionUser.premium && (
+                        <span className="premium-badge">
+                          <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
+                          </svg>
+                        </span>
+                      )}
                     </span>
                     <span className="suggestion-username">@{suggestionUser.username}</span>
                     <span className="suggestion-stats">
