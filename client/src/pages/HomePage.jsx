@@ -836,6 +836,8 @@ const HomePage = () => {
   const loadSuggestions = async () => {
     try {
       const res = await axios.get('https://server-u9ji.onrender.com/api/users/suggestions');
+      console.log('Suggestions response:', res.data);
+      
       setSuggestions(res.data.slice(0, 3));
     } catch (err) {
       console.error('Ошибка загрузки рекомендаций:', err);
@@ -1006,6 +1008,8 @@ const HomePage = () => {
   const loadChats = async () => {
     try {
       const res = await axios.get('https://server-u9ji.onrender.com/api/messages/chats');
+      console.log('Chats response:', res.data);
+      
       // Сортируем чаты по времени последнего сообщения
       const sortedChats = res.data.sort((a, b) => {
         const aTime = a.lastMessage?.createdAt || a.lastMessageTime || a.createdAt;
@@ -1306,6 +1310,8 @@ const HomePage = () => {
     try {
       setLeaderboardLoading(true);
       const response = await axios.get('https://server-u9ji.onrender.com/api/points/leaderboard');
+      console.log('Leaderboard response:', response.data);
+      
       setLeaderboard(response.data.leaderboard);
     } catch (error) {
       console.error('Error loading leaderboard:', error);
@@ -1721,253 +1727,186 @@ const HomePage = () => {
   return (
     <PointsProvider>
       <>
-        <div className={`home-container ${activeTab === 'home' ? 'show-right-sidebar' : ''}`}>
-      <header className="header">
-        <div className="header-content">
-          <div className="logo"><h1><Flame size={24} /> SocialSpace</h1></div>
-          <div className="header-search">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={handleSearch}
-              placeholder="Поиск пользователей..."
-              className="header-search-input"
-            />
-            {searchResults.length > 0 && (
-              <div className="header-search-results">
-                {searchResults.map(searchUser => (
-                  <div key={searchUser._id} className="header-search-result" onClick={() => handleSearchClick(searchUser)}>
-                    <Avatar 
-                      src={searchUser.avatar || null}
-                      alt={searchUser.displayName || searchUser.username}
-                      size="small"
-                      className="search-result-avatar"
-                    />
-                    <div className="search-result-info">
-                      <span className="header-search-username">@{searchUser.username}</span>
-                      {searchUser.displayName && (
-                        <span className="header-search-name">
-                          {searchUser.displayName}
-                          {searchUser.premium && (
-                            <span className="premium-badge">
-                              <svg viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
-                              </svg>
-                            </span>
-                          )}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-          <div className="user-info">
-            <Points />
-            <span>Hello, {user?.username}!</span>
-            
-            <button onClick={toggleTheme} className="theme-toggle">
-              <div className="theme-icon">
-                {isDarkTheme ? <Sun size={18} /> : <Moon size={18} />}
-              </div>
-              <span className="theme-text">
-                {isDarkTheme ? 'Светлая' : 'Темная'}
-              </span>
-            </button>
-            
-            <button onClick={handleLogout} className="logout-btn">
-              <LogOut size={16} /> Выйти
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <nav className="sidebar">
-        <ul className="nav-menu">
-          <li><button className={getNavItemClass('home')} onClick={() => setActiveTab('home')}><Home size={18} /> Главная</button></li>
-          <li><button className={getNavItemClass('messages')} onClick={() => { setActiveTab('messages'); loadChats(); }}>
-            <MessageCircle size={18} /> 
-            Сообщения
-            {totalUnread > 0 && <span className="unread-badge">{totalUnread}</span>}
-          </button></li>
-          <li><button className={getNavItemClass('leaderboard')} onClick={() => { setActiveTab('leaderboard'); loadLeaderboard(); }}>
-            <Trophy size={18} /> 
-            Топ игроков
-          </button></li>
-          <li><button className={getNavItemClass('profile')} onClick={() => { setActiveTab('profile'); if(user) loadUserProfile(user._id || user.id); }}><User size={18} /> Профиль</button></li>
-        </ul>
-      </nav>
-
-      <main className={`main-content ${activeTab === 'messages' ? 'messages-active' : ''}`}>
-        {activeTab === 'home' && (
-          <div>
-            <div className="create-post">
-              <div className="create-post-header">
-                <h3>Что нового?</h3>
-              </div>
-              <div className="create-post-body">
-                <textarea
-                  value={postText}
-                  onChange={(e) => setPostText(e.target.value)}
-                  placeholder="Поделитесь своими мыслями..."
-                  rows="3"
-                  className="create-post-input"
+        <div className="home-container">
+          <header className="header">
+            <div className="header-content">
+              <div className="logo"><h1><Flame size={24} /> SocialSpace</h1></div>
+              <div className="header-search">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={handleSearch}
+                  placeholder="Поиск пользователей..."
+                  className="header-search-input"
                 />
-                <div className="create-post-footer">
-                  <div className="post-stats">
-                    <span className={`char-count ${postText.length > 250 ? 'warning' : ''} ${postText.length > 280 ? 'error' : ''}`}>
-                      {postText.length}/280
-                    </span>
-                  </div>
-                  <button 
-                    onClick={handleCreatePost} 
-                    disabled={!postText.trim() || postText.length > 280}
-                    className="publish-btn"
-                  >
-                    <Plus size={18} /> Опубликовать
-                  </button>
-                </div>
-              </div>
-            </div>
-            
-            <div className="posts-feed">
-              {renderPosts(posts)}
-              
-              {hasMore && posts.length > 0 && (
-                <div className="load-more-section">
-                  <button 
-                    onClick={loadMorePosts} 
-                    disabled={loading}
-                    className="load-more-btn"
-                  >
-                    {loading ? (
-                      'Загрузка...'
-                    ) : (
-                      <>
-                        <ChevronDown size={18} />
-                        Показать ещё
-                      </>
-                    )}
-                  </button>
-                </div>
-              )}
-              
-              {!hasMore && posts.length > 0 && (
-                <div className="end-of-feed">
-                  <p>Больше постов нет</p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-        
-        {activeTab === 'messages' && (
-          <div className="messages-container">
-            <div className="chats-sidebar">
-              <div className="chats-header">
-                <h3>Чаты</h3>
-                {totalUnread > 0 && <span className="total-unread">{totalUnread}</span>}
-              </div>
-              
-              <div className="chats-list">
-                {chats.length > 0 ? (
-                  chats
-                    .sort((a, b) => {
-                      // Сортируем по времени последнего сообщения (новые вверху)
-                      const aTime = a.lastMessage?.createdAt || a.lastMessageTime || a.createdAt;
-                      const bTime = b.lastMessage?.createdAt || b.lastMessageTime || b.createdAt;
-                      return new Date(bTime) - new Date(aTime);
-                    })
-                    .map(chat => {
-                    // Находим собеседника для получения его аватарки
-                    const otherUser = chat.participants && chat.participants.length === 2 
-                      ? chat.participants.find(p => p._id !== user._id && p._id !== user.id)
-                      : null;
-                    
-                    return (
-                      <div 
-                        key={chat._id} 
-                        className={`chat-item ${activeChat?._id === chat._id ? 'active' : ''}`}
-                        onClick={() => { setActiveChat(chat); loadMessages(chat._id); }}
-                      >
+                {searchResults.length > 0 && (
+                  <div className="header-search-results">
+                    {searchResults.map(searchUser => (
+                      <div key={searchUser._id} className="header-search-result" onClick={() => handleSearchClick(searchUser)}>
                         <Avatar 
-                          src={otherUser?.avatar || null}
-                          alt={otherUser?.displayName || otherUser?.username || chat.name}
-                          size="medium"
-                          className="chat-avatar"
+                          src={searchUser.avatar || null}
+                          alt={searchUser.displayName || searchUser.username}
+                          size="small"
+                          className="search-result-avatar"
                         />
-                        <div className="chat-info">
-                          <div className="chat-header-row">
-                            <div className="chat-name">
-                              {chat.name}
-                              {otherUser?.premium && (
+                        <div className="search-result-info">
+                          <span className="header-search-username">@{searchUser.username}</span>
+                          {searchUser.displayName && (
+                            <span className="header-search-name">
+                              {searchUser.displayName}
+                              {searchUser.premium && (
                                 <span className="premium-badge">
                                   <svg viewBox="0 0 24 24" fill="currentColor">
                                     <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
                                   </svg>
                                 </span>
                               )}
-                            </div>
-                            {otherUser && (() => {
-                              const userStatus = getUserStatus(otherUser._id);
-                              return (
-                                <OnlineStatus
-                                  userId={otherUser._id}
-                                  isOnline={userStatus.isOnline}
-                                  lastSeen={userStatus.lastSeen}
-                                  showText={false}
-                                  size="small"
-                                />
-                              );
-                            })()}
-                          </div>
-                          {chat.lastMessage && (
-                            <div className="chat-last-message">
-                              {chat.lastMessage.sender.username}: {chat.lastMessage.content.substring(0, 30)}...
-                            </div>
+                            </span>
                           )}
                         </div>
-                        {chat.unreadCount > 0 && (
-                          <span className="chat-unread">{chat.unreadCount}</span>
-                        )}
                       </div>
-                    );
-                  })
-                ) : (
-                  <div className="no-chats">Чатов пока нет</div>
+                    ))}
+                  </div>
                 )}
               </div>
-            </div>
-            
-            <div className="chat-area">
-              {activeChat ? (
-                <>
-                  <div className="connection-status">
-                    {isConnected ? (
-                      <><Wifi size={16} /> {connectionStatus}</>
-                    ) : (
-                      <><WifiOff size={16} /> {connectionStatus}</>
-                    )}
+              <div className="user-info">
+                <Points />
+                <span>Hello, {user?.username}!</span>
+                
+                <button onClick={toggleTheme} className="theme-toggle">
+                  <div className="theme-icon">
+                    {isDarkTheme ? <Sun size={18} /> : <Moon size={18} />}
                   </div>
-                  <div className="chat-header">
-                    <div className="chat-header-content">
-                      <div className="chat-user-info">
-                        {/* Аватарка и информация о собеседнике */}
-                        {activeChat.participants && activeChat.participants.length === 2 && (() => {
-                          const otherUser = activeChat.participants.find(p => p._id !== user._id && p._id !== user.id);
-                          const userStatus = getUserStatus(otherUser?._id);
-                          return (
-                            <div className="chat-user-section">
-                              <Avatar 
-                                src={otherUser?.avatar || null}
-                                alt={otherUser?.displayName || otherUser?.username || 'User'}
-                                size="medium"
-                                className="chat-header-avatar"
-                              />
-                              <div className="chat-title-section">
-                                <h3>
-                                  {activeChat.name}
+                  <span className="theme-text">
+                    {isDarkTheme ? 'Светлая' : 'Темная'}
+                  </span>
+                </button>
+                
+                <button onClick={handleLogout} className="logout-btn">
+                  <LogOut size={16} /> Выйти
+                </button>
+              </div>
+            </div>
+          </header>
+
+          <nav className="sidebar">
+            <ul className="nav-menu">
+              <li><button className={getNavItemClass('home')} onClick={() => setActiveTab('home')}><Home size={18} /> Главная</button></li>
+              <li><button className={getNavItemClass('messages')} onClick={() => { setActiveTab('messages'); loadChats(); }}>
+                <MessageCircle size={18} /> 
+                Сообщения
+                {totalUnread > 0 && <span className="unread-badge">{totalUnread}</span>}
+              </button></li>
+              <li><button className={getNavItemClass('leaderboard')} onClick={() => { setActiveTab('leaderboard'); loadLeaderboard(); }}>
+                <Trophy size={18} /> 
+                Топ игроков
+              </button></li>
+              <li><button className={getNavItemClass('profile')} onClick={() => { setActiveTab('profile'); if(user) loadUserProfile(user._id || user.id); }}><User size={18} /> Профиль</button></li>
+            </ul>
+          </nav>
+
+          <main className={`main-content ${activeTab === 'messages' ? 'messages-active' : ''}`}>
+            {activeTab === 'home' && (
+              <div>
+                <div className="create-post">
+                  <div className="create-post-header">
+                    <h3>Что нового?</h3>
+                  </div>
+                  <div className="create-post-body">
+                    <textarea
+                      value={postText}
+                      onChange={(e) => setPostText(e.target.value)}
+                      placeholder="Поделитесь своими мыслями..."
+                      rows="3"
+                      className="create-post-input"
+                    />
+                    <div className="create-post-footer">
+                      <div className="post-stats">
+                        <span className={`char-count ${postText.length > 250 ? 'warning' : ''} ${postText.length > 280 ? 'error' : ''}`}>
+                          {postText.length}/280
+                        </span>
+                      </div>
+                      <button 
+                        onClick={handleCreatePost} 
+                        disabled={!postText.trim() || postText.length > 280}
+                        className="publish-btn"
+                      >
+                        <Plus size={18} /> Опубликовать
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="posts-feed">
+                  {renderPosts(posts)}
+                  
+                  {hasMore && posts.length > 0 && (
+                    <div className="load-more-section">
+                      <button 
+                        onClick={loadMorePosts} 
+                        disabled={loading}
+                        className="load-more-btn"
+                      >
+                        {loading ? (
+                          'Загрузка...'
+                        ) : (
+                          <>
+                            <ChevronDown size={18} />
+                            Показать ещё
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  )}
+                  
+                  {!hasMore && posts.length > 0 && (
+                    <div className="end-of-feed">
+                      <p>Больше постов нет</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            
+            {activeTab === 'messages' && (
+              <div className="messages-container">
+                <div className="chats-sidebar">
+                  <div className="chats-header">
+                    <h3>Чаты</h3>
+                    {totalUnread > 0 && <span className="total-unread">{totalUnread}</span>}
+                  </div>
+                  
+                  <div className="chats-list">
+                    {chats.length > 0 ? (
+                      chats
+                        .sort((a, b) => {
+                          // Сортируем по времени последнего сообщения (новые вверху)
+                          const aTime = a.lastMessage?.createdAt || a.lastMessageTime || a.createdAt;
+                          const bTime = b.lastMessage?.createdAt || b.lastMessageTime || b.createdAt;
+                          return new Date(bTime) - new Date(aTime);
+                        })
+                        .map(chat => {
+                        // Находим собеседника для получения его аватарки
+                        const otherUser = chat.participants && chat.participants.length === 2 
+                          ? chat.participants.find(p => p._id !== user._id && p._id !== user.id)
+                          : null;
+                        
+                        return (
+                          <div 
+                            key={chat._id} 
+                            className={`chat-item ${activeChat?._id === chat._id ? 'active' : ''}`}
+                            onClick={() => { setActiveChat(chat); loadMessages(chat._id); }}
+                          >
+                            <Avatar 
+                              src={otherUser?.avatar || null}
+                              alt={otherUser?.displayName || otherUser?.username || chat.name}
+                              size="medium"
+                              className="chat-avatar"
+                            />
+                            <div className="chat-info">
+                              <div className="chat-header-row">
+                                <div className="chat-name">
+                                  {chat.name}
                                   {otherUser?.premium && (
                                     <span className="premium-badge">
                                       <svg viewBox="0 0 24 24" fill="currentColor">
@@ -1975,414 +1914,481 @@ const HomePage = () => {
                                       </svg>
                                     </span>
                                   )}
-                                </h3>
-                                <OnlineStatus
-                                  userId={otherUser?._id}
-                                  isOnline={userStatus.isOnline}
-                                  lastSeen={userStatus.lastSeen}
-                                  showText={true}
-                                  size="small"
-                                />
+                                </div>
+                                {otherUser && (() => {
+                                  const userStatus = getUserStatus(otherUser._id);
+                                  return (
+                                    <OnlineStatus
+                                      userId={otherUser._id}
+                                      isOnline={userStatus.isOnline}
+                                      lastSeen={userStatus.lastSeen}
+                                      showText={false}
+                                      size="small"
+                                    />
+                                  );
+                                })()}
                               </div>
+                              {chat.lastMessage && (
+                                <div className="chat-last-message">
+                                  {chat.lastMessage.sender.username}: {chat.lastMessage.content.substring(0, 30)}...
+                                </div>
+                              )}
                             </div>
-                          );
-                        })()}
+                            {chat.unreadCount > 0 && (
+                              <span className="chat-unread">{chat.unreadCount}</span>
+                            )}
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div className="no-chats">Чатов пока нет</div>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="chat-area">
+                  {activeChat ? (
+                    <>
+                      <div className="connection-status">
+                        {isConnected ? (
+                          <><Wifi size={16} /> {connectionStatus}</>
+                        ) : (
+                          <><WifiOff size={16} /> {connectionStatus}</>
+                        )}
                       </div>
-                      <div className="chat-call-buttons">
+                      <div className="chat-header">
+                        <div className="chat-header-content">
+                          <div className="chat-user-info">
+                            {/* Аватарка и информация о собеседнике */}
+                            {activeChat.participants && activeChat.participants.length === 2 && (() => {
+                              const otherUser = activeChat.participants.find(p => p._id !== user._id && p._id !== user.id);
+                              const userStatus = getUserStatus(otherUser?._id);
+                              return (
+                                <div className="chat-user-section">
+                                  <Avatar 
+                                    src={otherUser?.avatar || null}
+                                    alt={otherUser?.displayName || otherUser?.username || 'User'}
+                                    size="medium"
+                                    className="chat-header-avatar"
+                                  />
+                                  <div className="chat-title-section">
+                                    <h3>
+                                      {activeChat.name}
+                                      {otherUser?.premium && (
+                                        <span className="premium-badge">
+                                          <svg viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
+                                          </svg>
+                                        </span>
+                                      )}
+                                    </h3>
+                                    <OnlineStatus
+                                      userId={otherUser?._id}
+                                      isOnline={userStatus.isOnline}
+                                      lastSeen={userStatus.lastSeen}
+                                      showText={true}
+                                      size="small"
+                                    />
+                                  </div>
+                                </div>
+                              );
+                            })()}
+                          </div>
+                          <div className="chat-call-buttons">
+                            <button 
+                              onClick={() => initiateCall('audio')}
+                              className="call-button audio-call"
+                              title="Голосовой звонок"
+                            >
+                              <Phone size={18} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="messages-area">
+                        {messagesLoading ? (
+                          <div className="messages-loading">Загрузка сообщений...</div>
+                        ) : (
+                          <>
+                            {/* Кнопка загрузки старых сообщений */}
+                            {messagesPagination[activeChat._id]?.hasMore && (
+                              <div className="load-more-messages">
+                                <button 
+                                  onClick={() => loadOlderMessages(activeChat._id)}
+                                  disabled={loadingOlderMessages}
+                                  className="load-more-btn"
+                                >
+                                  {loadingOlderMessages ? 'Загрузка...' : 'Загрузить старые сообщения'}
+                                </button>
+                              </div>
+                            )}
+                            
+                            {(messages[activeChat._id] || []).map(message => {
+                              // Пропускаем сообщения о звонках - не отображаем их
+                              if (message.type === 'call') {
+                                return null;
+                              }
+                              
+                              // Обычное сообщение
+                              return (
+                                <div 
+                                  key={message._id} 
+                                  className={`message ${message.sender._id === (user._id || user.id) ? 'own' : 'other'}`}
+                                >
+                                  <div className="message-avatar">
+
+                                    <Avatar 
+                                      src={message.sender?.avatar || null}
+                                      alt={message.sender?.displayName || message.sender?.username || 'Unknown'}
+                                      size="small"
+                                      className="chat-message-avatar"
+                                    />
+                                  </div>
+                                  <div className="message-body">
+                                    <div className="message-header">
+                                      <span className="message-sender">
+                                        {message.sender.username}
+                                        {message.sender.premium && (
+                                          <span className="premium-badge">
+                                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                              <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
+                                            </svg>
+                                          </span>
+                                        )}
+                                      </span>
+                                      <span className="message-time">
+                                        {new Date(message.createdAt).toLocaleTimeString('ru-RU', {
+                                          hour: '2-digit',
+                                          minute: '2-digit'
+                                        })}
+                                      </span>
+                                      {message.sender._id === (user._id || user.id) && (
+                                        <button 
+                                          onClick={() => deleteMessage(message._id)}
+                                          className="delete-message-btn"
+                                        >
+                                          <Trash2 size={14} />
+                                        </button>
+                                      )}
+                                    </div>
+                                    <div className="message-content">{message.content}</div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                            {typingUsers[activeChat?._id] && (
+                              <div className="typing-indicator">
+                                {typingUsers[activeChat._id].username} печатает...
+                              </div>
+                            )}
+                            <div ref={messagesEndRef} />
+                          </>
+                        )}
+                      </div>
+                      
+                      <div className="message-input-area">
+                        <input
+                          type="text"
+                          value={newMessage}
+                          onChange={(e) => {
+                            setNewMessage(e.target.value);
+                            if (activeChat) {
+                              socketRef.current.emit('typing', {
+                                chatId: activeChat._id,
+                                isTyping: e.target.value.length > 0
+                              });
+                            }
+                          }}
+                          placeholder="Написать сообщение..."
+                          className="message-input"
+                          onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                        />
                         <button 
-                          onClick={() => initiateCall('audio')}
-                          className="call-button audio-call"
-                          title="Голосовой звонок"
+                          onClick={sendMessage} 
+                          className="send-message-btn"
+                          disabled={!newMessage.trim()}
                         >
-                          <Phone size={18} />
+                          <Send size={18} />
                         </button>
                       </div>
+                    </>
+                  ) : (
+                    <div className="no-active-chat">
+                      <h3>Выберите чат для начала общения</h3>
+                      <p>Вы можете начать новый чат, нажав "Написать" под постом пользователя</p>
                     </div>
-                  </div>
-                  
-                  <div className="messages-area">
-                    {messagesLoading ? (
-                      <div className="messages-loading">Загрузка сообщений...</div>
-                    ) : (
-                      <>
-                        {/* Кнопка загрузки старых сообщений */}
-                        {messagesPagination[activeChat._id]?.hasMore && (
-                          <div className="load-more-messages">
+                  )}
+                </div>
+              </div>
+            )}
+            
+            {activeTab === 'profile' && profile && (
+              <div className="profile-view">
+                <div className="profile-header">
+                  <div className="profile-content">
+                    <div className="profile-main-info">
+                      <div className="profile-avatar-section">
+                        <Avatar 
+                          src={profile.avatar || null} 
+                          alt={profile.displayName || profile.username}
+                          size="xlarge"
+                        />
+                      </div>
+                      <div className="profile-info">
+                        <div className="profile-header-row">
+                          <h2 className="profile-display-name">
+                            {profile.displayName || profile.username}
+                            {profile.premium && (
+                              <span className="premium-badge">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                  <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
+                                </svg>
+                              </span>
+                            )}
+                            {isOwnProfile() && (
+                              <span className="own-profile-badge">
+                                <UserCheck size={16} /> Ваш профиль
+                              </span>
+                            )}
+                          </h2>
+                          {isOwnProfile() && (
                             <button 
-                              onClick={() => loadOlderMessages(activeChat._id)}
-                              disabled={loadingOlderMessages}
-                              className="load-more-btn"
+                              className="profile-settings-btn"
+                              onClick={() => setShowProfileSettings(true)}
+                              title="Настройки профиля"
                             >
-                              {loadingOlderMessages ? 'Загрузка...' : 'Загрузить старые сообщения'}
+                              <Settings size={20} />
+                            </button>
+                          )}
+                        </div>
+                        <p className="profile-handle">@{profile.username}</p>
+                        {profile.bio && (
+                          <p className="profile-bio">{profile.bio}</p>
+                        )}
+                        
+                        <div className="profile-stats">
+                          <div className="profile-stat">
+                            <span className="stat-number">{followers}</span>
+                            <span className="stat-label">Подписчиков</span>
+                          </div>
+                          <div className="profile-stat">
+                            <span className="stat-number">{following}</span>
+                            <span className="stat-label">Подписки</span>
+                          </div>
+                          <div className="profile-stat">
+                            <span className="stat-number">{profilePosts.length}</span>
+                            <span className="stat-label">Постов</span>
+                          </div>
+                        </div>
+                        
+                        {!isOwnProfile() && (
+                          <div className="profile-actions">
+                            <button 
+                              className={`follow-btn ${profile.followed ? 'following' : ''}`}
+                              onClick={() => toggleFollow(profile._id)}
+                            >
+                              {profile.followed ? (
+                                <>
+                                  <UserCheck size={16} /> Отписаться
+                                </>
+                              ) : (
+                                <>
+                                  <Users size={16} /> Подписаться
+                                </>
+                              )}
+                            </button>
+                            <button 
+                              onClick={() => startChat(profile._id)}
+                              className="follow-btn"
+                            >
+                              <MessageCircle size={16} /> Написать
                             </button>
                           </div>
                         )}
-                        
-                        {(messages[activeChat._id] || []).map(message => {
-                          // Пропускаем сообщения о звонках - не отображаем их
-                          if (message.type === 'call') {
-                            return null;
-                          }
-                          
-                          // Обычное сообщение
-                          return (
-                            <div 
-                              key={message._id} 
-                              className={`message ${message.sender._id === (user._id || user.id) ? 'own' : 'other'}`}
-                            >
-                              <div className="message-avatar">
-
-                                <Avatar 
-                                  src={message.sender?.avatar || null}
-                                  alt={message.sender?.displayName || message.sender?.username || 'Unknown'}
-                                  size="small"
-                                  className="chat-message-avatar"
-                                />
-                              </div>
-                              <div className="message-body">
-                                <div className="message-header">
-                                  <span className="message-sender">
-                                    {message.sender.username}
-                                    {message.sender.premium && (
-                                      <span className="premium-badge">
-                                        <svg viewBox="0 0 24 24" fill="currentColor">
-                                          <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
-                                        </svg>
-                                      </span>
-                                    )}
-                                  </span>
-                                  <span className="message-time">
-                                    {new Date(message.createdAt).toLocaleTimeString('ru-RU', {
-                                      hour: '2-digit',
-                                      minute: '2-digit'
-                                    })}
-                                  </span>
-                                  {message.sender._id === (user._id || user.id) && (
-                                    <button 
-                                      onClick={() => deleteMessage(message._id)}
-                                      className="delete-message-btn"
-                                    >
-                                      <Trash2 size={14} />
-                                    </button>
-                                  )}
-                                </div>
-                                <div className="message-content">{message.content}</div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                        {typingUsers[activeChat?._id] && (
-                          <div className="typing-indicator">
-                            {typingUsers[activeChat._id].username} печатает...
-                          </div>
-                        )}
-                        <div ref={messagesEndRef} />
-                      </>
-                    )}
-                  </div>
-                  
-                  <div className="message-input-area">
-                    <input
-                      type="text"
-                      value={newMessage}
-                      onChange={(e) => {
-                        setNewMessage(e.target.value);
-                        if (activeChat) {
-                          socketRef.current.emit('typing', {
-                            chatId: activeChat._id,
-                            isTyping: e.target.value.length > 0
-                          });
-                        }
-                      }}
-                      placeholder="Написать сообщение..."
-                      className="message-input"
-                      onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                    />
-                    <button 
-                      onClick={sendMessage} 
-                      className="send-message-btn"
-                      disabled={!newMessage.trim()}
-                    >
-                      <Send size={18} />
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <div className="no-active-chat">
-                  <h3>Выберите чат для начала общения</h3>
-                  <p>Вы можете начать новый чат, нажав "Написать" под постом пользователя</p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-        
-        {activeTab === 'profile' && profile && (
-          <div className="profile-view">
-            <div className="profile-header">
-              <div className="profile-content">
-                <div className="profile-main-info">
-                  <div className="profile-avatar-section">
-                    <Avatar 
-                      src={profile.avatar || null} 
-                      alt={profile.displayName || profile.username}
-                      size="xlarge"
-                    />
-                  </div>
-                  <div className="profile-info">
-                    <div className="profile-header-row">
-                      <h2 className="profile-display-name">
-                        {profile.displayName || profile.username}
-                        {profile.premium && (
-                          <span className="premium-badge">
-                            <svg viewBox="0 0 24 24" fill="currentColor">
-                              <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
-                            </svg>
-                          </span>
-                        )}
-                        {isOwnProfile() && (
-                          <span className="own-profile-badge">
-                            <UserCheck size={16} /> Ваш профиль
-                          </span>
-                        )}
-                      </h2>
-                      {isOwnProfile() && (
-                        <button 
-                          className="profile-settings-btn"
-                          onClick={() => setShowProfileSettings(true)}
-                          title="Настройки профиля"
-                        >
-                          <Settings size={20} />
-                        </button>
-                      )}
-                    </div>
-                    <p className="profile-handle">@{profile.username}</p>
-                    {profile.bio && (
-                      <p className="profile-bio">{profile.bio}</p>
-                    )}
-                    
-                    <div className="profile-stats">
-                      <div className="profile-stat">
-                        <span className="stat-number">{followers}</span>
-                        <span className="stat-label">Подписчиков</span>
-                      </div>
-                      <div className="profile-stat">
-                        <span className="stat-number">{following}</span>
-                        <span className="stat-label">Подписки</span>
-                      </div>
-                      <div className="profile-stat">
-                        <span className="stat-number">{profilePosts.length}</span>
-                        <span className="stat-label">Постов</span>
                       </div>
                     </div>
-                    
-                    {!isOwnProfile() && (
-                      <div className="profile-actions">
-                        <button 
-                          className={`follow-btn ${profile.followed ? 'following' : ''}`}
-                          onClick={() => toggleFollow(profile._id)}
-                        >
-                          {profile.followed ? (
-                            <>
-                              <UserCheck size={16} /> Отписаться
-                            </>
-                          ) : (
-                            <>
-                              <Users size={16} /> Подписаться
-                            </>
-                          )}
-                        </button>
-                        <button 
-                          onClick={() => startChat(profile._id)}
-                          className="follow-btn"
-                        >
-                          <MessageCircle size={16} /> Написать
-                        </button>
-                      </div>
-                    )}
                   </div>
                 </div>
-              </div>
-            </div>
 
-            <div className="profile-posts-header">
-              <h3>
-                <Pencil size={18} /> 
-                Посты {isOwnProfile() ? '(ваши)' : ''}
-              </h3>
-              {profilePosts.length > 0 && (
-                <span className="posts-count">{profilePosts.length} постов</span>
-              )}
-            </div>
+                <div className="profile-posts-header">
+                  <h3>
+                    <Pencil size={18} /> 
+                    Посты {isOwnProfile() ? '(ваши)' : ''}
+                  </h3>
+                  {profilePosts.length > 0 && (
+                    <span className="posts-count">{profilePosts.length} постов</span>
+                  )}
+                </div>
 
-            {profilePosts.length > 0 ? (
-              <div className="posts-feed">
-                {renderPosts(profilePosts)}
-              </div>
-            ) : (
-              <div className="no-posts">
-                {isOwnProfile() ? 
-                  'У вас пока нет постов. Создайте свой первый пост!' : 
-                  `У @${profile.username} пока нет постов`
-                }
+                {profilePosts.length > 0 ? (
+                  <div className="posts-feed">
+                    {renderPosts(profilePosts)}
+                  </div>
+                ) : (
+                  <div className="no-posts">
+                    {isOwnProfile() ? 
+                      'У вас пока нет постов. Создайте свой первый пост!' : 
+                      `У @${profile.username} пока нет постов`
+                    }
+                  </div>
+                )}
               </div>
             )}
-          </div>
-        )}
 
-        {activeTab === 'leaderboard' && (
-          <div className="leaderboard-view">
-            <div className="leaderboard-header">
-              <h2>
-                <Trophy size={24} /> 
-                Топ игроков по баллам
-              </h2>
-              <p className="leaderboard-description">
-                Рейтинг пользователей по количеству накопленных баллов
-              </p>
-            </div>
+            {activeTab === 'leaderboard' && (
+              <div className="leaderboard-view">
+                <div className="leaderboard-header">
+                  <h2>
+                    <Trophy size={24} /> 
+                    Топ игроков по баллам
+                  </h2>
+                  <p className="leaderboard-description">
+                    Рейтинг пользователей по количеству накопленных баллов
+                  </p>
+                </div>
 
-            {leaderboardLoading ? (
-              <div className="loading-container">
-                <div className="loading">Загрузка рейтинга...</div>
+                {leaderboardLoading ? (
+                  <div className="loading-container">
+                    <div className="loading">Загрузка рейтинга...</div>
+                  </div>
+                ) : leaderboard.length > 0 ? (
+                  <div className="leaderboard-list">
+                    {leaderboard.map(user => (
+                      <div key={user._id} className="leaderboard-item">
+                        <div className="leaderboard-position">
+                          {user.position === 1 ? '🥇' : user.position === 2 ? '🥈' : user.position === 3 ? '🥉' : user.position}
+                        </div>
+                        
+                        <div className="leaderboard-avatar">
+                          <Avatar 
+                            src={user.avatar}
+                            alt={user.displayName || user.username}
+                            size="medium"
+                          />
+                        </div>
+                        
+                        <div className="leaderboard-info">
+                          <div className="leaderboard-name">
+                            {user.displayName || user.username}
+                            {user.premium && (
+                              <span className="premium-badge">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                  <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
+                                </svg>
+                              </span>
+                            )}
+                          </div>
+                          <div className="leaderboard-username">
+                            @{user.username}
+                          </div>
+                        </div>
+                        
+                        <div className="leaderboard-points">
+                          {new Intl.NumberFormat('ru-RU').format(user.points)} баллов
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="no-leaderboard">
+                    <p>Рейтинг пока пуст</p>
+                  </div>
+                )}
               </div>
-            ) : leaderboard.length > 0 ? (
-              <div className="leaderboard-list">
-                {leaderboard.map(user => (
-                  <div key={user._id} className="leaderboard-item">
-                    <div className="leaderboard-position">
-                      {user.position === 1 ? '🥇' : user.position === 2 ? '🥈' : user.position === 3 ? '🥉' : user.position}
+            )}
+          </main>
+
+          <aside className="right-sidebar">
+            <div className="changelog">
+              <h3><Clock size={18} /> Список изменений</h3>
+              <div className="changelog-content">
+                {changelogData.map((version, index) => (
+                  <div key={version.version} className="version-block">
+                    <div className="version-header">
+                      <span className="version-number">v{version.version}</span>
+                      <span className="version-date">{version.date}</span>
                     </div>
-                    
-                    <div className="leaderboard-avatar">
-                      <Avatar 
-                        src={user.avatar}
-                        alt={user.displayName || user.username}
-                        size="medium"
-                      />
-                    </div>
-                    
-                    <div className="leaderboard-info">
-                      <div className="leaderboard-name">
-                        {user.displayName || user.username}
-                        {user.premium && (
-                          <span className="premium-badge">
-                            <svg viewBox="0 0 24 24" fill="currentColor">
-                              <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
-                            </svg>
-                          </span>
-                        )}
-                      </div>
-                      <div className="leaderboard-username">
-                        @{user.username}
-                      </div>
-                    </div>
-                    
-                    <div className="leaderboard-points">
-                      {new Intl.NumberFormat('ru-RU').format(user.points)} баллов
-                    </div>
+                    <ul className="changes-list">
+                      {version.changes.map((change, changeIndex) => (
+                        <li key={changeIndex} className="change-item">
+                          {change}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 ))}
               </div>
-            ) : (
-              <div className="no-leaderboard">
-                <p>Рейтинг пока пуст</p>
-              </div>
-            )}
-          </div>
-        )}
-      </main>
+            </div>
 
-      <aside className="right-sidebar">
-        <div className="changelog">
-          <h3><Clock size={18} /> Список изменений</h3>
-          <div className="changelog-content">
-            {changelogData.map((version, index) => (
-              <div key={version.version} className="version-block">
-                <div className="version-header">
-                  <span className="version-number">v{version.version}</span>
-                  <span className="version-date">{version.date}</span>
-                </div>
-                <ul className="changes-list">
-                  {version.changes.map((change, changeIndex) => (
-                    <li key={changeIndex} className="change-item">
-                      {change}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="suggestions">
-          <h3><Users size={18} /> Рекомендации</h3>
-          {suggestions.length > 0 ? (
-            suggestions.map(suggestionUser => (
-              <div key={suggestionUser._id} className="user-suggestion">
-                <div className="suggestion-info">
-                  <Avatar 
-                    src={suggestionUser.avatar || null}
-                    alt={suggestionUser.displayName || suggestionUser.username}
-                    size="medium"
-                  />
-                  <div className="suggestion-user-details">
-                    <span className="suggestion-display-name">
-                      {suggestionUser.displayName || suggestionUser.username}
-                      {suggestionUser.premium && (
-                        <span className="premium-badge">
-                          <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
-                          </svg>
+            <div className="suggestions">
+              <h3><Users size={18} /> Рекомендации</h3>
+              {suggestions.length > 0 ? (
+                suggestions.map(suggestionUser => (
+                  <div key={suggestionUser._id} className="user-suggestion">
+                    <div className="suggestion-info">
+                      <Avatar 
+                        src={suggestionUser.avatar || null}
+                        alt={suggestionUser.displayName || suggestionUser.username}
+                        size="medium"
+                      />
+                      <div className="suggestion-user-details">
+                        <span className="suggestion-display-name">
+                          {suggestionUser.displayName || suggestionUser.username}
+                          {suggestionUser.premium && (
+                            <span className="premium-badge">
+                              <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
+                              </svg>
+                            </span>
+                          )}
                         </span>
-                      )}
-                    </span>
-                    <span className="suggestion-username">@{suggestionUser.username}</span>
-                    <span className="suggestion-stats">
-                      {suggestionUser.followersCount || 0} подписчиков
-                    </span>
+                        <span className="suggestion-username">@{suggestionUser.username}</span>
+                        <span className="suggestion-stats">
+                          {suggestionUser.followersCount || 0} подписчиков
+                        </span>
+                      </div>
+                    </div>
+                    <div className="suggestion-actions">
+                      <button 
+                        onClick={() => toggleFollow(suggestionUser._id)}
+                        className="suggestion-follow-btn"
+                      >
+                        <Users size={14} />
+                      </button>
+                    </div>
                   </div>
-                </div>
-                <div className="suggestion-actions">
-                  <button 
-                    onClick={() => toggleFollow(suggestionUser._id)}
-                    className="suggestion-follow-btn"
-                  >
-                    <Users size={14} />
-                  </button>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="no-suggestions">Рекомендации загружаются...</div>
-          )}
-        </div>
-      </aside>
+                ))
+              ) : (
+                <div className="no-suggestions">Рекомендации загружаются...</div>
+              )}
+            </div>
+          </aside>
 
-      {/* ИНТЕРФЕЙС ЗВОНКА */}
-            {currentCall && (
-        <CallInterface
-          call={currentCall}
-          onEndCall={endCall}
-          onAcceptCall={acceptCall}
-          onDeclineCall={declineCall}
-          isIncoming={isIncomingCall}
-          socket={socketRef.current}
-        />
-      )}
-      
-      {showProfileSettings && (
-        <ProfileSettings
-          isOpen={showProfileSettings}
-          onClose={() => setShowProfileSettings(false)}
-          user={user}
-          onProfileUpdate={handleProfileUpdate}
-        />
-      )}
-      
-      <PointsModals />
-    </div>
-    </>
+          {/* ИНТЕРФЕЙС ЗВОНКА */}
+                {currentCall && (
+          <CallInterface
+            call={currentCall}
+            onEndCall={endCall}
+            onAcceptCall={acceptCall}
+            onDeclineCall={declineCall}
+            isIncoming={isIncomingCall}
+            socket={socketRef.current}
+          />
+        )}
+        
+        {showProfileSettings && (
+          <ProfileSettings
+            isOpen={showProfileSettings}
+            onClose={() => setShowProfileSettings(false)}
+            user={user}
+            onProfileUpdate={handleProfileUpdate}
+          />
+        )}
+        
+        <PointsModals />
+      </div>
+      </>
     </PointsProvider>
   );
 };
