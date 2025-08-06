@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import AuthPage from './pages/AuthPage';
 import HomePage from './pages/HomePage';
+import { PointsProvider } from './context/PointsContext';
 import axios from 'axios';
 
 // Настройка axios interceptors для автоматической отправки токенов
@@ -115,7 +116,11 @@ function AppRouter() {
   return (
     <Routes>
       <Route path="/" element={<AuthPage />} />
-      <Route path="/home" element={<HomePage />} />
+      <Route path="/home" element={
+        <PointsProvider>
+          <HomePage />
+        </PointsProvider>
+      } />
     </Routes>
   );
 }
