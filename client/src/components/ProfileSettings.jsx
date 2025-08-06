@@ -79,12 +79,11 @@ const ProfileSettings = ({ isOpen, onClose, user, onProfileUpdate }) => {
       // Вызываем callback для обновления профиля в родительском компоненте
       onProfileUpdate(updatedUser);
       
-      alert('Профиль успешно обновлен!');
-      onClose();
+      // Закрываем модальное окно (переключение на профиль произойдет в handleProfileUpdate)
       
     } catch (error) {
       console.error('Ошибка обновления профиля:', error);
-      alert('Не удалось обновить профиль. Попробуйте еще раз.');
+      // Тихо обрабатываем ошибку без alert
     } finally {
       setIsLoading(false);
     }

@@ -881,12 +881,21 @@ const HomePage = () => {
   };
 
   // Обновление профиля пользователя
-  const handleProfileUpdate = (updatedUser) => {
+  const handleProfileUpdate = async (updatedUser) => {
     setUser(updatedUser);
     
     // Также обновляем profile если это текущий пользователь
     if (profile?._id === updatedUser._id || profile?.id === updatedUser.id) {
       setProfile(updatedUser);
+    }
+    
+    // Автоматически переключаемся на вкладку профиля и закрываем настройки
+    setActiveTab('profile');
+    setShowProfileSettings(false);
+    
+    // Перезагружаем профиль для обновления всех данных
+    if (updatedUser._id || updatedUser.id) {
+      await loadUserProfile(updatedUser._id || updatedUser.id);
     }
   };
 
