@@ -7,7 +7,7 @@ import {
   Home, MessageCircle, User, LogOut, Plus,
   Heart, MessageSquare, Repeat, Pencil, Trash2, Users, UserCheck, Send, X, ChevronDown,
   Moon, Sun, Wifi, WifiOff, Flame, Clock, Phone, Settings, Trophy, DollarSign,
-  Check, Play, HelpCircle
+  Check, Play, HelpCircle, History, Crown
 } from 'lucide-react';
 
 import CallInterface from '../components/CallInterface';
@@ -16,7 +16,7 @@ import ProfileSettings from '../components/ProfileSettings';
 import Avatar from '../components/Avatar';
 import Points from '../components/Points';
 import PointsModals from '../components/PointsModals';
-import { PointsProvider } from '../context/PointsContext';
+import { PointsProvider, usePoints } from '../context/PointsContext';
 
 import useOnlineStatus from '../hooks/useOnlineStatus';
 
@@ -40,6 +40,18 @@ const HomePage = () => {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  
+  // Wallet states
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [walletTransactions, setWalletTransactions] = useState([]);
+  const [walletLoading, setWalletLoading] = useState(false);
+  const [walletError, setWalletError] = useState('');
+  const [showWalletTransfer, setShowWalletTransfer] = useState(false);
+  const [transferData, setTransferData] = useState({
+    recipientUsername: '',
+    amount: '',
+    description: ''
+  });
   const [isDarkTheme, setIsDarkTheme] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState('Подключение...');
@@ -1734,6 +1746,107 @@ const HomePage = () => {
     );
   }
 
+  const { 
+    showTransfer, setShowTransfer,
+    showHistory, setShowHistory,
+    showPremium, setShowPremium,
+    showGiftPremium, setShowGiftPremium,
+    openHistory,
+    transactions,
+    loadTransactions
+  } = usePoints();
+
+  // Wallet functions
+  const loadWalletBalance = async () => {
+    try {
+      setWalletLoading(true);
+      const response = await axios.get('https://server-u9ji.onrender.com/api/points/balance');
+      setWalletBalance(response.data.points);
+    } catch (error) {
+      console.error('Error loading wallet balance:', error);
+      setWalletError('Ошибка загрузки баланса');
+    } finally {
+      setWalletLoading(false);
+    }
+  };
+
+  const loadWalletTransactions = async () => {
+    try {
+      setWalletLoading(true);
+      const response = await axios.get('https://server-u9ji.onrender.com/api/points/transactions?limit=10');
+      setWalletTransactions(response.data.transactions || []);
+    } catch (error) {
+      console.error('Error loading wallet transactions:', error);
+      setWalletError('Ошибка загрузки транзакций');
+    } finally {
+      setWalletLoading(false);
+    }
+  };
+
+  const handleWalletTransfer = async (e) => {
+    e.preventDefault();
+    
+    if (!transferData.recipientUsername.trim()) {
+      setWalletError('Введите username получателя');
+      return;
+    }
+    
+    if (!transferData.amount || transferData.amount <= 0) {
+      setWalletError('Введите корректную сумму');
+      return;
+    }
+    
+    if (transferData.amount > walletBalance) {
+      setWalletError('Недостаточно баллов');
+      return;
+    }
+    
+    try {
+      setWalletLoading(true);
+      setWalletError('');
+      const response = await axios.post('https://server-u9ji.onrender.com/api/points/transfer', {
+        recipientUsername: transferData.recipientUsername,
+        amount: transferData.amount,
+        description: transferData.description
+      });
+      
+      // Обновляем баланс и транзакции
+      setWalletBalance(response.data.newBalance);
+      setTransferData({ recipientUsername: '', amount: '', description: '' });
+      setShowWalletTransfer(false);
+      
+      // Перезагружаем транзакции
+      await loadWalletTransactions();
+      
+    } catch (error) {
+      setWalletError(error.response?.data?.message || 'Ошибка перевода');
+    } finally {
+      setWalletLoading(false);
+    }
+  };
+
+  const formatWalletAmount = (amount) => {
+    return new Intl.NumberFormat('ru-RU').format(amount);
+  };
+
+  const formatWalletDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('ru-RU', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  // Load wallet data when wallet tab is active
+  useEffect(() => {
+    if (activeTab === 'wallet') {
+      loadWalletBalance();
+      loadWalletTransactions();
+    }
+  }, [activeTab]);
+
   return (
     <PointsProvider>
       <>
@@ -2258,7 +2371,13 @@ const HomePage = () => {
                     Кошелек
                   </h2>
                 </div>
-
+                
+                {walletError && (
+                  <div className="wallet-error">
+                    {walletError}
+                  </div>
+                )}
+                
                 <div className="wallet-balance-section">
                   <div className="wallet-balance-card">
                     <div className="wallet-balance-icon">
@@ -2267,42 +2386,88 @@ const HomePage = () => {
                     <div className="wallet-balance-info">
                       <h3>M Coin Баланс</h3>
                       <div className="wallet-balance-amount">
-                        {user?.points || 0}
+                        {walletLoading ? 'Загрузка...' : formatWalletAmount(walletBalance)}
                       </div>
                     </div>
                   </div>
-
                   <div className="wallet-actions">
-                    <button className="wallet-action-btn">
-                      <Plus size={20} />
+                    <button 
+                      className="wallet-action-btn"
+                      onClick={() => setShowWalletTransfer(true)}
+                      disabled={walletLoading}
+                    >
+                      <Send size={20} />
                     </button>
-                    <button className="wallet-action-btn">
-                      <Plus size={20} />
+                    <button 
+                      className="wallet-action-btn"
+                      onClick={() => openHistory()}
+                      disabled={walletLoading}
+                    >
+                      <History size={20} />
                     </button>
-                    <button className="wallet-action-btn">
-                      <Play size={20} />
+                    <button 
+                      className="wallet-action-btn"
+                      onClick={() => setShowPremium(true)}
+                      disabled={walletLoading}
+                    >
+                      <Crown size={20} />
                     </button>
                   </div>
                 </div>
-
+                
                 <div className="wallet-history-section">
-                  <div className="wallet-history-item">
-                    <div className="wallet-history-icon">
-                      <Check size={20} />
-                    </div>
-                    <div className="wallet-history-content">
-                      <div className="wallet-history-period">
-                        4 августа - 10 августа
-                      </div>
-                      <div className="wallet-history-amount positive">
-                        +44 Баллов
-                      </div>
-                      <div className="wallet-history-description">
-                        Это простые баллы, которые вы получаете в конце недели за вашу активность. Обновляется раз в час.
-                      </div>
-                    </div>
+                  <div className="wallet-history-header">
+                    <h4>Последние транзакции</h4>
+                    <button 
+                      className="wallet-view-all-btn"
+                      onClick={() => openHistory()}
+                    >
+                      Посмотреть все
+                    </button>
                   </div>
-
+                  
+                  {walletLoading ? (
+                    <div className="wallet-loading">Загрузка транзакций...</div>
+                  ) : walletTransactions.length > 0 ? (
+                    <div className="wallet-transactions-list">
+                      {walletTransactions.slice(0, 5).map(transaction => (
+                        <div key={transaction._id} className="wallet-transaction-item">
+                          <div className="wallet-transaction-icon">
+                            {transaction.isOutgoing ? <Send size={16} /> : <Check size={16} />}
+                          </div>
+                          <div className="wallet-transaction-content">
+                            <div className="wallet-transaction-user">
+                              {transaction.isOutgoing 
+                                ? transaction.recipient?.displayName || transaction.recipient?.username || 'Неизвестно'
+                                : transaction.sender?.displayName || transaction.sender?.username || 'Неизвестно'
+                              }
+                            </div>
+                            <div className="wallet-transaction-description">
+                              {transaction.description}
+                            </div>
+                            <div className="wallet-transaction-date">
+                              {formatWalletDate(transaction.createdAt)}
+                            </div>
+                          </div>
+                          <div className={`wallet-transaction-amount ${transaction.isOutgoing ? 'outgoing' : 'incoming'}`}>
+                            {transaction.isOutgoing ? '-' : '+'}{formatWalletAmount(transaction.amount)}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="wallet-no-transactions">
+                      <div className="wallet-no-transactions-icon">
+                        <History size={24} />
+                      </div>
+                      <div className="wallet-no-transactions-text">
+                        У вас пока нет транзакций
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="wallet-info-section">
                   <div className="wallet-info-item">
                     <div className="wallet-info-icon">
                       <HelpCircle size={20} />
@@ -2311,11 +2476,75 @@ const HomePage = () => {
                       <div className="wallet-info-title">
                         Как начисляются баллы?
                       </div>
+                      <div className="wallet-info-description">
+                        Баллы начисляются за активность: посты, комментарии, лайки и другие действия
+                      </div>
                     </div>
                     <div className="wallet-info-arrow">
                       <ChevronDown size={20} />
                     </div>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* Wallet Transfer Modal */}
+            {showWalletTransfer && (
+              <div className="modal-overlay" onClick={() => setShowWalletTransfer(false)}>
+                <div className="modal-content transfer-modal" onClick={(e) => e.stopPropagation()}>
+                  <div className="modal-header">
+                    <h3>Перевод баллов</h3>
+                    <button onClick={() => setShowWalletTransfer(false)} className="close-btn">
+                      <X size={16} />
+                    </button>
+                  </div>
+                  
+                  <form onSubmit={handleWalletTransfer}>
+                    <div className="form-group">
+                      <label>Получатель (username):</label>
+                      <input
+                        type="text"
+                        value={transferData.recipientUsername}
+                        onChange={(e) => setTransferData(prev => ({ ...prev, recipientUsername: e.target.value }))}
+                        placeholder="@username"
+                        className="form-input"
+                      />
+                    </div>
+                    
+                    <div className="form-group">
+                      <label>Сумма:</label>
+                      <input
+                        type="number"
+                        value={transferData.amount}
+                        onChange={(e) => setTransferData(prev => ({ ...prev, amount: parseInt(e.target.value) || '' }))}
+                        placeholder="Введите сумму"
+                        min="1"
+                        max={walletBalance}
+                        className="form-input"
+                      />
+                    </div>
+                    
+                    <div className="form-group">
+                      <label>Описание (необязательно):</label>
+                      <input
+                        type="text"
+                        value={transferData.description}
+                        onChange={(e) => setTransferData(prev => ({ ...prev, description: e.target.value }))}
+                        placeholder="Описание перевода"
+                        className="form-input"
+                      />
+                    </div>
+                    
+                    {walletError && <div className="error-message">{walletError}</div>}
+                    
+                    <button 
+                      type="submit" 
+                      disabled={walletLoading}
+                      className="submit-btn"
+                    >
+                      {walletLoading ? 'Выполняется...' : 'Перевести'}
+                    </button>
+                  </form>
                 </div>
               </div>
             )}
