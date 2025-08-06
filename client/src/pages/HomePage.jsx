@@ -6,7 +6,8 @@ import { io } from 'socket.io-client';
 import {
   Home, MessageCircle, User, LogOut, Plus,
   Heart, MessageSquare, Repeat, Pencil, Trash2, Users, UserCheck, Send, X, ChevronDown,
-  Moon, Sun, Wifi, WifiOff, Flame, Clock, Phone, Settings, Trophy
+  Moon, Sun, Wifi, WifiOff, Flame, Clock, Phone, Settings, Trophy, DollarSign,
+  Check, Play, HelpCircle
 } from 'lucide-react';
 
 import CallInterface from '../components/CallInterface';
@@ -1810,6 +1811,10 @@ const HomePage = () => {
                 <Trophy size={18} /> 
                 Топ игроков
               </button></li>
+              <li><button className={getNavItemClass('wallet')} onClick={() => setActiveTab('wallet')}>
+                <DollarSign size={18} /> 
+                Кошелек
+              </button></li>
               <li><button className={getNavItemClass('profile')} onClick={() => { setActiveTab('profile'); if(user) loadUserProfile(user._id || user.id); }}><User size={18} /> Профиль</button></li>
             </ul>
           </nav>
@@ -2242,6 +2247,76 @@ const HomePage = () => {
                     }
                   </div>
                 )}
+              </div>
+            )}
+
+            {activeTab === 'wallet' && (
+              <div className="wallet-view">
+                <div className="wallet-header">
+                  <h2>
+                    <DollarSign size={24} /> 
+                    Кошелек
+                  </h2>
+                </div>
+
+                <div className="wallet-balance-section">
+                  <div className="wallet-balance-card">
+                    <div className="wallet-balance-icon">
+                      <DollarSign size={48} />
+                    </div>
+                    <div className="wallet-balance-info">
+                      <h3>M Coin Баланс</h3>
+                      <div className="wallet-balance-amount">
+                        {user?.points || 0}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="wallet-actions">
+                    <button className="wallet-action-btn">
+                      <Plus size={20} />
+                    </button>
+                    <button className="wallet-action-btn">
+                      <Plus size={20} />
+                    </button>
+                    <button className="wallet-action-btn">
+                      <Play size={20} />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="wallet-history-section">
+                  <div className="wallet-history-item">
+                    <div className="wallet-history-icon">
+                      <Check size={20} />
+                    </div>
+                    <div className="wallet-history-content">
+                      <div className="wallet-history-period">
+                        4 августа - 10 августа
+                      </div>
+                      <div className="wallet-history-amount positive">
+                        +44 Баллов
+                      </div>
+                      <div className="wallet-history-description">
+                        Это простые баллы, которые вы получаете в конце недели за вашу активность. Обновляется раз в час.
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="wallet-info-item">
+                    <div className="wallet-info-icon">
+                      <HelpCircle size={20} />
+                    </div>
+                    <div className="wallet-info-content">
+                      <div className="wallet-info-title">
+                        Как начисляются баллы?
+                      </div>
+                    </div>
+                    <div className="wallet-info-arrow">
+                      <ChevronDown size={20} />
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
 
