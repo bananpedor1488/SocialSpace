@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Coins, Send, History, Trophy, X, ChevronDown, ChevronUp, Crown, Gift } from 'lucide-react';
+import Avatar from './Avatar';
 import axios from 'axios';
 import Avatar from './Avatar';
 import { usePoints } from '../context/PointsContext';
@@ -17,9 +18,10 @@ const PointsModals = () => {
     amount: '',
     description: ''
   });
-  const [giftData, setGiftData] = useState({
-    recipientUsername: ''
-  });
+  const [giftData, setGiftData] = useState({ recipientUsername: '' });
+  const [giftSuggestions, setGiftSuggestions] = useState([]);
+  const [giftSearchLoading, setGiftSearchLoading] = useState(false);
+  const [showGiftSuggestions, setShowGiftSuggestions] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   
@@ -125,6 +127,31 @@ const PointsModals = () => {
       setLoading(false);
     }
   };
+
+  // Поиск получателя для подарка (подсказки, поддержка @ и без @)
+  useEffect(() => {
+    const raw = giftData.recipientUsername.trim();
+    const query = raw.replace(/^@/, '');
+    if (!query || query.length < 2) {
+      setGiftSuggestions([]);
+      setShowGiftSuggestions(false);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      try {
+        setGiftSearchLoading(true);
+        const res = await axios.get(`https://server-pqqy.onrender.com/api/users/search?query=${encodeURIComponent(query)}`);
+        setGiftSuggestions(res.data || []);
+        setShowGiftSuggestions(true);
+      } catch (err) {
+        setGiftSuggestions([]);
+        setShowGiftSuggestions(false);
+      } finally {
+        setGiftSearchLoading(false);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [giftData.recipientUsername]);
 
   // Перевести баллы
   const handleTransfer = async (e) => {
@@ -415,7 +442,30 @@ const PointsModals = () => {
                   onChange={(e) => setGiftData(prev => ({ ...prev, recipientUsername: e.target.value }))}
                   placeholder="@username"
                   className="form-input"
+                  onFocus={() => { if (giftSuggestions.length) setShowGiftSuggestions(true); }}
                 />
+                {showGiftSuggestions && giftSuggestions.length > 0 && (
+                  <div className="transfer-search-results" onMouseDown={(e) => e.preventDefault()}>
+                    {giftSuggestions.slice(0, 5).map(user => (
+                      <div
+                        key={user._id}
+                        className="transfer-search-result"
+                        onClick={() => {
+                          setGiftData({ recipientUsername: `@${user.username}` });
+                          setShowGiftSuggestions(false);
+                        }}
+                      >
+                        <Avatar src={user.avatar || null} alt={user.displayName || user.username} size="small" />
+                        <div className="search-result-info">
+                          <span className="header-search-username">@{user.username}</span>
+                          {user.displayName && (
+                            <span className="header-search-name">{user.displayName}</span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
               
               <div className="gift-info">

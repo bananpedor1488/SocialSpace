@@ -56,6 +56,7 @@ const HomePage = () => {
   const [transferSuggestions, setTransferSuggestions] = useState([]);
   const [transferSearchLoading, setTransferSearchLoading] = useState(false);
   const [showTransferSuggestions, setShowTransferSuggestions] = useState(false);
+  const [transferSuppressSearch, setTransferSuppressSearch] = useState(false);
   // Локальные состояния кошелька (вкладка из бокового меню)
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [historyTransactions, setHistoryTransactions] = useState([]);
@@ -1458,8 +1459,8 @@ const HomePage = () => {
 
   const handleSearch = async (e) => {
     const raw = e.target.value;
-    const query = raw.replace(/^@/, '');
-    setSearchQuery(query);
+    const query = raw.startsWith('@') ? raw.slice(1) : raw;
+    setSearchQuery(raw); // оставляем @ в поле, но в запрос отдаем без неё
     if (query.trim()) {
       try {
         const res = await axios.get(`https://server-pqqy.onrender.com/api/users/search?query=${encodeURIComponent(query)}`);
@@ -1777,6 +1778,7 @@ const HomePage = () => {
   // Подсказки по username для перевода (держим хук вне условных return)
   useEffect(() => {
     if (!showWalletTransfer) return;
+    if (transferSuppressSearch) return;
     const raw = transferData.recipientUsername.trim();
     const query = raw.replace(/^@/, '');
     if (!query || query.length < 2) {
@@ -1798,7 +1800,7 @@ const HomePage = () => {
       }
     }, 300);
     return () => clearTimeout(timer);
-  }, [transferData.recipientUsername, showWalletTransfer]);
+  }, [transferData.recipientUsername, showWalletTransfer, transferSuppressSearch]);
 
   // Показываем загрузку если пользователь еще не загружен
   if (!user) {
@@ -2658,8 +2660,11 @@ const HomePage = () => {
                               key={user._id}
                               className="transfer-search-result"
                               onClick={() => {
+                                setTransferSuppressSearch(true);
                                 setTransferData(prev => ({ ...prev, recipientUsername: `@${user.username}` }));
                                 setShowTransferSuggestions(false);
+                                // через тик снимаем флаг подавления, чтобы не мигало обратно
+                                setTimeout(() => setTransferSuppressSearch(false), 0);
                               }}
                             >
                               <Avatar 
