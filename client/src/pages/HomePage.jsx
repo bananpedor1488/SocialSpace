@@ -1779,13 +1779,36 @@ const HomePage = () => {
   useEffect(() => {
     if (!showWalletTransfer) return;
     if (transferSuppressSearch) return;
+    
     const raw = transferData.recipientUsername.trim();
     const query = raw.replace(/^@/, '');
+    
+    // Если username уже содержит @ и выглядит как выбранный пользователь, не показываем подсказки
+    if (raw.startsWith('@') && query.length >= 2) {
+      const selectedUser = transferSuggestions.find(user => user.username.toLowerCase() === query.toLowerCase());
+      if (selectedUser) {
+        setShowTransferSuggestions(false);
+        return;
+      }
+    }
+    
+    // Если введен точный username с @, скрываем подсказки
+    if (raw.startsWith('@') && query.length >= 2) {
+      const exactMatch = transferSuggestions.find(user => 
+        user.username.toLowerCase() === query.toLowerCase()
+      );
+      if (exactMatch) {
+        setShowTransferSuggestions(false);
+        return;
+      }
+    }
+    
     if (!query || query.length < 2) {
       setTransferSuggestions([]);
       setShowTransferSuggestions(false);
       return;
     }
+    
     const timer = setTimeout(async () => {
       try {
         setTransferSearchLoading(true);
@@ -1985,6 +2008,9 @@ const HomePage = () => {
       setWalletBalance(response.data.newBalance);
       setTransferData({ recipientUsername: '', amount: '', description: '' });
       setShowWalletTransfer(false);
+      setTransferSuggestions([]);
+      setShowTransferSuggestions(false);
+      setTransferSuppressSearch(false);
       
       // Перезагружаем транзакции
       await loadWalletTransactions();
@@ -2643,11 +2669,21 @@ const HomePage = () => {
 
             {/* Wallet Transfer Modal */}
             {showWalletTransfer && (
-              <div className="modal-overlay" onClick={() => setShowWalletTransfer(false)}>
+              <div className="modal-overlay" onClick={() => {
+                setShowWalletTransfer(false);
+                setTransferSuggestions([]);
+                setShowTransferSuggestions(false);
+                setTransferSuppressSearch(false);
+              }}>
                 <div className="modal-content transfer-modal" onClick={(e) => e.stopPropagation()}>
                   <div className="modal-header">
                     <h3>Перевод баллов</h3>
-                    <button onClick={() => setShowWalletTransfer(false)} className="close-btn">
+                    <button onClick={() => {
+                      setShowWalletTransfer(false);
+                      setTransferSuggestions([]);
+                      setShowTransferSuggestions(false);
+                      setTransferSuppressSearch(false);
+                    }} className="close-btn">
                       <X size={16} />
                     </button>
                   </div>
@@ -2675,7 +2711,7 @@ const HomePage = () => {
                                 setShowTransferSuggestions(false);
                                 setTransferSuggestions([]);
                                 // Увеличиваем задержку, чтобы подсказки не появлялись снова
-                                setTimeout(() => setTransferSuppressSearch(false), 1000);
+                                setTimeout(() => setTransferSuppressSearch(false), 2000);
                               }}
                             >
                               <Avatar 
