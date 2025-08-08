@@ -5282,3 +5282,8 @@ body {
     transform: translateY(0);
   }
 }
+
+/* Специальные стили для модального окна переводов */
+.transfer-modal {
+  z-index: 99999;
+}
