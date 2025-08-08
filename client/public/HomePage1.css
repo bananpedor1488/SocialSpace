@@ -5260,6 +5260,116 @@ body {
   gap: 15px;
 }
 
+/* Стили списка транзакций кошелька (светлая тема) */
+.wallet-transactions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.wallet-transaction-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.wallet-transaction-item:hover {
+  background: rgba(249, 250, 251, 0.9);
+  border-color: rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+.wallet-transaction-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 10px;
+  color: #374151;
+  flex-shrink: 0;
+}
+
+.wallet-transaction-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.wallet-transaction-user {
+  color: #1f2937;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+.wallet-transaction-description {
+  color: #6b7280;
+  font-size: 12px;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wallet-transaction-date {
+  color: #9ca3af;
+  font-size: 11px;
+}
+
+.wallet-transaction-amount {
+  font-weight: 700;
+  font-size: 16px;
+  margin-left: 8px;
+}
+
+.wallet-transaction-amount.outgoing {
+  color: #dc2626;
+}
+
+.wallet-transaction-amount.incoming {
+  color: #059669;
+}
+
+.wallet-no-transactions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px dashed rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  color: #6b7280;
+}
+
+.wallet-no-transactions-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+}
+
+.wallet-no-transactions-text {
+  font-size: 14px;
+}
+
+.wallet-loading {
+  text-align: center;
+  color: #6b7280;
+  padding: 16px 0;
+}
+
 .wallet-history-item {
   background: rgba(255, 255, 255, 0.8);
   border: 1px solid rgba(107, 114, 128, 0.2);
