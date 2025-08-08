@@ -238,7 +238,7 @@ const HomePage = () => {
     }
 
     try {
-      const response = await axios.post('https://server-u9ji.onrender.com/api/auth/refresh', {
+      const response = await axios.post('https://server-pqqy.onrender.com/api/auth/refresh', {
         refreshToken: refreshToken
       });
       
@@ -262,7 +262,7 @@ const HomePage = () => {
       console.log('Initializing Socket.IO connection...');
       setConnectionStatus('Подключение...');
 
-      socketRef.current = io('https://server-u9ji.onrender.com', {
+      socketRef.current = io('https://server-pqqy.onrender.com', {
         auth: {
           token: accessToken
         },
@@ -666,7 +666,7 @@ const HomePage = () => {
                 socketRef.current.disconnect();
                 setTimeout(() => {
                   if (user) {
-                    const newSocket = io('https://server-u9ji.onrender.com', {
+                    const newSocket = io('https://server-pqqy.onrender.com', {
                       auth: { token: accessToken },
                       transports: ['websocket', 'polling']
                     });
@@ -812,21 +812,21 @@ const HomePage = () => {
 
         }
 
-        const res = await axios.get('https://server-u9ji.onrender.com/api/me');
+        const res = await axios.get('https://server-pqqy.onrender.com/api/me');
         setUser(res.data.user);
         localStorage.setItem('user', JSON.stringify(res.data.user));
         
         // Очищаем любые "зависшие" звонки при загрузке
         try {
-          await axios.get('https://server-u9ji.onrender.com/api/calls/active');
+          await axios.get('https://server-pqqy.onrender.com/api/calls/active');
         } catch (err) {
           // Если есть активный звонок, пытаемся его завершить
           if (err.response?.status === 409) {
             console.log('Found stuck call, cleaning up...');
             try {
-              const activeCallRes = await axios.get('https://server-u9ji.onrender.com/api/calls/active');
+              const activeCallRes = await axios.get('https://server-pqqy.onrender.com/api/calls/active');
               if (activeCallRes.data) {
-                await axios.post(`https://server-u9ji.onrender.com/api/calls/end/${activeCallRes.data._id}`);
+                await axios.post(`https://server-pqqy.onrender.com/api/calls/end/${activeCallRes.data._id}`);
                 console.log('Stuck call cleaned up');
               }
             } catch (cleanupErr) {
@@ -864,7 +864,7 @@ const HomePage = () => {
   // Функция загрузки рекомендаций
   const loadSuggestions = async () => {
     try {
-      const res = await axios.get('https://server-u9ji.onrender.com/api/users/suggestions');
+      const res = await axios.get('https://server-pqqy.onrender.com/api/users/suggestions');
       console.log('Suggestions response:', res.data);
       
       setSuggestions(res.data.slice(0, 3));
@@ -879,7 +879,7 @@ const HomePage = () => {
     if (!activeChat) return;
     
     try {
-      const response = await axios.post('https://server-u9ji.onrender.com/api/calls/initiate', {
+      const response = await axios.post('https://server-pqqy.onrender.com/api/calls/initiate', {
         chatId: activeChat._id,
         type: type
       });
@@ -938,7 +938,7 @@ const HomePage = () => {
       console.log('Accepting call with ID:', currentCall.callId || currentCall._id);
       const callId = currentCall.callId || currentCall._id;
       
-      await axios.post(`https://server-u9ji.onrender.com/api/calls/accept/${callId}`);
+      await axios.post(`https://server-pqqy.onrender.com/api/calls/accept/${callId}`);
       console.log('Call accepted via API successfully');
       
       // НЕ изменяем состояние здесь - пусть это делает socket событие
@@ -964,7 +964,7 @@ const HomePage = () => {
     if (!currentCall) return;
     
     try {
-      await axios.post(`https://server-u9ji.onrender.com/api/calls/decline/${currentCall.callId}`);
+      await axios.post(`https://server-pqqy.onrender.com/api/calls/decline/${currentCall.callId}`);
       
       // Логируем отклоненный входящий звонок
       await logCallToChat({
@@ -987,7 +987,7 @@ const HomePage = () => {
     
     try {
       const callId = currentCall.callId || currentCall._id;
-      await axios.post(`https://server-u9ji.onrender.com/api/calls/end/${callId}`);
+      await axios.post(`https://server-pqqy.onrender.com/api/calls/end/${callId}`);
       console.log('Call ended successfully via API');
     } catch (err) {
       console.error('Ошибка завершения звонка:', err);
@@ -1004,7 +1004,7 @@ const HomePage = () => {
   const emergencyCleanup = async (silent = false) => {
     if (!silent) console.log('Emergency cleanup started...');
     try {
-      const response = await axios.post('https://server-u9ji.onrender.com/api/calls/cleanup');
+      const response = await axios.post('https://server-pqqy.onrender.com/api/calls/cleanup');
       
       // Сбрасываем состояние звонков
       setCurrentCall(null);
@@ -1034,7 +1034,7 @@ const HomePage = () => {
     // Не загружаем, если уже есть сообщения этого чата в стейте
     if (messages[chatId]) return;
     try {
-      const res = await axios.get(`https://server-u9ji.onrender.com/api/messages/chats/${chatId}/messages?page=1&limit=20`);
+      const res = await axios.get(`https://server-pqqy.onrender.com/api/messages/chats/${chatId}/messages?page=1&limit=20`);
       const { messages: newMessages, pagination } = res.data;
       setMessages(prev => ({ ...prev, [chatId]: newMessages }));
       setMessagesPagination(prev => ({ ...prev, [chatId]: pagination }));
@@ -1045,7 +1045,7 @@ const HomePage = () => {
 
   const loadChats = async () => {
     try {
-      const res = await axios.get('https://server-u9ji.onrender.com/api/messages/chats');
+      const res = await axios.get('https://server-pqqy.onrender.com/api/messages/chats');
       console.log('Chats response:', res.data);
       
       // Сортируем чаты по времени последнего сообщения
@@ -1077,7 +1077,7 @@ const HomePage = () => {
         await fetchOnlineStatus(Array.from(allParticipantIds));
       }
       
-      const unreadRes = await axios.get('https://server-u9ji.onrender.com/api/messages/unread-count');
+      const unreadRes = await axios.get('https://server-pqqy.onrender.com/api/messages/unread-count');
       setTotalUnread(unreadRes.data.totalUnread);
     } catch (err) {
       console.error('Ошибка загрузки чатов:', err);
@@ -1089,7 +1089,7 @@ const HomePage = () => {
     
     setMessagesLoading(true);
     try {
-      const res = await axios.get(`https://server-u9ji.onrender.com/api/messages/chats/${chatId}/messages?page=${page}&limit=20`);
+      const res = await axios.get(`https://server-pqqy.onrender.com/api/messages/chats/${chatId}/messages?page=${page}&limit=20`);
       console.log('Messages loaded for chat:', res.data);
       
       const { messages: newMessages, pagination } = res.data;
@@ -1127,7 +1127,7 @@ const HomePage = () => {
       }
       
       // Отмечаем как прочитанные
-      await axios.put(`https://server-u9ji.onrender.com/api/messages/chats/${chatId}/read`);
+      await axios.put(`https://server-pqqy.onrender.com/api/messages/chats/${chatId}/read`);
       
       setChats(prev => prev.map(chat => 
         chat._id === chatId ? { ...chat, unreadCount: 0 } : chat
@@ -1151,7 +1151,7 @@ const HomePage = () => {
 
     
     try {
-      const response = await axios.post(`https://server-u9ji.onrender.com/api/messages/chats/${activeChat._id}/messages`, {
+      const response = await axios.post(`https://server-pqqy.onrender.com/api/messages/chats/${activeChat._id}/messages`, {
         content: messageContent
       });
       
@@ -1209,7 +1209,7 @@ const HomePage = () => {
     setLoadingOlderMessages(true);
     try {
       const nextPage = currentPagination.page + 1;
-      const res = await axios.get(`https://server-u9ji.onrender.com/api/messages/chats/${chatId}/messages?page=${nextPage}&limit=20`);
+      const res = await axios.get(`https://server-pqqy.onrender.com/api/messages/chats/${chatId}/messages?page=${nextPage}&limit=20`);
       
       const { messages: olderMessages, pagination } = res.data;
       
@@ -1231,7 +1231,7 @@ const HomePage = () => {
 
   const deleteMessage = async (messageId) => {
     try {
-      await axios.delete(`https://server-u9ji.onrender.com/api/messages/messages/${messageId}`);
+      await axios.delete(`https://server-pqqy.onrender.com/api/messages/messages/${messageId}`);
     } catch (err) {
       console.error('Ошибка удаления сообщения:', err);
     }
@@ -1239,7 +1239,7 @@ const HomePage = () => {
 
   const startChat = async (userId) => {
     try {
-      const res = await axios.post('https://server-u9ji.onrender.com/api/messages/chats', {
+      const res = await axios.post('https://server-pqqy.onrender.com/api/messages/chats', {
         participantId: userId
       });
       
@@ -1264,7 +1264,7 @@ const HomePage = () => {
     console.log('Loading posts, page:', pageNum);
     
     try {
-      const res = await axios.get('https://server-u9ji.onrender.com/api/posts', {
+      const res = await axios.get('https://server-pqqy.onrender.com/api/posts', {
         params: {
           page: pageNum,
           limit: 10
@@ -1347,7 +1347,7 @@ const HomePage = () => {
   const loadLeaderboard = async () => {
     try {
       setLeaderboardLoading(true);
-      const response = await axios.get('https://server-u9ji.onrender.com/api/points/leaderboard');
+      const response = await axios.get('https://server-pqqy.onrender.com/api/points/leaderboard');
       console.log('Leaderboard response:', response.data);
       
       setLeaderboard(response.data.leaderboard);
@@ -1360,7 +1360,7 @@ const HomePage = () => {
 
   const fetchComments = async (postId) => {
     try {
-      const res = await axios.get(`https://server-u9ji.onrender.com/api/posts/${postId}/comments`);
+      const res = await axios.get(`https://server-pqqy.onrender.com/api/posts/${postId}/comments`);
       setComments(prev => ({ ...prev, [postId]: res.data }));
     } catch (err) {
       console.error('Ошибка загрузки комментариев:', err);
@@ -1381,7 +1381,7 @@ const HomePage = () => {
   const handleLogout = async () => {
     try {
       const { refreshToken } = getTokens();
-      await axios.post('https://server-u9ji.onrender.com/api/auth/logout', {
+      await axios.post('https://server-pqqy.onrender.com/api/auth/logout', {
         refreshToken
       });
     } catch (error) {
@@ -1398,7 +1398,7 @@ const HomePage = () => {
   const handleCreatePost = async () => {
     if (postText.trim()) {
       try {
-        await axios.post('https://server-u9ji.onrender.com/api/posts', { 
+        await axios.post('https://server-pqqy.onrender.com/api/posts', { 
           content: postText 
         });
         setPostText('');
@@ -1410,7 +1410,7 @@ const HomePage = () => {
 
   const handleLikePost = async (postId) => {
     try {
-      await axios.post(`https://server-u9ji.onrender.com/api/posts/${postId}/like`);
+      await axios.post(`https://server-pqqy.onrender.com/api/posts/${postId}/like`);
     } catch (err) {
       console.error('Ошибка лайка:', err);
     }
@@ -1418,7 +1418,7 @@ const HomePage = () => {
 
   const handleRepost = async (postId) => {
     try {
-      const res = await axios.post(`https://server-u9ji.onrender.com/api/posts/${postId}/repost`);
+      const res = await axios.post(`https://server-pqqy.onrender.com/api/posts/${postId}/repost`);
       console.log('Repost successful:', res.data);
       // Репост появится через Socket.IO событие 'newRepost'
     } catch (err) {
@@ -1435,7 +1435,7 @@ const HomePage = () => {
     }
     
     try {
-      await axios.delete(`https://server-u9ji.onrender.com/api/posts/${postId}`);
+      await axios.delete(`https://server-pqqy.onrender.com/api/posts/${postId}`);
       
       // Удаляем пост из локального состояния
       setPosts(prevPosts => prevPosts.filter(post => post._id !== postId));
@@ -1453,7 +1453,7 @@ const HomePage = () => {
     setSearchQuery(query);
     if (query.trim()) {
       try {
-        const res = await axios.get(`https://server-u9ji.onrender.com/api/users/search?query=${query}`);
+        const res = await axios.get(`https://server-pqqy.onrender.com/api/users/search?query=${query}`);
         setSearchResults(res.data);
       } catch (err) {
         console.error('Ошибка поиска пользователей:', err);
@@ -1480,14 +1480,14 @@ const HomePage = () => {
     }
     
     try {
-      const res = await axios.get(`https://server-u9ji.onrender.com/api/users/${userId}`);
+      const res = await axios.get(`https://server-pqqy.onrender.com/api/users/${userId}`);
       console.log('Profile response:', res.data);
       setProfile(res.data);
       
       setFollowers(res.data.followersCount || 0);
       setFollowing(res.data.followingCount || 0);
       
-      const postsRes = await axios.get(`https://server-u9ji.onrender.com/api/users/${userId}/posts`);
+      const postsRes = await axios.get(`https://server-pqqy.onrender.com/api/users/${userId}/posts`);
       console.log('Profile posts response:', postsRes.data);
       
       const formattedProfilePosts = postsRes.data.map(post => ({
@@ -1524,7 +1524,7 @@ const HomePage = () => {
 
   const toggleFollow = async (userId) => {
     try {
-      await axios.post(`https://server-u9ji.onrender.com/api/follow/${userId}`);
+      await axios.post(`https://server-pqqy.onrender.com/api/follow/${userId}`);
     } catch (err) {
       console.error('Ошибка подписки/отписки:', err);
     }
@@ -1535,7 +1535,7 @@ const HomePage = () => {
     if (!commentText?.trim()) return;
     
     try {
-      await axios.post(`https://server-u9ji.onrender.com/api/posts/${postId}/comment`, 
+      await axios.post(`https://server-pqqy.onrender.com/api/posts/${postId}/comment`, 
         { content: commentText }
       );
       setNewComment(prev => ({
@@ -1774,7 +1774,7 @@ const HomePage = () => {
   const loadWalletBalance = async () => {
     try {
       setWalletLoading(true);
-      const response = await axios.get('https://server-u9ji.onrender.com/api/points/balance');
+      const response = await axios.get('https://server-pqqy.onrender.com/api/points/balance');
       setWalletBalance(response.data.points);
     } catch (error) {
       console.error('Error loading wallet balance:', error);
@@ -1787,7 +1787,7 @@ const HomePage = () => {
   const loadWalletTransactions = async () => {
     try {
       setWalletLoading(true);
-      const response = await axios.get('https://server-u9ji.onrender.com/api/points/transactions?limit=10');
+      const response = await axios.get('https://server-pqqy.onrender.com/api/points/transactions?limit=10');
       setWalletTransactions(response.data.transactions || []);
     } catch (error) {
       console.error('Error loading wallet transactions:', error);
@@ -1802,7 +1802,7 @@ const HomePage = () => {
     try {
       setShowHistoryModal(true);
       setHistoryLoading(true);
-      const response = await axios.get('https://server-u9ji.onrender.com/api/points/transactions?page=1&limit=20');
+      const response = await axios.get('https://server-pqqy.onrender.com/api/points/transactions?page=1&limit=20');
       setHistoryTransactions(response.data.transactions || []);
       setHistoryPagination({
         page: 1,
@@ -1821,7 +1821,7 @@ const HomePage = () => {
     try {
       setHistoryLoading(true);
       const nextPage = historyPagination.page + 1;
-      const response = await axios.get(`https://server-u9ji.onrender.com/api/points/transactions?page=${nextPage}&limit=${historyPagination.limit}`);
+      const response = await axios.get(`https://server-pqqy.onrender.com/api/points/transactions?page=${nextPage}&limit=${historyPagination.limit}`);
       setHistoryTransactions(prev => [...prev, ...(response.data.transactions || [])]);
       setHistoryPagination(prev => ({
         ...prev,
@@ -1841,7 +1841,7 @@ const HomePage = () => {
       setPremiumError('');
       setPremiumSuccess('');
       setPremiumLoading(true);
-      const response = await axios.get('https://server-u9ji.onrender.com/api/points/premium-info');
+      const response = await axios.get('https://server-pqqy.onrender.com/api/points/premium-info');
       setPremiumInfo({
         active: response.data.premium?.active || false,
         expiresAt: response.data.premium?.expiresAt || null,
@@ -1861,7 +1861,7 @@ const HomePage = () => {
     try {
       setPremiumLoading(true);
       setPremiumError('');
-      const response = await axios.post('https://server-u9ji.onrender.com/api/points/buy-premium');
+      const response = await axios.post('https://server-pqqy.onrender.com/api/points/buy-premium');
       setPremiumSuccess('Премиум успешно куплен!');
       setWalletBalance(response.data.newBalance);
       await openPremiumModal();
@@ -1882,7 +1882,7 @@ const HomePage = () => {
       setGiftLoading(true);
       setGiftError('');
       setGiftSuccess('');
-      const response = await axios.post('https://server-u9ji.onrender.com/api/points/gift-premium', giftData);
+      const response = await axios.post('https://server-pqqy.onrender.com/api/points/gift-premium', giftData);
       setWalletBalance(response.data.newBalance);
       setGiftSuccess('Премиум успешно подарен!');
       setGiftData({ recipientUsername: '' });
@@ -1914,7 +1914,7 @@ const HomePage = () => {
     try {
       setWalletLoading(true);
       setWalletError('');
-      const response = await axios.post('https://server-u9ji.onrender.com/api/points/transfer', {
+      const response = await axios.post('https://server-pqqy.onrender.com/api/points/transfer', {
         recipientUsername: transferData.recipientUsername,
         amount: transferData.amount,
         description: transferData.description
