@@ -1783,26 +1783,6 @@ const HomePage = () => {
     const raw = transferData.recipientUsername.trim();
     const query = raw.replace(/^@/, '');
     
-    // Если username уже содержит @ и выглядит как выбранный пользователь, не показываем подсказки
-    if (raw.startsWith('@') && query.length >= 2) {
-      const selectedUser = transferSuggestions.find(user => user.username.toLowerCase() === query.toLowerCase());
-      if (selectedUser) {
-        setShowTransferSuggestions(false);
-        return;
-      }
-    }
-    
-    // Если введен точный username с @, скрываем подсказки
-    if (raw.startsWith('@') && query.length >= 2) {
-      const exactMatch = transferSuggestions.find(user => 
-        user.username.toLowerCase() === query.toLowerCase()
-      );
-      if (exactMatch) {
-        setShowTransferSuggestions(false);
-        return;
-      }
-    }
-    
     if (!query || query.length < 2) {
       setTransferSuggestions([]);
       setShowTransferSuggestions(false);
@@ -1814,7 +1794,21 @@ const HomePage = () => {
         setTransferSearchLoading(true);
         const res = await axios.get(`https://server-pqqy.onrender.com/api/users/search?query=${encodeURIComponent(query)}`);
         if (transferSuppressSearch) return; // Проверяем еще раз после запроса
-        setTransferSuggestions(res.data || []);
+        
+        const suggestions = res.data || [];
+        setTransferSuggestions(suggestions);
+        
+        // Если введен точный username с @ и он совпадает с одним из результатов, не показываем подсказки
+        if (raw.startsWith('@') && query.length >= 2) {
+          const exactMatch = suggestions.find(user => 
+            user.username.toLowerCase() === query.toLowerCase()
+          );
+          if (exactMatch) {
+            setShowTransferSuggestions(false);
+            return;
+          }
+        }
+        
         setShowTransferSuggestions(true);
       } catch (e) {
         if (transferSuppressSearch) return;
