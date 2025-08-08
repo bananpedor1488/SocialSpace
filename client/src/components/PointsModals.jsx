@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Coins, Send, History, Trophy, X, ChevronDown, ChevronUp, Crown, Gift } from 'lucide-react';
-import Avatar from './Avatar';
 import axios from 'axios';
 import Avatar from './Avatar';
 import { usePoints } from '../context/PointsContext';
