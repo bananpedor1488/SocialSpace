@@ -52,6 +52,7 @@ const HomePage = () => {
     amount: '',
     description: ''
   });
+  const [transferPreview, setTransferPreview] = useState({ commission: 0, netAmount: 0 });
   // Локальные состояния кошелька (вкладка из бокового меню)
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [historyTransactions, setHistoryTransactions] = useState([]);
@@ -1789,6 +1790,20 @@ const HomePage = () => {
     }
   };
 
+  // Пересчет комиссии на клиенте (15% без премиума, 0% с премиумом — сервер проверяет окончательно)
+  useEffect(() => {
+    const amount = Number(transferData.amount) || 0;
+    if (amount <= 0) {
+      setTransferPreview({ commission: 0, netAmount: 0 });
+      return;
+    }
+    // Клиентская индикация: попробуем получить признак премиума из баланса запроса (если добавим хранение)
+    // Здесь просто считаем по правилу: если сумма >= 1, комиссия 15% (сервер потом уточнит, если у юзера премиум — будет 0%)
+    const commission = Math.floor(amount * 0.15);
+    const netAmount = Math.max(amount - commission, 0);
+    setTransferPreview({ commission, netAmount });
+  }, [transferData.amount]);
+
   const loadWalletTransactions = async () => {
     try {
       setWalletLoading(true);
@@ -2630,6 +2645,20 @@ const HomePage = () => {
                         placeholder="Описание перевода"
                         className="form-input"
                       />
+                    </div>
+
+                    <div className="form-group">
+                      <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 6,
+                        color: '#94a3b8',
+                        fontSize: 13
+                      }}>
+                        <div>Комиссия (без премиума): {transferPreview.commission} баллов</div>
+                        <div>Дойдёт получателю: {transferPreview.netAmount} баллов</div>
+                        <div>С премиумом комиссия 0%</div>
+                      </div>
                     </div>
                     
                     {walletError && <div className="error-message">{walletError}</div>}
