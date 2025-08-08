@@ -175,7 +175,7 @@ const PointsModals = () => {
       setLoading(true);
       setError('');
       const response = await axios.post('https://server-pqqy.onrender.com/api/points/transfer', {
-        recipientUsername: transferData.recipientUsername,
+        recipientUsername: (transferData.recipientUsername || '').replace(/^@/, ''),
         amount: transferData.amount,
         description: transferData.description
       });
@@ -230,15 +230,51 @@ const PointsModals = () => {
             </div>
             
             <form onSubmit={handleTransfer}>
-              <div className="form-group">
+              <div className="form-group transfer-search-wrapper">
                 <label>Получатель (username):</label>
                 <input
                   type="text"
                   value={transferData.recipientUsername}
-                  onChange={(e) => setTransferData(prev => ({ ...prev, recipientUsername: e.target.value }))}
+                  onChange={async (e) => {
+                    const v = e.target.value;
+                    setTransferData(prev => ({ ...prev, recipientUsername: v }));
+                    const q = v.replace(/^@/, '');
+                    if (!q || q.length < 2) { setTransferSuggestions([]); setShowTransferSuggestions(false); return; }
+                    try {
+                      const res = await axios.get(`https://server-pqqy.onrender.com/api/users/search?query=${encodeURIComponent(q)}`);
+                      setTransferSuggestions(res.data || []);
+                      setShowTransferSuggestions(true);
+                    } catch {
+                      setTransferSuggestions([]);
+                      setShowTransferSuggestions(false);
+                    }
+                  }}
                   placeholder="@username"
                   className="form-input"
+                  onFocus={() => { if (transferSuggestions.length) setShowTransferSuggestions(true); }}
                 />
+                {showTransferSuggestions && transferSuggestions.length > 0 && (
+                  <div className="transfer-search-results" onMouseDown={(e) => e.preventDefault()}>
+                    {transferSuggestions.slice(0, 5).map(user => (
+                      <div
+                        key={user._id}
+                        className="transfer-search-result"
+                        onClick={() => {
+                          setTransferData(prev => ({ ...prev, recipientUsername: `@${user.username}` }));
+                          setShowTransferSuggestions(false);
+                        }}
+                      >
+                        <Avatar src={user.avatar || null} alt={user.displayName || user.username} size="small" />
+                        <div className="search-result-info">
+                          <span className="header-search-username">@{user.username}</span>
+                          {user.displayName && (
+                            <span className="header-search-name">{user.displayName}</span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
               
               <div className="form-group">
