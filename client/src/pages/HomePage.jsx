@@ -84,6 +84,25 @@ const HomePage = () => {
   // Хук для онлайн статуса
   const { onlineUsers, fetchOnlineStatus, getUserStatus } = useOnlineStatus(socketRef.current);
 
+  // Points context hook - moved to the top to avoid conditional calls
+  const { 
+    showTransfer, setShowTransfer,
+    showHistory, setShowHistory,
+    showPremium, setShowPremium,
+    showGiftPremium, setShowGiftPremium,
+    openHistory,
+    transactions,
+    loadTransactions
+  } = usePoints();
+
+  // Load wallet data when wallet tab is active - moved to the top to avoid conditional calls
+  useEffect(() => {
+    if (activeTab === 'wallet' && user) {
+      loadWalletBalance();
+      loadWalletTransactions();
+    }
+  }, [activeTab, user]);
+
   // Список изменений версий
   const changelogData = [
     {
@@ -1729,34 +1748,7 @@ const HomePage = () => {
     });
   };
 
-  // Показываем загрузку если пользователь еще не загружен
-  if (!user) {
-    return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        color: 'white',
-        fontSize: '18px'
-      }}>
-        Загрузка...
-      </div>
-    );
-  }
-
-  const { 
-    showTransfer, setShowTransfer,
-    showHistory, setShowHistory,
-    showPremium, setShowPremium,
-    showGiftPremium, setShowGiftPremium,
-    openHistory,
-    transactions,
-    loadTransactions
-  } = usePoints();
-
-  // Wallet functions
+  // Wallet functions - moved before useEffect to avoid reference errors
   const loadWalletBalance = async () => {
     try {
       setWalletLoading(true);
@@ -1839,13 +1831,22 @@ const HomePage = () => {
     });
   };
 
-  // Load wallet data when wallet tab is active
-  useEffect(() => {
-    if (activeTab === 'wallet') {
-      loadWalletBalance();
-      loadWalletTransactions();
-    }
-  }, [activeTab]);
+  // Показываем загрузку если пользователь еще не загружен
+  if (!user) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        color: 'white',
+        fontSize: '18px'
+      }}>
+        Загрузка...
+      </div>
+    );
+  }
 
   return (
     <>
