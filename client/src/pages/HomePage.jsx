@@ -2568,24 +2568,7 @@ const HomePage = () => {
                   )}
                 </div>
                 
-                <div className="wallet-info-section">
-                  <div className="wallet-info-item">
-                    <div className="wallet-info-icon">
-                      <HelpCircle size={20} />
-                    </div>
-                    <div className="wallet-info-content">
-                      <div className="wallet-info-title">
-                        Как начисляются баллы?
-                      </div>
-                      <div className="wallet-info-description">
-                        Баллы начисляются за активность: посты, комментарии, лайки и другие действия
-                      </div>
-                    </div>
-                    <div className="wallet-info-arrow">
-                      <ChevronDown size={20} />
-                    </div>
-                  </div>
-                </div>
+                {/* Информационный блок убран по просьбе пользователя */}
               </div>
             )}
 

@@ -5260,6 +5260,31 @@ body {
   gap: 15px;
 }
 
+.wallet-history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.wallet-view-all-btn {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  color: #2563eb;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.wallet-view-all-btn:hover {
+  background: rgba(59, 130, 246, 0.18);
+  border-color: rgba(59, 130, 246, 0.4);
+  color: #1d4ed8;
+  transform: translateY(-1px);
+}
+
 /* Стили списка транзакций кошелька (светлая тема) */
 .wallet-transactions-list {
   display: flex;
