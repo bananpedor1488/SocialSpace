@@ -28,6 +28,7 @@ const Points = () => {
   const [transferSearchToken, setTransferSearchToken] = useState(0);
   const [giftSuggestions, setGiftSuggestions] = useState([]);
   const [showGiftSuggestions, setShowGiftSuggestions] = useState(false);
+  const [transferSuppressSearch, setTransferSuppressSearch] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [transferPreview, setTransferPreview] = useState({ commission: 0, net: 0, rate: 0 });
@@ -49,8 +50,6 @@ const Points = () => {
       console.error('Error loading balance:', error);
     }
   };
-
-
 
   // Загрузить рейтинг
   const loadLeaderboard = async () => {
@@ -158,15 +157,6 @@ const Points = () => {
     }
   };
 
-  // Предпросчет комиссии и суммы к получению
-  useEffect(() => {
-    const amountInt = parseInt(transferData.amount, 10) || 0;
-    const rate = premiumInfo.active ? 0 : 0.15;
-    const commission = Math.floor(amountInt * rate);
-    const net = Math.max(amountInt - commission, 0);
-    setTransferPreview({ commission, net, rate });
-  }, [transferData.amount, premiumInfo.active]);
-
   // Форматировать дату
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('ru-RU', {
@@ -183,7 +173,41 @@ const Points = () => {
     return new Intl.NumberFormat('ru-RU').format(amount);
   };
 
+  // Предпросчет комиссии и суммы к получению
+  useEffect(() => {
+    const amountInt = parseInt(transferData.amount, 10) || 0;
+    const rate = premiumInfo.active ? 0 : 0.15;
+    const commission = Math.floor(amountInt * rate);
+    const net = Math.max(amountInt - commission, 0);
+    setTransferPreview({ commission, net, rate });
+  }, [transferData.amount, premiumInfo.active]);
 
+  // Подсказки по username для перевода (логика из кошелька)
+  useEffect(() => {
+    if (!showTransfer) return;
+    if (transferSuppressSearch) return;
+    const raw = transferData.recipientUsername.trim();
+    const query = raw.replace(/^@/, '');
+    if (!query || query.length < 2) {
+      setTransferSuggestions([]);
+      setShowTransferSuggestions(false);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      try {
+        setTransferSearchLoading(true);
+        const res = await axios.get(`https://server-pqqy.onrender.com/api/users/search?query=${encodeURIComponent(query)}`);
+        setTransferSuggestions(res.data || []);
+        setShowTransferSuggestions(true);
+      } catch (e) {
+        setTransferSuggestions([]);
+        setShowTransferSuggestions(false);
+      } finally {
+        setTransferSearchLoading(false);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [transferData.recipientUsername, showTransfer, transferSuppressSearch]);
 
   useEffect(() => {
     loadBalance();
@@ -282,30 +306,9 @@ const Points = () => {
                 <input
                   type="text"
                   value={transferData.recipientUsername}
-                  onChange={async (e) => {
+                  onChange={(e) => {
                     const v = e.target.value;
                     setTransferData(prev => ({ ...prev, recipientUsername: v }));
-                    const q = v.replace(/^@/, '');
-                    if (!q || q.length < 2) { setTransferSuggestions([]); setShowTransferSuggestions(false); return; }
-                    const token = Date.now();
-                    setTransferSearchToken(token);
-                    setTransferSearchLoading(true);
-                    setTimeout(async () => {
-                      if (transferSearchToken !== token) return;
-                      try {
-                        const res = await axios.get(`https://server-pqqy.onrender.com/api/users/search?query=${encodeURIComponent(q)}`);
-                        if (transferSearchToken !== token) return;
-                        const unique = Array.isArray(res.data) ? Array.from(new Map(res.data.map(u => [u._id, u])).values()) : [];
-                        setTransferSuggestions(unique);
-                        setShowTransferSuggestions(unique.length > 0);
-                      } catch (err) {
-                        if (transferSearchToken !== token) return;
-                        setTransferSuggestions([]);
-                        setShowTransferSuggestions(false);
-                      } finally {
-                        if (transferSearchToken === token) setTransferSearchLoading(false);
-                      }
-                    }, 250);
                   }}
                   placeholder="@username"
                   className="form-input"
@@ -323,6 +326,8 @@ const Points = () => {
                           setShowTransferSuggestions(false);
                           setTransferSearchToken(Date.now()); // инвалидация старых запросов
                           setTransferSearchLoading(false);
+                          setTransferSuppressSearch(true);
+                          setTimeout(() => setTransferSuppressSearch(false), 100);
                         }}
                       >
                         <Avatar src={user.avatar || null} alt={user.displayName || user.username} size="small" />

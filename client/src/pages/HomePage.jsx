@@ -2663,8 +2663,9 @@ const HomePage = () => {
                                 setTransferSuppressSearch(true);
                                 setTransferData(prev => ({ ...prev, recipientUsername: `@${user.username}` }));
                                 setShowTransferSuggestions(false);
-                                // через тик снимаем флаг подавления, чтобы не мигало обратно
-                                setTimeout(() => setTransferSuppressSearch(false), 0);
+                                setTransferSuggestions([]);
+                                // Увеличиваем задержку, чтобы подсказки не появлялись снова
+                                setTimeout(() => setTransferSuppressSearch(false), 500);
                               }}
                             >
                               <Avatar 
