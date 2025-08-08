@@ -79,27 +79,7 @@ const Points = () => {
   // Подарить премиум
   const handleGiftPremium = async (e) => {
     e.preventDefault();
-    if (!giftData.recipientUsername) {
-      setError('Укажите имя пользователя');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setError('');
-      const response = await axios.post('https://server-pqqy.onrender.com/api/points/gift-premium', giftData);
-      
-      setSuccess('Премиум успешно подарен!');
-      setBalance(response.data.newBalance);
-      setGiftData({ recipientUsername: '' });
-      setShowGiftPremium(false);
-      
-      setTimeout(() => setSuccess(''), 3000);
-    } catch (error) {
-      setError(error.response?.data?.message || 'Ошибка дарения премиума');
-    } finally {
-      setLoading(false);
-    }
+    setError('Функция подарка премиума недоступна в хедере');
   };
 
   // Форматировать дату

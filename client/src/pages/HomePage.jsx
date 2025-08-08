@@ -1804,6 +1804,14 @@ const HomePage = () => {
     return () => clearTimeout(timer);
   }, [transferData.recipientUsername, showWalletTransfer, transferSuppressSearch]);
 
+  // Эффект для открытия модальки перевода из хедера
+  useEffect(() => {
+    if (showTransfer) {
+      setShowWalletTransfer(true);
+      setShowTransfer(false); // Сбрасываем флаг в контексте
+    }
+  }, [showTransfer, setShowTransfer]);
+
   // Показываем загрузку если пользователь еще не загружен
   if (!user) {
     return (
@@ -2001,14 +2009,6 @@ const HomePage = () => {
       minute: '2-digit'
     });
   };
-
-  // Эффект для открытия модальки перевода из хедера
-  useEffect(() => {
-    if (showTransfer) {
-      setShowWalletTransfer(true);
-      setShowTransfer(false); // Сбрасываем флаг в контексте
-    }
-  }, [showTransfer, setShowTransfer]);
 
   return (
     <>
