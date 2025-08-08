@@ -24,10 +24,13 @@ const Points = () => {
   });
   const [transferSuggestions, setTransferSuggestions] = useState([]);
   const [showTransferSuggestions, setShowTransferSuggestions] = useState(false);
+  const [transferSearchLoading, setTransferSearchLoading] = useState(false);
+  const [transferSearchToken, setTransferSearchToken] = useState(0);
   const [giftSuggestions, setGiftSuggestions] = useState([]);
   const [showGiftSuggestions, setShowGiftSuggestions] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [transferPreview, setTransferPreview] = useState({ commission: 0, net: 0, rate: 0 });
   
   const { 
     showTransfer, setShowTransfer,
@@ -155,6 +158,15 @@ const Points = () => {
     }
   };
 
+  // Предпросчет комиссии и суммы к получению
+  useEffect(() => {
+    const amountInt = parseInt(transferData.amount, 10) || 0;
+    const rate = premiumInfo.active ? 0 : 0.15;
+    const commission = Math.floor(amountInt * rate);
+    const net = Math.max(amountInt - commission, 0);
+    setTransferPreview({ commission, net, rate });
+  }, [transferData.amount, premiumInfo.active]);
+
   // Форматировать дату
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('ru-RU', {
@@ -270,15 +282,30 @@ const Points = () => {
                 <input
                   type="text"
                   value={transferData.recipientUsername}
-                  onChange={(e) => {
+                  onChange={async (e) => {
                     const v = e.target.value;
                     setTransferData(prev => ({ ...prev, recipientUsername: v }));
                     const q = v.replace(/^@/, '');
                     if (!q || q.length < 2) { setTransferSuggestions([]); setShowTransferSuggestions(false); return; }
-                    // легкий дебаунс через setTimeout вне области — упрощенно опускаем
-                    axios.get(`https://server-pqqy.onrender.com/api/users/search?query=${encodeURIComponent(q)}`)
-                      .then(res => { setTransferSuggestions(res.data || []); setShowTransferSuggestions(true); })
-                      .catch(() => { setTransferSuggestions([]); setShowTransferSuggestions(false); });
+                    const token = Date.now();
+                    setTransferSearchToken(token);
+                    setTransferSearchLoading(true);
+                    setTimeout(async () => {
+                      if (transferSearchToken !== token) return;
+                      try {
+                        const res = await axios.get(`https://server-pqqy.onrender.com/api/users/search?query=${encodeURIComponent(q)}`);
+                        if (transferSearchToken !== token) return;
+                        const unique = Array.isArray(res.data) ? Array.from(new Map(res.data.map(u => [u._id, u])).values()) : [];
+                        setTransferSuggestions(unique);
+                        setShowTransferSuggestions(unique.length > 0);
+                      } catch (err) {
+                        if (transferSearchToken !== token) return;
+                        setTransferSuggestions([]);
+                        setShowTransferSuggestions(false);
+                      } finally {
+                        if (transferSearchToken === token) setTransferSearchLoading(false);
+                      }
+                    }, 250);
                   }}
                   placeholder="@username"
                   className="form-input"
@@ -292,7 +319,10 @@ const Points = () => {
                         className="transfer-search-result"
                         onClick={() => {
                           setTransferData(prev => ({ ...prev, recipientUsername: `@${user.username}` }));
+                          setTransferSuggestions([]);
                           setShowTransferSuggestions(false);
+                          setTransferSearchToken(Date.now()); // инвалидация старых запросов
+                          setTransferSearchLoading(false);
                         }}
                       >
                         <Avatar src={user.avatar || null} alt={user.displayName || user.username} size="small" />
@@ -320,6 +350,19 @@ const Points = () => {
                   className="form-input"
                 />
               </div>
+
+              {transferData.amount && (
+                <div className="transfer-preview">
+                  <div className="transfer-preview-row">
+                    <span>Комиссия ({Math.round(transferPreview.rate * 100)}%):</span>
+                    <span>{transferPreview.commission}</span>
+                  </div>
+                  <div className="transfer-preview-row">
+                    <span>Получит получатель:</span>
+                    <span>{transferPreview.net}</span>
+                  </div>
+                </div>
+              )}
 
               <div className="form-group">
                 <label>Описание (необязательно):</label>
