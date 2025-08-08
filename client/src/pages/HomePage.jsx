@@ -16,6 +16,7 @@ import ProfileSettings from '../components/ProfileSettings';
 import Avatar from '../components/Avatar';
 import Points from '../components/Points';
 import PointsModals from '../components/PointsModals';
+import { usePoints } from '../context/PointsContext';
 
 import useOnlineStatus from '../hooks/useOnlineStatus';
 
@@ -99,6 +100,9 @@ const HomePage = () => {
   
   // Хук для онлайн статуса
   const { onlineUsers, fetchOnlineStatus, getUserStatus } = useOnlineStatus(socketRef.current);
+
+  // Доступ к истории из контекста (для открытия глобальной истории в хедере)
+  const { openHistory } = usePoints();
 
   // Список изменений версий
   const changelogData = [
@@ -1776,6 +1780,7 @@ const HomePage = () => {
       setWalletLoading(true);
       const response = await axios.get('https://server-pqqy.onrender.com/api/points/balance');
       setWalletBalance(response.data.points);
+      // можем отрисовать бейдж "Premium" рядом с балансом при необходимости через response.data.premiumActive
     } catch (error) {
       console.error('Error loading wallet balance:', error);
       setWalletError('Ошибка загрузки баланса');
@@ -2501,7 +2506,7 @@ const HomePage = () => {
                     </button>
                     <button 
                       className="wallet-action-btn"
-                      onClick={openHistoryModal}
+                      onClick={openHistory}
                       disabled={walletLoading}
                     >
                       <History size={20} />
@@ -2521,7 +2526,7 @@ const HomePage = () => {
                     <h4>Последние транзакции</h4>
                     <button 
                       className="wallet-view-all-btn"
-                      onClick={openHistoryModal}
+                      onClick={openHistory}
                     >
                       Посмотреть все
                     </button>
@@ -2531,30 +2536,38 @@ const HomePage = () => {
                     <div className="wallet-loading">Загрузка транзакций...</div>
                   ) : walletTransactions.length > 0 ? (
                     <div className="wallet-transactions-list">
-                      {walletTransactions.slice(0, 5).map(transaction => (
-                        <div key={transaction._id} className="wallet-transaction-item">
-                          <div className="wallet-transaction-icon">
-                            {transaction.isOutgoing ? <Send size={16} /> : <Check size={16} />}
-                          </div>
-                          <div className="wallet-transaction-content">
-                            <div className="wallet-transaction-user">
-                              {transaction.isOutgoing 
-                                ? transaction.recipient?.displayName || transaction.recipient?.username || 'Неизвестно'
-                                : transaction.sender?.displayName || transaction.sender?.username || 'Неизвестно'
-                              }
+                      {walletTransactions.slice(0, 5).map(transaction => {
+                        const otherUser = transaction.isOutgoing ? transaction.recipient : transaction.sender;
+                        return (
+                          <div key={transaction._id} className="wallet-transaction-item">
+                            <div className="wallet-transaction-icon">
+                              {transaction.isOutgoing ? <Send size={16} /> : <Check size={16} />}
                             </div>
-                            <div className="wallet-transaction-description">
-                              {transaction.description}
+                            <Avatar 
+                              src={otherUser?.avatar || null}
+                              alt={otherUser?.displayName || otherUser?.username}
+                              size="small"
+                            />
+                            <div className="wallet-transaction-content">
+                              <div className="wallet-transaction-user">
+                                {otherUser?.displayName || otherUser?.username || 'Неизвестно'}
+                              </div>
+                              <div className="wallet-transaction-description">
+                                {transaction.description}
+                              </div>
+                              <div className="wallet-transaction-date">
+                                {formatWalletDate(transaction.createdAt)}
+                              </div>
+                              {transaction.transactionCode && (
+                                <div className="wallet-transaction-code">{transaction.transactionCode}</div>
+                              )}
                             </div>
-                            <div className="wallet-transaction-date">
-                              {formatWalletDate(transaction.createdAt)}
+                            <div className={`wallet-transaction-amount ${transaction.isOutgoing ? 'outgoing' : 'incoming'}`}>
+                              {transaction.isOutgoing ? '-' : '+'}{formatWalletAmount(transaction.amount)}
                             </div>
                           </div>
-                          <div className={`wallet-transaction-amount ${transaction.isOutgoing ? 'outgoing' : 'incoming'}`}>
-                            {transaction.isOutgoing ? '-' : '+'}{formatWalletAmount(transaction.amount)}
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   ) : (
                     <div className="wallet-no-transactions">
