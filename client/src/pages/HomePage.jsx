@@ -1966,7 +1966,7 @@ const HomePage = () => {
       setWalletLoading(true);
       setWalletError('');
       const response = await axios.post('https://server-pqqy.onrender.com/api/points/transfer', {
-        recipientUsername: transferData.recipientUsername,
+        recipientUsername: (transferData.recipientUsername || '').replace(/^@/, ''),
         amount: transferData.amount,
         description: transferData.description
       });

@@ -22,6 +22,10 @@ const Points = () => {
   const [giftData, setGiftData] = useState({
     recipientUsername: ''
   });
+  const [transferSuggestions, setTransferSuggestions] = useState([]);
+  const [showTransferSuggestions, setShowTransferSuggestions] = useState(false);
+  const [giftSuggestions, setGiftSuggestions] = useState([]);
+  const [showGiftSuggestions, setShowGiftSuggestions] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   
@@ -133,7 +137,10 @@ const Points = () => {
     try {
       setLoading(true);
       setError('');
-      const response = await axios.post('https://server-pqqy.onrender.com/api/points/transfer', transferData);
+      const response = await axios.post('https://server-pqqy.onrender.com/api/points/transfer', {
+        ...transferData,
+        recipientUsername: (transferData.recipientUsername || '').replace(/^@/, '')
+      });
       
       setSuccess('Перевод выполнен успешно!');
       setBalance(response.data.newBalance);
@@ -243,6 +250,96 @@ const Points = () => {
             <Gift size={16} />
             Подарить премиум
           </button>
+        </div>
+      )}
+
+      {/* Модалка перевода из хедера (через контекст showTransfer) */}
+      {showTransfer && (
+        <div className="modal-overlay" onClick={() => setShowTransfer(false)}>
+          <div className="modal-content transfer-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Перевод баллов</h3>
+              <button onClick={() => setShowTransfer(false)} className="close-btn">
+                <X size={16} />
+              </button>
+            </div>
+
+            <form onSubmit={handleTransfer}>
+              <div className="form-group transfer-search-wrapper">
+                <label>Получатель (username):</label>
+                <input
+                  type="text"
+                  value={transferData.recipientUsername}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setTransferData(prev => ({ ...prev, recipientUsername: v }));
+                    const q = v.replace(/^@/, '');
+                    if (!q || q.length < 2) { setTransferSuggestions([]); setShowTransferSuggestions(false); return; }
+                    // легкий дебаунс через setTimeout вне области — упрощенно опускаем
+                    axios.get(`https://server-pqqy.onrender.com/api/users/search?query=${encodeURIComponent(q)}`)
+                      .then(res => { setTransferSuggestions(res.data || []); setShowTransferSuggestions(true); })
+                      .catch(() => { setTransferSuggestions([]); setShowTransferSuggestions(false); });
+                  }}
+                  placeholder="@username"
+                  className="form-input"
+                  onFocus={() => { if (transferSuggestions.length) setShowTransferSuggestions(true); }}
+                />
+                {showTransferSuggestions && transferSuggestions.length > 0 && (
+                  <div className="transfer-search-results" onMouseDown={(e) => e.preventDefault()}>
+                    {transferSuggestions.slice(0, 5).map(user => (
+                      <div
+                        key={user._id}
+                        className="transfer-search-result"
+                        onClick={() => {
+                          setTransferData(prev => ({ ...prev, recipientUsername: `@${user.username}` }));
+                          setShowTransferSuggestions(false);
+                        }}
+                      >
+                        <Avatar src={user.avatar || null} alt={user.displayName || user.username} size="small" />
+                        <div className="search-result-info">
+                          <span className="header-search-username">@{user.username}</span>
+                          {user.displayName && (
+                            <span className="header-search-name">{user.displayName}</span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label>Сумма:</label>
+                <input
+                  type="number"
+                  value={transferData.amount}
+                  onChange={(e) => setTransferData(prev => ({ ...prev, amount: e.target.value }))}
+                  placeholder="Введите сумму"
+                  min="1"
+                  max={balance}
+                  className="form-input"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Описание (необязательно):</label>
+                <input
+                  type="text"
+                  value={transferData.description}
+                  onChange={(e) => setTransferData(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Описание перевода"
+                  className="form-input"
+                />
+              </div>
+
+              {error && <div className="error-message">{error}</div>}
+              {success && <div className="success-message">{success}</div>}
+
+              <button type="submit" disabled={loading} className="submit-btn">
+                {loading ? 'Выполняется...' : 'Перевести'}
+              </button>
+            </form>
+          </div>
         </div>
       )}
     </div>
