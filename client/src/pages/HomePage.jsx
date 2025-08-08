@@ -1457,11 +1457,12 @@ const HomePage = () => {
   };
 
   const handleSearch = async (e) => {
-    const query = e.target.value;
+    const raw = e.target.value;
+    const query = raw.replace(/^@/, '');
     setSearchQuery(query);
     if (query.trim()) {
       try {
-        const res = await axios.get(`https://server-pqqy.onrender.com/api/users/search?query=${query}`);
+        const res = await axios.get(`https://server-pqqy.onrender.com/api/users/search?query=${encodeURIComponent(query)}`);
         setSearchResults(res.data);
       } catch (err) {
         console.error('Ошибка поиска пользователей:', err);
