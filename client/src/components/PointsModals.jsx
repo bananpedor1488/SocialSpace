@@ -221,31 +221,31 @@ const PointsModals = () => {
     setTransferPreview({ commission, net, rate });
   }, [transferData.amount, premiumInfo.active]);
 
-  // Подсказки по username для перевода
-  useEffect(() => {
-    if (!showTransfer) return;
-    const raw = transferData.recipientUsername.trim();
-    const query = raw.replace(/^@/, '');
-    if (!query || query.length < 2) {
-      setTransferSuggestions([]);
-      setShowTransferSuggestions(false);
-      return;
-    }
-    const timer = setTimeout(async () => {
-      try {
-        setTransferSearchLoading(true);
-        const res = await axios.get(`https://server-pqqy.onrender.com/api/users/search?query=${encodeURIComponent(query)}`);
-        setTransferSuggestions(res.data || []);
-        setShowTransferSuggestions(true);
-      } catch (e) {
-        setTransferSuggestions([]);
-        setShowTransferSuggestions(false);
-      } finally {
-        setTransferSearchLoading(false);
-      }
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [transferData.recipientUsername, showTransfer]);
+  // Подсказки по username для перевода - УБИРАЕМ, так как перевод теперь только в Points.jsx
+  // useEffect(() => {
+  //   if (!showTransfer) return;
+  //   const raw = transferData.recipientUsername.trim();
+  //   const query = raw.replace(/^@/, '');
+  //   if (!query || query.length < 2) {
+  //     setTransferSuggestions([]);
+  //     setShowTransferSuggestions(false);
+  //     return;
+  //   }
+  //   const timer = setTimeout(async () => {
+  //     try {
+  //       setTransferSearchLoading(true);
+  //       const res = await axios.get(`https://server-pqqy.onrender.com/api/users/search?query=${encodeURIComponent(query)}`);
+  //       setTransferSuggestions(res.data || []);
+  //       setShowTransferSuggestions(true);
+  //     } catch (e) {
+  //       setTransferSuggestions([]);
+  //       setShowTransferSuggestions(false);
+  //     } finally {
+  //       setTransferSearchLoading(false);
+  //     }
+  //   }, 300);
+  //   return () => clearTimeout(timer);
+  // }, [transferData.recipientUsername, showTransfer]);
 
   useEffect(() => {
     loadBalance();
@@ -254,8 +254,8 @@ const PointsModals = () => {
 
   return (
     <>
-      {/* Форма перевода */}
-      {showTransfer && (
+      {/* Форма перевода - УБИРАЕМ, так как она уже есть в Points.jsx */}
+      {/* {showTransfer && (
         <div className="modal-overlay" onClick={() => setShowTransfer(false)}>
           <div className="modal-content transfer-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
@@ -359,7 +359,7 @@ const PointsModals = () => {
             </form>
           </div>
         </div>
-      )}
+      )} */}
 
       {/* История транзакций */}
       {showHistory && (

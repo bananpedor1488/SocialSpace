@@ -197,13 +197,15 @@ const Points = () => {
       try {
         setTransferSearchLoading(true);
         const res = await axios.get(`https://server-pqqy.onrender.com/api/users/search?query=${encodeURIComponent(query)}`);
+        if (transferSuppressSearch) return; // Проверяем еще раз после запроса
         setTransferSuggestions(res.data || []);
         setShowTransferSuggestions(true);
       } catch (e) {
+        if (transferSuppressSearch) return;
         setTransferSuggestions([]);
         setShowTransferSuggestions(false);
       } finally {
-        setTransferSearchLoading(false);
+        if (!transferSuppressSearch) setTransferSearchLoading(false);
       }
     }, 300);
     return () => clearTimeout(timer);
@@ -327,7 +329,8 @@ const Points = () => {
                           setTransferSearchToken(Date.now()); // инвалидация старых запросов
                           setTransferSearchLoading(false);
                           setTransferSuppressSearch(true);
-                          setTimeout(() => setTransferSuppressSearch(false), 100);
+                          // Увеличиваем задержку, чтобы подсказки не появлялись снова
+                          setTimeout(() => setTransferSuppressSearch(false), 1000);
                         }}
                       >
                         <Avatar src={user.avatar || null} alt={user.displayName || user.username} size="small" />

@@ -1790,13 +1790,15 @@ const HomePage = () => {
       try {
         setTransferSearchLoading(true);
         const res = await axios.get(`https://server-pqqy.onrender.com/api/users/search?query=${encodeURIComponent(query)}`);
+        if (transferSuppressSearch) return; // Проверяем еще раз после запроса
         setTransferSuggestions(res.data || []);
         setShowTransferSuggestions(true);
       } catch (e) {
+        if (transferSuppressSearch) return;
         setTransferSuggestions([]);
         setShowTransferSuggestions(false);
       } finally {
-        setTransferSearchLoading(false);
+        if (!transferSuppressSearch) setTransferSearchLoading(false);
       }
     }, 300);
     return () => clearTimeout(timer);
@@ -2665,7 +2667,7 @@ const HomePage = () => {
                                 setShowTransferSuggestions(false);
                                 setTransferSuggestions([]);
                                 // Увеличиваем задержку, чтобы подсказки не появлялись снова
-                                setTimeout(() => setTransferSuppressSearch(false), 500);
+                                setTimeout(() => setTransferSuppressSearch(false), 1000);
                               }}
                             >
                               <Avatar 
