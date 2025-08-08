@@ -57,6 +57,8 @@ const HomePage = () => {
   const [transferSearchLoading, setTransferSearchLoading] = useState(false);
   const [showTransferSuggestions, setShowTransferSuggestions] = useState(false);
   const [transferSuppressSearch, setTransferSuppressSearch] = useState(false);
+  const [foundUser, setFoundUser] = useState(null);
+  const [foundUserStatus, setFoundUserStatus] = useState(null);
   // Локальные состояния кошелька (вкладка из бокового меню)
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [historyTransactions, setHistoryTransactions] = useState([]);
@@ -1786,6 +1788,8 @@ const HomePage = () => {
     if (!query || query.length < 2) {
       setTransferSuggestions([]);
       setShowTransferSuggestions(false);
+      setFoundUser(null);
+      setFoundUserStatus(null);
       return;
     }
     
@@ -1805,15 +1809,29 @@ const HomePage = () => {
           );
           if (exactMatch) {
             setShowTransferSuggestions(false);
+            setFoundUser(exactMatch);
+            // Получаем статус пользователя
+            try {
+              const statusRes = await axios.get(`https://server-pqqy.onrender.com/api/users/online-status?userIds=${exactMatch._id}`);
+              if (statusRes.data && statusRes.data[exactMatch._id]) {
+                setFoundUserStatus(statusRes.data[exactMatch._id]);
+              }
+            } catch (statusError) {
+              console.error('Error fetching user status:', statusError);
+            }
             return;
           }
         }
         
+        setFoundUser(null);
+        setFoundUserStatus(null);
         setShowTransferSuggestions(true);
       } catch (e) {
         if (transferSuppressSearch) return;
         setTransferSuggestions([]);
         setShowTransferSuggestions(false);
+        setFoundUser(null);
+        setFoundUserStatus(null);
       } finally {
         if (!transferSuppressSearch) setTransferSearchLoading(false);
       }
@@ -2005,6 +2023,8 @@ const HomePage = () => {
       setTransferSuggestions([]);
       setShowTransferSuggestions(false);
       setTransferSuppressSearch(false);
+      setFoundUser(null);
+      setFoundUserStatus(null);
       
       // Перезагружаем транзакции
       await loadWalletTransactions();
@@ -2668,6 +2688,8 @@ const HomePage = () => {
                 setTransferSuggestions([]);
                 setShowTransferSuggestions(false);
                 setTransferSuppressSearch(false);
+                setFoundUser(null);
+                setFoundUserStatus(null);
               }}>
                 <div className="modal-content transfer-modal" onClick={(e) => e.stopPropagation()}>
                   <div className="modal-header">
@@ -2677,6 +2699,8 @@ const HomePage = () => {
                       setTransferSuggestions([]);
                       setShowTransferSuggestions(false);
                       setTransferSuppressSearch(false);
+                      setFoundUser(null);
+                      setFoundUserStatus(null);
                     }} className="close-btn">
                       <X size={16} />
                     </button>
@@ -2688,7 +2712,14 @@ const HomePage = () => {
                       <input
                         type="text"
                         value={transferData.recipientUsername}
-                        onChange={(e) => setTransferData(prev => ({ ...prev, recipientUsername: e.target.value }))}
+                        onChange={(e) => {
+                          setTransferData(prev => ({ ...prev, recipientUsername: e.target.value }));
+                          // Сбрасываем найденного пользователя при изменении
+                          if (!e.target.value.trim()) {
+                            setFoundUser(null);
+                            setFoundUserStatus(null);
+                          }
+                        }}
                         placeholder="@username"
                         className="form-input"
                         onFocus={() => { if (transferSuggestions.length) setShowTransferSuggestions(true); }}
@@ -2727,6 +2758,62 @@ const HomePage = () => {
                         </div>
                       )}
                     </div>
+                    
+                    {/* Плашка с информацией о найденном пользователе */}
+                    {foundUser && (
+                      <div className="found-user-card">
+                        <div className="found-user-header">
+                          <div className="found-user-check">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                          </div>
+                          <span className="found-user-title">Пользователь найден</span>
+                        </div>
+                        <div className="found-user-content">
+                          <div className="found-user-avatar">
+                            <Avatar 
+                              src={foundUser.avatar || null}
+                              alt={foundUser.displayName || foundUser.username}
+                              size="medium"
+                            />
+                            {foundUserStatus && (
+                              <div className="found-user-status">
+                                <OnlineStatus
+                                  userId={foundUser._id}
+                                  isOnline={foundUserStatus.isOnline}
+                                  lastSeen={foundUserStatus.lastSeen}
+                                  size="small"
+                                />
+                              </div>
+                            )}
+                          </div>
+                          <div className="found-user-info">
+                            <div className="found-user-name">
+                              {foundUser.displayName || foundUser.username}
+                              {foundUser.premium && (
+                                <span className="found-user-premium">
+                                  <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
+                                  </svg>
+                                </span>
+                              )}
+                            </div>
+                            <div className="found-user-username">@{foundUser.username}</div>
+                            {foundUserStatus && !foundUserStatus.isOnline && foundUserStatus.lastSeen && (
+                              <div className="found-user-last-seen">
+                                Был в сети {new Date(foundUserStatus.lastSeen).toLocaleDateString('ru-RU', {
+                                  day: 'numeric',
+                                  month: 'short',
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
                     
                     <div className="form-group">
                       <label>Сумма:</label>
