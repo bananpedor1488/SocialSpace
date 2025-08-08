@@ -12,20 +12,10 @@ const PointsModals = () => {
     expiresAt: null,
     premiumCost: 300
   });
-  const [transferData, setTransferData] = useState({
-    recipientUsername: '',
-    amount: '',
-    description: ''
-  });
   const [giftData, setGiftData] = useState({ recipientUsername: '' });
   const [giftSuggestions, setGiftSuggestions] = useState([]);
   const [giftSearchLoading, setGiftSearchLoading] = useState(false);
   const [showGiftSuggestions, setShowGiftSuggestions] = useState(false);
-  const [transferSuggestions, setTransferSuggestions] = useState([]);
-  const [showTransferSuggestions, setShowTransferSuggestions] = useState(false);
-  const [transferSearchLoading, setTransferSearchLoading] = useState(false);
-  const [transferSearchToken, setTransferSearchToken] = useState(0);
-  const [transferPreview, setTransferPreview] = useState({ commission: 0, net: 0, rate: 0 });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   
@@ -157,47 +147,6 @@ const PointsModals = () => {
     return () => clearTimeout(timer);
   }, [giftData.recipientUsername]);
 
-  // Перевести баллы
-  const handleTransfer = async (e) => {
-    e.preventDefault();
-    
-    if (!transferData.recipientUsername.trim()) {
-      setError('Введите username получателя');
-      return;
-    }
-    
-    if (!transferData.amount || transferData.amount <= 0) {
-      setError('Введите корректную сумму');
-      return;
-    }
-    
-    if (transferData.amount > balance) {
-      setError('Недостаточно баллов');
-      return;
-    }
-    
-    try {
-      setLoading(true);
-      setError('');
-      const response = await axios.post('https://server-pqqy.onrender.com/api/points/transfer', {
-        recipientUsername: (transferData.recipientUsername || '').replace(/^@/, ''),
-        amount: transferData.amount,
-        description: transferData.description
-      });
-      
-      setSuccess('Перевод выполнен успешно!');
-      setBalance(response.data.newBalance);
-      setTransferData({ recipientUsername: '', amount: '', description: '' });
-      setShowTransfer(false);
-      
-      setTimeout(() => setSuccess(''), 3000);
-    } catch (error) {
-      setError(error.response?.data?.message || 'Ошибка перевода');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('ru-RU', {
       year: 'numeric',
@@ -212,41 +161,6 @@ const PointsModals = () => {
     return amount.toLocaleString('ru-RU');
   };
 
-  // Предпросчет комиссии и суммы к получению
-  useEffect(() => {
-    const amountInt = parseInt(transferData.amount, 10) || 0;
-    const rate = premiumInfo.active ? 0 : 0.15;
-    const commission = Math.floor(amountInt * rate);
-    const net = Math.max(amountInt - commission, 0);
-    setTransferPreview({ commission, net, rate });
-  }, [transferData.amount, premiumInfo.active]);
-
-  // Подсказки по username для перевода - УБИРАЕМ, так как перевод теперь только в Points.jsx
-  // useEffect(() => {
-  //   if (!showTransfer) return;
-  //   const raw = transferData.recipientUsername.trim();
-  //   const query = raw.replace(/^@/, '');
-  //   if (!query || query.length < 2) {
-  //     setTransferSuggestions([]);
-  //     setShowTransferSuggestions(false);
-  //     return;
-  //   }
-  //   const timer = setTimeout(async () => {
-  //     try {
-  //       setTransferSearchLoading(true);
-  //       const res = await axios.get(`https://server-pqqy.onrender.com/api/users/search?query=${encodeURIComponent(query)}`);
-  //       setTransferSuggestions(res.data || []);
-  //       setShowTransferSuggestions(true);
-  //     } catch (e) {
-  //       setTransferSuggestions([]);
-  //       setShowTransferSuggestions(false);
-  //     } finally {
-  //       setTransferSearchLoading(false);
-  //     }
-  //   }, 300);
-  //   return () => clearTimeout(timer);
-  // }, [transferData.recipientUsername, showTransfer]);
-
   useEffect(() => {
     loadBalance();
     loadPremiumInfo();
@@ -254,113 +168,6 @@ const PointsModals = () => {
 
   return (
     <>
-      {/* Форма перевода - УБИРАЕМ, так как она уже есть в Points.jsx */}
-      {/* {showTransfer && (
-        <div className="modal-overlay" onClick={() => setShowTransfer(false)}>
-          <div className="modal-content transfer-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>Перевод баллов</h3>
-              <button onClick={() => setShowTransfer(false)} className="close-btn">
-                <X size={16} />
-              </button>
-            </div>
-            
-            <form onSubmit={handleTransfer}>
-              <div className="form-group transfer-search-wrapper">
-                <label>Получатель (username):</label>
-                <input
-                  type="text"
-                  value={transferData.recipientUsername}
-                  onChange={(e) => {
-                    const v = e.target.value;
-                    setTransferData(prev => ({ ...prev, recipientUsername: v }));
-                  }}
-                  placeholder="@username"
-                  className="form-input"
-                  onFocus={() => { if (transferSuggestions.length) setShowTransferSuggestions(true); }}
-                />
-                {showTransferSuggestions && transferSuggestions.length > 0 && (
-                  <div className="transfer-search-results" onMouseDown={(e) => e.preventDefault()}>
-                    {transferSuggestions.slice(0, 5).map(user => (
-                      <div
-                        key={user._id}
-                        className="transfer-search-result"
-                        onClick={() => {
-                          setTransferData(prev => ({ ...prev, recipientUsername: `@${user.username}` }));
-                          setTransferSuggestions([]);
-                          setShowTransferSuggestions(false);
-                          // Добавляем задержку, чтобы подсказки не появлялись снова
-                          setTimeout(() => {
-                            setTransferSuggestions([]);
-                            setShowTransferSuggestions(false);
-                          }, 500);
-                        }}
-                      >
-                        <Avatar src={user.avatar || null} alt={user.displayName || user.username} size="small" />
-                        <div className="search-result-info">
-                          <span className="header-search-username">@{user.username}</span>
-                          {user.displayName && (
-                            <span className="header-search-name">{user.displayName}</span>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-              
-              <div className="form-group">
-                <label>Сумма:</label>
-                <input
-                  type="number"
-                  value={transferData.amount}
-                  onChange={(e) => setTransferData(prev => ({ ...prev, amount: parseInt(e.target.value) || '' }))}
-                  placeholder="Введите сумму"
-                  min="1"
-                  max={balance}
-                  className="form-input"
-                />
-              </div>
-
-              {transferData.amount && (
-                <div className="transfer-preview">
-                  <div className="transfer-preview-row">
-                    <span>Комиссия ({Math.round(transferPreview.rate * 100)}%):</span>
-                    <span>{transferPreview.commission}</span>
-                  </div>
-                  <div className="transfer-preview-row">
-                    <span>Получит получатель:</span>
-                    <span>{transferPreview.net}</span>
-                  </div>
-                </div>
-              )}
-              
-              <div className="form-group">
-                <label>Описание (необязательно):</label>
-                <input
-                  type="text"
-                  value={transferData.description}
-                  onChange={(e) => setTransferData(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder="Описание перевода"
-                  className="form-input"
-                />
-              </div>
-              
-              {error && <div className="error-message">{error}</div>}
-              {success && <div className="success-message">{success}</div>}
-              
-              <button 
-                type="submit" 
-                disabled={loading}
-                className="submit-btn"
-              >
-                {loading ? 'Выполняется...' : 'Перевести'}
-              </button>
-            </form>
-          </div>
-        </div>
-      )} */}
-
       {/* История транзакций */}
       {showHistory && (
         <div className="modal-overlay" onClick={() => setShowHistory(false)}>

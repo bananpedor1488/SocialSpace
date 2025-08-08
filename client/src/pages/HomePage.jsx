@@ -107,7 +107,7 @@ const HomePage = () => {
   const { onlineUsers, fetchOnlineStatus, getUserStatus } = useOnlineStatus(socketRef.current);
 
   // Доступ к истории из контекста (для открытия глобальной истории в хедере)
-  const { openHistory } = usePoints();
+  const { openHistory, showTransfer, setShowTransfer } = usePoints();
 
   // Список изменений версий
   const changelogData = [
@@ -2001,6 +2001,14 @@ const HomePage = () => {
       minute: '2-digit'
     });
   };
+
+  // Эффект для открытия модальки перевода из хедера
+  useEffect(() => {
+    if (showTransfer) {
+      setShowWalletTransfer(true);
+      setShowTransfer(false); // Сбрасываем флаг в контексте
+    }
+  }, [showTransfer, setShowTransfer]);
 
   return (
     <>
