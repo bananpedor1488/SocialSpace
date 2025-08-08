@@ -7,7 +7,7 @@ import {
   Home, MessageCircle, User, LogOut, Plus,
   Heart, MessageSquare, Repeat, Pencil, Trash2, Users, UserCheck, Send, X, ChevronDown,
   Moon, Sun, Wifi, WifiOff, Flame, Clock, Phone, Settings, Trophy, DollarSign,
-  Check, Play, HelpCircle, History, Crown
+  Check, Play, HelpCircle, History, Crown, Gift
 } from 'lucide-react';
 
 import CallInterface from '../components/CallInterface';
@@ -16,7 +16,6 @@ import ProfileSettings from '../components/ProfileSettings';
 import Avatar from '../components/Avatar';
 import Points from '../components/Points';
 import PointsModals from '../components/PointsModals';
-import { PointsProvider, usePoints } from '../context/PointsContext';
 
 import useOnlineStatus from '../hooks/useOnlineStatus';
 
@@ -52,6 +51,23 @@ const HomePage = () => {
     amount: '',
     description: ''
   });
+  // Локальные состояния кошелька (вкладка из бокового меню)
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [historyTransactions, setHistoryTransactions] = useState([]);
+  const [historyPagination, setHistoryPagination] = useState({ page: 1, limit: 20, hasMore: false });
+  const [historyLoading, setHistoryLoading] = useState(false);
+
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [premiumInfo, setPremiumInfo] = useState({ active: false, expiresAt: null, premiumCost: 300 });
+  const [premiumLoading, setPremiumLoading] = useState(false);
+  const [premiumError, setPremiumError] = useState('');
+  const [premiumSuccess, setPremiumSuccess] = useState('');
+
+  const [showGiftPremiumModal, setShowGiftPremiumModal] = useState(false);
+  const [giftData, setGiftData] = useState({ recipientUsername: '' });
+  const [giftLoading, setGiftLoading] = useState(false);
+  const [giftError, setGiftError] = useState('');
+  const [giftSuccess, setGiftSuccess] = useState('');
   const [isDarkTheme, setIsDarkTheme] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState('Подключение...');
@@ -83,25 +99,6 @@ const HomePage = () => {
   
   // Хук для онлайн статуса
   const { onlineUsers, fetchOnlineStatus, getUserStatus } = useOnlineStatus(socketRef.current);
-
-  // Points context hook - moved to the top to avoid conditional calls
-  const { 
-    showTransfer, setShowTransfer,
-    showHistory, setShowHistory,
-    showPremium, setShowPremium,
-    showGiftPremium, setShowGiftPremium,
-    openHistory,
-    transactions,
-    loadTransactions
-  } = usePoints();
-
-  // Load wallet data when wallet tab is active - moved to the top to avoid conditional calls
-  useEffect(() => {
-    if (activeTab === 'wallet' && user) {
-      loadWalletBalance();
-      loadWalletTransactions();
-    }
-  }, [activeTab, user]);
 
   // Список изменений версий
   const changelogData = [
@@ -1748,7 +1745,32 @@ const HomePage = () => {
     });
   };
 
-  // Wallet functions - moved before useEffect to avoid reference errors
+  // Load wallet data when wallet tab is active
+  useEffect(() => {
+    if (activeTab === 'wallet') {
+      loadWalletBalance();
+      loadWalletTransactions();
+    }
+  }, [activeTab]);
+
+  // Показываем загрузку если пользователь еще не загружен
+  if (!user) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        color: 'white',
+        fontSize: '18px'
+      }}>
+        Загрузка...
+      </div>
+    );
+  }
+
+  // Wallet functions
   const loadWalletBalance = async () => {
     try {
       setWalletLoading(true);
@@ -1772,6 +1794,102 @@ const HomePage = () => {
       setWalletError('Ошибка загрузки транзакций');
     } finally {
       setWalletLoading(false);
+    }
+  };
+
+  // Локальная история транзакций (модалка)
+  const openHistoryModal = async () => {
+    try {
+      setShowHistoryModal(true);
+      setHistoryLoading(true);
+      const response = await axios.get('https://server-u9ji.onrender.com/api/points/transactions?page=1&limit=20');
+      setHistoryTransactions(response.data.transactions || []);
+      setHistoryPagination({
+        page: 1,
+        limit: 20,
+        hasMore: response.data.pagination?.hasMore || false
+      });
+    } catch (error) {
+      console.error('Error loading history:', error);
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  const loadMoreHistory = async () => {
+    if (historyLoading || !historyPagination.hasMore) return;
+    try {
+      setHistoryLoading(true);
+      const nextPage = historyPagination.page + 1;
+      const response = await axios.get(`https://server-u9ji.onrender.com/api/points/transactions?page=${nextPage}&limit=${historyPagination.limit}`);
+      setHistoryTransactions(prev => [...prev, ...(response.data.transactions || [])]);
+      setHistoryPagination(prev => ({
+        ...prev,
+        page: nextPage,
+        hasMore: response.data.pagination?.hasMore || false
+      }));
+    } catch (error) {
+      console.error('Error loading more history:', error);
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  // Локальный премиум (модалка)
+  const openPremiumModal = async () => {
+    try {
+      setPremiumError('');
+      setPremiumSuccess('');
+      setPremiumLoading(true);
+      const response = await axios.get('https://server-u9ji.onrender.com/api/points/premium-info');
+      setPremiumInfo({
+        active: response.data.premium?.active || false,
+        expiresAt: response.data.premium?.expiresAt || null,
+        premiumCost: response.data.premiumCost || 300
+      });
+      setShowPremiumModal(true);
+    } catch (error) {
+      console.error('Error loading premium info:', error);
+      setPremiumError('Ошибка загрузки информации о премиуме');
+      setShowPremiumModal(true);
+    } finally {
+      setPremiumLoading(false);
+    }
+  };
+
+  const handleBuyPremium = async () => {
+    try {
+      setPremiumLoading(true);
+      setPremiumError('');
+      const response = await axios.post('https://server-u9ji.onrender.com/api/points/buy-premium');
+      setPremiumSuccess('Премиум успешно куплен!');
+      setWalletBalance(response.data.newBalance);
+      await openPremiumModal();
+    } catch (error) {
+      setPremiumError(error.response?.data?.message || 'Ошибка покупки премиума');
+    } finally {
+      setPremiumLoading(false);
+    }
+  };
+
+  const handleGiftPremium = async (e) => {
+    e.preventDefault();
+    if (!giftData.recipientUsername.trim()) {
+      setGiftError('Укажите имя пользователя');
+      return;
+    }
+    try {
+      setGiftLoading(true);
+      setGiftError('');
+      setGiftSuccess('');
+      const response = await axios.post('https://server-u9ji.onrender.com/api/points/gift-premium', giftData);
+      setWalletBalance(response.data.newBalance);
+      setGiftSuccess('Премиум успешно подарен!');
+      setGiftData({ recipientUsername: '' });
+    } catch (error) {
+      setGiftError(error.response?.data?.message || 'Ошибка дарения премиума');
+    } finally {
+      setGiftLoading(false);
     }
   };
 
@@ -1830,23 +1948,6 @@ const HomePage = () => {
       minute: '2-digit'
     });
   };
-
-  // Показываем загрузку если пользователь еще не загружен
-  if (!user) {
-    return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        color: 'white',
-        fontSize: '18px'
-      }}>
-        Загрузка...
-      </div>
-    );
-  }
 
   return (
     <>
@@ -2400,14 +2501,14 @@ const HomePage = () => {
                     </button>
                     <button 
                       className="wallet-action-btn"
-                      onClick={() => openHistory()}
+                      onClick={openHistoryModal}
                       disabled={walletLoading}
                     >
                       <History size={20} />
                     </button>
                     <button 
                       className="wallet-action-btn"
-                      onClick={() => setShowPremium(true)}
+                      onClick={openPremiumModal}
                       disabled={walletLoading}
                     >
                       <Crown size={20} />
@@ -2420,7 +2521,7 @@ const HomePage = () => {
                     <h4>Последние транзакции</h4>
                     <button 
                       className="wallet-view-all-btn"
-                      onClick={() => openHistory()}
+                      onClick={openHistoryModal}
                     >
                       Посмотреть все
                     </button>
@@ -2690,6 +2791,140 @@ const HomePage = () => {
           />
         )}
         
+            {/* History Modal (локальный для вкладки кошелька) */}
+            {showHistoryModal && (
+              <div className="modal-overlay" onClick={() => setShowHistoryModal(false)}>
+                <div className="modal-content history-modal" onClick={(e) => e.stopPropagation()}>
+                  <div className="modal-header">
+                    <h3>История транзакций</h3>
+                    <button onClick={() => setShowHistoryModal(false)} className="close-btn">
+                      <X size={16} />
+                    </button>
+                  </div>
+                  {historyLoading && historyTransactions.length === 0 ? (
+                    <div className="loading">Загрузка...</div>
+                  ) : historyTransactions.length > 0 ? (
+                    <div className="transactions-list">
+                      {historyTransactions.map((tx) => (
+                        <div key={tx._id} className="transaction-item clickable">
+                          <div className="transaction-info">
+                            <div className="transaction-user">
+                              {tx.isOutgoing ? (tx.recipient?.displayName || tx.recipient?.username) : (tx.sender?.displayName || tx.sender?.username)}
+                            </div>
+                            <div className="transaction-description">{tx.description}</div>
+                            <div className="transaction-date">{formatWalletDate(tx.createdAt)}</div>
+                          </div>
+                          <div className={`transaction-amount ${tx.isOutgoing ? 'outgoing' : 'incoming'}`}>
+                            {tx.isOutgoing ? '-' : '+'}{formatWalletAmount(tx.amount)}
+                          </div>
+                          {tx.transactionCode && (
+                            <div className="transaction-code">{tx.transactionCode}</div>
+                          )}
+                        </div>
+                      ))}
+                      {historyPagination.hasMore && (
+                        <div className="load-more-section">
+                          <button className="load-more-btn" onClick={loadMoreHistory} disabled={historyLoading}>
+                            {historyLoading ? 'Загрузка...' : 'Загрузить ещё'}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="no-transactions">Транзакций пока нет</div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Premium Modal (локальный для вкладки кошелька) */}
+            {showPremiumModal && (
+              <div className="modal-overlay" onClick={() => setShowPremiumModal(false)}>
+                <div className="modal-content premium-modal" onClick={(e) => e.stopPropagation()}>
+                  <div className="modal-header">
+                    <h3>Премиум</h3>
+                    <button onClick={() => setShowPremiumModal(false)} className="close-btn">
+                      <X size={16} />
+                    </button>
+                  </div>
+                  {premiumLoading ? (
+                    <div className="loading">Загрузка...</div>
+                  ) : (
+                    <div className="premium-info">
+                      {premiumInfo.active ? (
+                        <div className="premium-active">
+                          <Crown className="premium-icon" size={48} />
+                          <div className="premium-status">
+                            <h5>Премиум активен</h5>
+                            <p className="premium-expires">Действует до: {premiumInfo.expiresAt ? new Date(premiumInfo.expiresAt).toLocaleDateString('ru-RU') : '—'}</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div>
+                          <div className="premium-details">
+                            <div className="premium-cost">
+                              <span className="cost-label">Стоимость</span>
+                              <span className="cost-amount">{formatWalletAmount(premiumInfo.premiumCost)} баллов</span>
+                            </div>
+                            <div className="premium-duration">
+                              <span className="duration-label">Срок</span>
+                              <span className="duration-amount">30 дней</span>
+                            </div>
+                            <div className="premium-balance">
+                              <span className="balance-label">Ваш баланс</span>
+                              <span className="balance-amount">{formatWalletAmount(walletBalance)} баллов</span>
+                            </div>
+                          </div>
+                          {premiumError && <div className="error-message">{premiumError}</div>}
+                          {premiumSuccess && <div className="success-message">{premiumSuccess}</div>}
+                          <div className="premium-buy">
+                            <button className="buy-premium-btn" onClick={handleBuyPremium} disabled={premiumLoading || walletBalance < premiumInfo.premiumCost}>
+                              {premiumLoading ? 'Покупка...' : 'Купить премиум'}
+                            </button>
+                          </div>
+                          <div style={{ marginTop: 16, textAlign: 'center' }}>
+                            <button className="message-btn" onClick={() => setShowGiftPremiumModal(true)}>
+                              <Gift size={16} /> Подарить премиум
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Gift Premium Modal (локальный для вкладки кошелька) */}
+            {showGiftPremiumModal && (
+              <div className="modal-overlay" onClick={() => setShowGiftPremiumModal(false)}>
+                <div className="modal-content gift-modal" onClick={(e) => e.stopPropagation()}>
+                  <div className="modal-header">
+                    <h3>Подарить премиум</h3>
+                    <button onClick={() => setShowGiftPremiumModal(false)} className="close-btn">
+                      <X size={16} />
+                    </button>
+                  </div>
+                  <form onSubmit={handleGiftPremium}>
+                    <div className="form-group">
+                      <label>Получатель (username)</label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        placeholder="@username"
+                        value={giftData.recipientUsername}
+                        onChange={(e) => setGiftData({ recipientUsername: e.target.value })}
+                      />
+                    </div>
+                    {giftError && <div className="error-message">{giftError}</div>}
+                    {giftSuccess && <div className="success-message">{giftSuccess}</div>}
+                    <button type="submit" className="submit-btn" disabled={giftLoading}>
+                      {giftLoading ? 'Отправка...' : 'Подарить'}
+                    </button>
+                  </form>
+                </div>
+              </div>
+            )}
         {showProfileSettings && (
           <ProfileSettings
             isOpen={showProfileSettings}
