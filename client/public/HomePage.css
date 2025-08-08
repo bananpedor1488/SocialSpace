@@ -3328,6 +3328,31 @@ body {
   color: #64748b;
 }
 
+.transfer-search-wrapper { position: relative; }
+.transfer-search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: rgba(15, 23, 42, 0.98);
+  border: 1px solid rgba(71, 85, 105, 0.4);
+  border-radius: 12px;
+  margin-top: 8px;
+  max-height: 240px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+.transfer-search-result {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+  cursor: pointer;
+}
+.transfer-search-result:last-child { border-bottom: none; }
+.transfer-search-result:hover { background: rgba(51, 65, 85, 0.6); }
+
 .error-message {
   color: #ef4444;
   font-size: 12px;

@@ -53,6 +53,9 @@ const HomePage = () => {
     description: ''
   });
   const [transferPreview, setTransferPreview] = useState({ commission: 0, netAmount: 0 });
+  const [transferSuggestions, setTransferSuggestions] = useState([]);
+  const [transferSearchLoading, setTransferSearchLoading] = useState(false);
+  const [showTransferSuggestions, setShowTransferSuggestions] = useState(false);
   // Локальные состояния кошелька (вкладка из бокового меню)
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [historyTransactions, setHistoryTransactions] = useState([]);
@@ -1804,6 +1807,32 @@ const HomePage = () => {
     setTransferPreview({ commission, netAmount });
   }, [transferData.amount]);
 
+  // Подсказки по username для перевода
+  useEffect(() => {
+    if (!showWalletTransfer) return;
+    const raw = transferData.recipientUsername.trim();
+    const query = raw.replace(/^@/, '');
+    if (!query || query.length < 2) {
+      setTransferSuggestions([]);
+      setShowTransferSuggestions(false);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      try {
+        setTransferSearchLoading(true);
+        const res = await axios.get(`https://server-pqqy.onrender.com/api/users/search?query=${encodeURIComponent(query)}`);
+        setTransferSuggestions(res.data || []);
+        setShowTransferSuggestions(true);
+      } catch (e) {
+        setTransferSuggestions([]);
+        setShowTransferSuggestions(false);
+      } finally {
+        setTransferSearchLoading(false);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [transferData.recipientUsername, showWalletTransfer]);
+
   const loadWalletTransactions = async () => {
     try {
       setWalletLoading(true);
@@ -2612,7 +2641,7 @@ const HomePage = () => {
                   </div>
                   
                   <form onSubmit={handleWalletTransfer}>
-                    <div className="form-group">
+                    <div className="form-group transfer-search-wrapper">
                       <label>Получатель (username):</label>
                       <input
                         type="text"
@@ -2620,7 +2649,37 @@ const HomePage = () => {
                         onChange={(e) => setTransferData(prev => ({ ...prev, recipientUsername: e.target.value }))}
                         placeholder="@username"
                         className="form-input"
+                        onFocus={() => { if (transferSuggestions.length) setShowTransferSuggestions(true); }}
                       />
+                      {showTransferSuggestions && transferSuggestions.length > 0 && (
+                        <div className="transfer-search-results" onMouseDown={(e) => e.preventDefault()}>
+                          {transferSuggestions.slice(0, 5).map(user => (
+                            <div
+                              key={user._id}
+                              className="transfer-search-result"
+                              onClick={() => {
+                                setTransferData(prev => ({ ...prev, recipientUsername: `@${user.username}` }));
+                                setShowTransferSuggestions(false);
+                              }}
+                            >
+                              <Avatar 
+                                src={user.avatar || null}
+                                alt={user.displayName || user.username}
+                                size="small"
+                                className="search-result-avatar"
+                              />
+                              <div className="search-result-info">
+                                <span className="header-search-username">@{user.username}</span>
+                                {user.displayName && (
+                                  <span className="header-search-name">
+                                    {user.displayName}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                     
                     <div className="form-group">
