@@ -1761,6 +1761,44 @@ const HomePage = () => {
     }
   }, [activeTab]);
 
+  // Пересчет комиссии на клиенте (15% без премиума, 0% с премиумом — сервер проверяет окончательно)
+  useEffect(() => {
+    const amount = Number(transferData.amount) || 0;
+    if (amount <= 0) {
+      setTransferPreview({ commission: 0, netAmount: 0 });
+      return;
+    }
+    const commission = Math.floor(amount * 0.15);
+    const netAmount = Math.max(amount - commission, 0);
+    setTransferPreview({ commission, netAmount });
+  }, [transferData.amount]);
+
+  // Подсказки по username для перевода (держим хук вне условных return)
+  useEffect(() => {
+    if (!showWalletTransfer) return;
+    const raw = transferData.recipientUsername.trim();
+    const query = raw.replace(/^@/, '');
+    if (!query || query.length < 2) {
+      setTransferSuggestions([]);
+      setShowTransferSuggestions(false);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      try {
+        setTransferSearchLoading(true);
+        const res = await axios.get(`https://server-pqqy.onrender.com/api/users/search?query=${encodeURIComponent(query)}`);
+        setTransferSuggestions(res.data || []);
+        setShowTransferSuggestions(true);
+      } catch (e) {
+        setTransferSuggestions([]);
+        setShowTransferSuggestions(false);
+      } finally {
+        setTransferSearchLoading(false);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [transferData.recipientUsername, showWalletTransfer]);
+
   // Показываем загрузку если пользователь еще не загружен
   if (!user) {
     return (
@@ -1793,45 +1831,6 @@ const HomePage = () => {
     }
   };
 
-  // Пересчет комиссии на клиенте (15% без премиума, 0% с премиумом — сервер проверяет окончательно)
-  useEffect(() => {
-    const amount = Number(transferData.amount) || 0;
-    if (amount <= 0) {
-      setTransferPreview({ commission: 0, netAmount: 0 });
-      return;
-    }
-    // Клиентская индикация: попробуем получить признак премиума из баланса запроса (если добавим хранение)
-    // Здесь просто считаем по правилу: если сумма >= 1, комиссия 15% (сервер потом уточнит, если у юзера премиум — будет 0%)
-    const commission = Math.floor(amount * 0.15);
-    const netAmount = Math.max(amount - commission, 0);
-    setTransferPreview({ commission, netAmount });
-  }, [transferData.amount]);
-
-  // Подсказки по username для перевода
-  useEffect(() => {
-    if (!showWalletTransfer) return;
-    const raw = transferData.recipientUsername.trim();
-    const query = raw.replace(/^@/, '');
-    if (!query || query.length < 2) {
-      setTransferSuggestions([]);
-      setShowTransferSuggestions(false);
-      return;
-    }
-    const timer = setTimeout(async () => {
-      try {
-        setTransferSearchLoading(true);
-        const res = await axios.get(`https://server-pqqy.onrender.com/api/users/search?query=${encodeURIComponent(query)}`);
-        setTransferSuggestions(res.data || []);
-        setShowTransferSuggestions(true);
-      } catch (e) {
-        setTransferSuggestions([]);
-        setShowTransferSuggestions(false);
-      } finally {
-        setTransferSearchLoading(false);
-      }
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [transferData.recipientUsername, showWalletTransfer]);
 
   const loadWalletTransactions = async () => {
     try {
