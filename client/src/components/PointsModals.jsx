@@ -21,6 +21,8 @@ const PointsModals = () => {
   const [giftSuggestions, setGiftSuggestions] = useState([]);
   const [giftSearchLoading, setGiftSearchLoading] = useState(false);
   const [showGiftSuggestions, setShowGiftSuggestions] = useState(false);
+  const [transferSuggestions, setTransferSuggestions] = useState([]);
+  const [showTransferSuggestions, setShowTransferSuggestions] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   
