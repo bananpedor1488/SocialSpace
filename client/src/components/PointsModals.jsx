@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Coins, Send, History, Trophy, X, ChevronDown, ChevronUp, Crown, Gift } from 'lucide-react';
 import axios from 'axios';
 import Avatar from './Avatar';
+import OnlineStatus from './OnlineStatus';
 import { usePoints } from '../context/PointsContext';
 
 const PointsModals = () => {
@@ -16,6 +17,8 @@ const PointsModals = () => {
   const [giftSuggestions, setGiftSuggestions] = useState([]);
   const [giftSearchLoading, setGiftSearchLoading] = useState(false);
   const [showGiftSuggestions, setShowGiftSuggestions] = useState(false);
+  const [foundGiftUser, setFoundGiftUser] = useState(null);
+  const [foundGiftUserStatus, setFoundGiftUserStatus] = useState(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   
@@ -113,6 +116,8 @@ const PointsModals = () => {
       setBalance(response.data.newBalance);
       setGiftData({ recipientUsername: '' });
       setShowGiftPremium(false);
+      setFoundGiftUser(null);
+      setFoundGiftUserStatus(null);
       
       setTimeout(() => setSuccess(''), 3000);
     } catch (error) {
@@ -126,20 +131,51 @@ const PointsModals = () => {
   useEffect(() => {
     const raw = giftData.recipientUsername.trim();
     const query = raw.replace(/^@/, '');
+    
     if (!query || query.length < 2) {
       setGiftSuggestions([]);
       setShowGiftSuggestions(false);
+      setFoundGiftUser(null);
+      setFoundGiftUserStatus(null);
       return;
     }
+    
     const timer = setTimeout(async () => {
       try {
         setGiftSearchLoading(true);
         const res = await axios.get(`https://server-pqqy.onrender.com/api/users/search?query=${encodeURIComponent(query)}`);
-        setGiftSuggestions(res.data || []);
+        const suggestions = res.data || [];
+        setGiftSuggestions(suggestions);
+        
+        // Если введен точный username с @ и он совпадает с одним из результатов, не показываем подсказки
+        if (raw.startsWith('@') && query.length >= 2) {
+          const exactMatch = suggestions.find(user => 
+            user.username.toLowerCase() === query.toLowerCase()
+          );
+          if (exactMatch) {
+            setShowGiftSuggestions(false);
+            setFoundGiftUser(exactMatch);
+            // Получаем статус пользователя
+            try {
+              const statusRes = await axios.get(`https://server-pqqy.onrender.com/api/users/online-status?userIds=${exactMatch._id}`);
+              if (statusRes.data && statusRes.data[exactMatch._id]) {
+                setFoundGiftUserStatus(statusRes.data[exactMatch._id]);
+              }
+            } catch (statusError) {
+              console.error('Error fetching user status:', statusError);
+            }
+            return;
+          }
+        }
+        
+        setFoundGiftUser(null);
+        setFoundGiftUserStatus(null);
         setShowGiftSuggestions(true);
       } catch (err) {
         setGiftSuggestions([]);
         setShowGiftSuggestions(false);
+        setFoundGiftUser(null);
+        setFoundGiftUserStatus(null);
       } finally {
         setGiftSearchLoading(false);
       }
@@ -311,11 +347,19 @@ const PointsModals = () => {
 
       {/* Форма дарения премиума */}
       {showGiftPremium && (
-        <div className="modal-overlay" onClick={() => setShowGiftPremium(false)}>
+        <div className="modal-overlay" onClick={() => {
+          setShowGiftPremium(false);
+          setFoundGiftUser(null);
+          setFoundGiftUserStatus(null);
+        }}>
           <div className="modal-content gift-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>🎁 Подарить премиум</h3>
-              <button onClick={() => setShowGiftPremium(false)} className="close-btn">
+              <button onClick={() => {
+                setShowGiftPremium(false);
+                setFoundGiftUser(null);
+                setFoundGiftUserStatus(null);
+              }} className="close-btn">
                 <X size={16} />
               </button>
             </div>
@@ -326,7 +370,14 @@ const PointsModals = () => {
                 <input
                   type="text"
                   value={giftData.recipientUsername}
-                  onChange={(e) => setGiftData(prev => ({ ...prev, recipientUsername: e.target.value }))}
+                  onChange={(e) => {
+                    setGiftData(prev => ({ ...prev, recipientUsername: e.target.value }));
+                    // Сбрасываем найденного пользователя при изменении
+                    if (!e.target.value.trim()) {
+                      setFoundGiftUser(null);
+                      setFoundGiftUserStatus(null);
+                    }
+                  }}
                   placeholder="@username"
                   className="form-input"
                   onFocus={() => { if (giftSuggestions.length) setShowGiftSuggestions(true); }}
@@ -354,6 +405,62 @@ const PointsModals = () => {
                   </div>
                 )}
               </div>
+              
+              {/* Плашка с информацией о найденном пользователе */}
+              {foundGiftUser && (
+                <div className="found-user-card">
+                  <div className="found-user-header">
+                    <div className="found-user-check">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                      </svg>
+                    </div>
+                    <span className="found-user-title">Пользователь найден</span>
+                  </div>
+                  <div className="found-user-content">
+                    <div className="found-user-avatar">
+                      <Avatar 
+                        src={foundGiftUser.avatar || null}
+                        alt={foundGiftUser.displayName || foundGiftUser.username}
+                        size="medium"
+                      />
+                      {foundGiftUserStatus && (
+                        <div className="found-user-status">
+                          <OnlineStatus
+                            userId={foundGiftUser._id}
+                            isOnline={foundGiftUserStatus.isOnline}
+                            lastSeen={foundGiftUserStatus.lastSeen}
+                            size="small"
+                          />
+                        </div>
+                      )}
+                    </div>
+                    <div className="found-user-info">
+                      <div className="found-user-name">
+                        {foundGiftUser.displayName || foundGiftUser.username}
+                        {foundGiftUser.premium && (
+                          <span className="found-user-premium">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
+                            </svg>
+                          </span>
+                        )}
+                      </div>
+                      <div className="found-user-username">@{foundGiftUser.username}</div>
+                      {foundGiftUserStatus && !foundGiftUserStatus.isOnline && foundGiftUserStatus.lastSeen && (
+                        <div className="found-user-last-seen">
+                          Был в сети {new Date(foundGiftUserStatus.lastSeen).toLocaleDateString('ru-RU', {
+                            day: 'numeric',
+                            month: 'short',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
               
               <div className="gift-info">
                 <Gift size={24} className="gift-icon" />
