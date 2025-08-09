@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, User, Shield, Key, Bell, Palette, LogOut } from 'lucide-react';
+import { X, User, Shield, Key, Bell, Palette, LogOut, Sun, Moon } from 'lucide-react';
 import axios from 'axios';
 import './ProfileSettings.css';
 
