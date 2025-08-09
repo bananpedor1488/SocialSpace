@@ -15,10 +15,12 @@ const MobileMessenger = ({
   messagesLoading, 
   loadingOlderMessages, 
   loadOlderMessages, 
+  messagesPagination,
   totalUnread, 
   initiateCall, 
   getUserStatus, 
-  user 
+  user,
+  onViewChange
 }) => {
   const [view, setView] = useState('chats'); // 'chats' или 'chat'
   const messagesEndRef = useRef(null);
@@ -26,6 +28,13 @@ const MobileMessenger = ({
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  // Уведомляем родителя об изменении текущего вида (список чатов или активный чат)
+  useEffect(() => {
+    if (typeof onViewChange === 'function') {
+      onViewChange(view);
+    }
+  }, [view, onViewChange]);
 
   useEffect(() => {
     if (activeChat && view === 'chat') {
@@ -193,7 +202,7 @@ const MobileMessenger = ({
           ) : (
             <>
               {/* Кнопка загрузки старых сообщений */}
-              {messages[activeChat._id]?.pagination?.hasMore && (
+              {messagesPagination?.[activeChat._id]?.hasMore && (
                 <div className="mobile-load-more-messages">
                   <button 
                     onClick={() => loadOlderMessages(activeChat._id)}
@@ -207,7 +216,7 @@ const MobileMessenger = ({
 
               {/* Сообщения */}
               <div className="mobile-messages-list">
-                {messages[activeChat._id]?.messages?.map((message) => (
+                {(messages[activeChat._id] || []).map((message) => (
                   <div 
                     key={message._id} 
                     className={`mobile-message ${message.sender._id === user._id ? 'own' : 'other'}`}

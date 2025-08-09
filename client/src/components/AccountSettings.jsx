@@ -98,12 +98,13 @@ const AccountSettings = ({ isOpen, onClose, user, onLogout, isDarkTheme, onToggl
               <button 
                 className="theme-toggle-btn"
                 onClick={onToggleTheme}
+                title={isDarkTheme ? 'Переключить на светлую тему' : 'Переключить на темную тему'}
               >
                 <div className="theme-icon">
-                  {isDarkTheme ? <Sun size={18} /> : <Moon size={18} />}
+                  {isDarkTheme ? <Moon size={18} /> : <Sun size={18} />}
                 </div>
                 <span className="theme-text">
-                  {isDarkTheme ? 'Светлая' : 'Темная'}
+                  {isDarkTheme ? 'Темная' : 'Светлая'}
                 </span>
               </button>
             </div>

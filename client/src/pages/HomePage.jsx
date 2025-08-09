@@ -1523,8 +1523,21 @@ const HomePage = () => {
       
       const postsRes = await axios.get(`https://server-pqqy.onrender.com/api/users/${userId}/posts`);
       console.log('Profile posts response:', postsRes.data);
-      
-      const formattedProfilePosts = postsRes.data.map(post => ({
+
+      // Унифицируем форму ответа: поддерживаем массив и обёртки вида {posts: []} или {data: []}
+      let profilePostsData = [];
+      if (Array.isArray(postsRes.data)) {
+        profilePostsData = postsRes.data;
+      } else if (postsRes.data?.posts && Array.isArray(postsRes.data.posts)) {
+        profilePostsData = postsRes.data.posts;
+      } else if (postsRes.data?.data && Array.isArray(postsRes.data.data)) {
+        profilePostsData = postsRes.data.data;
+      }
+
+      // Сортируем по дате (новые сверху)
+      profilePostsData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+      const formattedProfilePosts = profilePostsData.map(post => ({
         _id: post._id,
         userId: post.author?._id || post.author,
         username: post.author?.username || 'Unknown',
@@ -2228,10 +2241,19 @@ const HomePage = () => {
                     messagesLoading={messagesLoading}
                     loadingOlderMessages={loadingOlderMessages}
                     loadOlderMessages={loadOlderMessages}
+                    messagesPagination={messagesPagination}
                     totalUnread={totalUnread}
                     initiateCall={initiateCall}
                     getUserStatus={getUserStatus}
                     user={user}
+                    onViewChange={(v) => {
+                      // Скрываем глобальный хедер на мобильном, когда открыт активный чат
+                      const headerEl = document.querySelector('.header');
+                      if (headerEl) {
+                        if (v === 'chat') headerEl.style.display = 'none';
+                        else headerEl.style.display = '';
+                      }
+                    }}
                   />
                 ) : (
                   <div className="messages-container">
@@ -3264,7 +3286,6 @@ const HomePage = () => {
             onClose={() => setShowProfileSettings(false)}
             user={user}
             onProfileUpdate={handleProfileUpdate}
-            onLogout={handleLogout}
           />
         )}
         {showAccountSettings && (

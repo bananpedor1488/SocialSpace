@@ -1,9 +1,9 @@
 import React, { useState, useRef } from 'react';
-import { X, Camera, Save, User, FileText, AtSign, LogOut } from 'lucide-react';
+import { X, Camera, Save, User, FileText } from 'lucide-react';
 import axios from 'axios';
 import './ProfileSettings.css';
 
-const ProfileSettings = ({ isOpen, onClose, user, onProfileUpdate, onLogout }) => {
+const ProfileSettings = ({ isOpen, onClose, user, onProfileUpdate }) => {
   const [displayName, setDisplayName] = useState(user?.displayName || user?.username || '');
   const [bio, setBio] = useState(user?.bio || '');
   const [avatar, setAvatar] = useState(user?.avatar || '');
@@ -193,29 +193,7 @@ const ProfileSettings = ({ isOpen, onClose, user, onProfileUpdate, onLogout }) =
               </>
             )}
           </button>
-          <button 
-            className="logout-btn" 
-            onClick={onLogout}
-            style={{ 
-              backgroundColor: '#ef4444', 
-              color: 'white',
-              border: 'none',
-              padding: '10px 16px',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              fontSize: '14px',
-              fontWeight: '500',
-              transition: 'background-color 0.2s ease'
-            }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#dc2626'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = '#ef4444'}
-          >
-            <LogOut size={18} />
-            Выйти
-          </button>
+          {/* Кнопка выхода убрана из настроек профиля по требованию */}
         </div>
       </div>
     </div>
