@@ -99,7 +99,7 @@ const MobileMessenger = ({
           <div className="mobile-chats-header">
             <h2>Сообщения</h2>
             {totalUnread > 0 && (
-              <span className="mobile-chat-unread">{totalUnread}</span>
+              <span className="mobile-total-unread">{totalUnread}</span>
             )}
           </div>
           
@@ -129,14 +129,19 @@ const MobileMessenger = ({
                         className="mobile-chat-avatar"
                       />
                       <div className="mobile-chat-info">
-                        <div className="mobile-chat-name">
-                          {chat.name}
-                          {otherUser?.premium && (
-                            <span className="premium-badge">
-                              <svg viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
-                              </svg>
-                            </span>
+                        <div className="mobile-chat-header-row">
+                          <div className="mobile-chat-name">
+                            {chat.name}
+                            {otherUser?.premium && (
+                              <span className="premium-badge">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                  <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
+                                </svg>
+                              </span>
+                            )}
+                          </div>
+                          {chat.unreadCount > 0 && (
+                            <span className="mobile-chat-unread">{chat.unreadCount}</span>
                           )}
                         </div>
                         {chat.lastMessage && (
@@ -145,9 +150,6 @@ const MobileMessenger = ({
                           </div>
                         )}
                       </div>
-                      {chat.unreadCount > 0 && (
-                        <span className="mobile-chat-unread">{chat.unreadCount}</span>
-                      )}
                     </div>
                   );
                 })
@@ -177,7 +179,7 @@ const MobileMessenger = ({
           <div className="mobile-chat-header">
             <div className="mobile-chat-header-left">
               <button 
-                className="back-btn"
+                className="mobile-back-btn"
                 onClick={handleBackToChats}
               >
                 <ArrowLeft size={20} />
@@ -188,9 +190,9 @@ const MobileMessenger = ({
                 size="medium"
                 className="mobile-chat-header-avatar"
               />
-              <div className="mobile-chat-header-info">
-                <h3>{activeChat.name}</h3>
-                <div className="online-status">
+              <div className="mobile-chat-user-info">
+                <div className="mobile-chat-title-section">
+                  <h3>{activeChat.name}</h3>
                   <OnlineStatus
                     userId={otherUser?._id}
                     isOnline={userStatus.isOnline}
@@ -201,8 +203,9 @@ const MobileMessenger = ({
                 </div>
               </div>
             </div>
-            <div className="mobile-chat-header-actions">
+            <div className="mobile-chat-actions">
               <button 
+                className="mobile-call-button"
                 onClick={() => initiateCall('audio')}
                 title="Голосовой звонок"
               >
@@ -216,14 +219,14 @@ const MobileMessenger = ({
           
           <div className="mobile-messages-area">
             {messagesLoading ? (
-              <div className="mobile-loading">
+              <div className="mobile-messages-loading">
                 <div className="mobile-loading-spinner"></div>
                 Загрузка сообщений...
               </div>
             ) : (
               <>
                 {messagesPagination[activeChat._id]?.hasMore && (
-                  <div className="mobile-loading">
+                  <div className="mobile-load-more-messages">
                     <button 
                       onClick={() => loadOlderMessages(activeChat._id)}
                       disabled={loadingOlderMessages}
@@ -234,46 +237,51 @@ const MobileMessenger = ({
                   </div>
                 )}
                 
-                {chatMessages.map(message => {
-                  if (message.type === 'call') return null;
-                  
-                  const isOwn = message.sender._id === user._id || message.sender.id === user.id;
-                  const messageTime = formatMessageTime(message.createdAt);
-                  
-                  return (
-                    <div 
-                      key={message._id} 
-                      className={`mobile-message ${isOwn ? 'own' : 'other'}`}
-                    >
-                      {!isOwn && (
-                        <Avatar 
-                          src={message.sender.avatar || null}
-                          alt={message.sender.displayName || message.sender.username}
-                          size="small"
-                          className="mobile-message-avatar"
-                        />
-                      )}
-                      <div className="mobile-message-content">
+                <div className="mobile-messages-list">
+                  {chatMessages.map(message => {
+                    if (message.type === 'call') return null;
+                    
+                    const isOwn = message.sender._id === user._id || message.sender.id === user.id;
+                    const messageTime = formatMessageTime(message.createdAt);
+                    
+                    return (
+                      <div 
+                        key={message._id} 
+                        className={`mobile-message ${isOwn ? 'own' : 'other'}`}
+                      >
+                        {!isOwn && (
+                          <Avatar 
+                            src={message.sender.avatar || null}
+                            alt={message.sender.displayName || message.sender.username}
+                            size="small"
+                            className="mobile-message-avatar"
+                          />
+                        )}
                         <div className="mobile-message-body">
-                          {message.content}
-                        </div>
-                        <div className="mobile-message-time">
-                          {messageTime}
+                          <div className="mobile-message-header">
+                            {!isOwn && (
+                              <span className="mobile-message-sender">{message.sender.displayName || message.sender.username}</span>
+                            )}
+                            <span className="mobile-message-time">{messageTime}</span>
+                          </div>
+                          <div className="mobile-message-content">
+                            {message.content}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
                 <div ref={messagesEndRef} />
               </>
             )}
           </div>
           
-          <div className="mobile-input-area">
-            <div className="mobile-input-container">
+          <div className="mobile-message-input-area">
+            <div className="mobile-message-input-wrapper">
               <textarea
                 ref={inputRef}
-                className="mobile-input-field"
+                className="mobile-message-input"
                 placeholder="Введите сообщение..."
                 value={newMessage}
                 onChange={handleInputChange}
@@ -281,7 +289,7 @@ const MobileMessenger = ({
                 rows={1}
               />
               <button 
-                className="mobile-send-btn"
+                className="mobile-send-message-btn"
                 onClick={handleSendMessage}
                 disabled={!newMessage.trim()}
               >

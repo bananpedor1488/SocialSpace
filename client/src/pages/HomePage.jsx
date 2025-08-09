@@ -2246,14 +2246,19 @@ const HomePage = () => {
                     initiateCall={initiateCall}
                     getUserStatus={getUserStatus}
                     user={user}
-                    onViewChange={(v) => {
-                      // На мобильном всегда скрываем глобальный хедер во вкладке сообщений
+                    onViewChange={(view) => {
                       const headerEl = document.querySelector('.header');
                       if (headerEl) {
-                        headerEl.style.display = 'none';
+                        if (view === 'chat') {
+                          // Показываем хедер когда открыт чат
+                          headerEl.style.display = 'flex';
+                          document.body.classList.add('mobile-chat-open');
+                        } else {
+                          // Скрываем хедер когда показываем список чатов
+                          headerEl.style.display = 'none';
+                          document.body.classList.remove('mobile-chat-open');
+                        }
                       }
-                      // Добавляем класс для корректной высоты и фиксации
-                      document.body.classList.add('mobile-chat-open');
                     }}
                   />
                 ) : (
