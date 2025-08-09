@@ -2110,20 +2110,6 @@ const HomePage = () => {
               </div>
               <div className="user-info">
                 <Points />
-                <span>Hello, {user?.username}!</span>
-                
-                <button onClick={toggleTheme} className="theme-toggle">
-                  <div className="theme-icon">
-                    {isDarkTheme ? <Sun size={18} /> : <Moon size={18} />}
-                  </div>
-                  <span className="theme-text">
-                    {isDarkTheme ? 'Светлая' : 'Темная'}
-                  </span>
-                </button>
-                
-                <button onClick={handleLogout} className="logout-btn">
-                  <LogOut size={16} /> Выйти
-                </button>
               </div>
             </div>
           </header>
@@ -2505,25 +2491,11 @@ const HomePage = () => {
                                 <Settings size={20} />
                               </button>
                               <button 
-                                className="profile-settings-btn"
+                                className="profile-settings-btn account-settings-btn"
                                 onClick={() => setShowAccountSettings(true)}
                                 title="Настройки аккаунта"
-                                style={{
-                                  backgroundColor: '#3b82f6',
-                                  color: 'white',
-                                  border: 'none',
-                                  padding: '8px',
-                                  borderRadius: '8px',
-                                  cursor: 'pointer',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  transition: 'background-color 0.2s ease'
-                                }}
-                                onMouseEnter={(e) => e.target.style.backgroundColor = '#2563eb'}
-                                onMouseLeave={(e) => e.target.style.backgroundColor = '#3b82f6'}
                               >
-                                <User size={18} />
+                                <Settings size={18} />
                               </button>
                             </div>
                           )}
@@ -3258,6 +3230,8 @@ const HomePage = () => {
             onClose={() => setShowAccountSettings(false)}
             user={user}
             onLogout={handleLogout}
+            isDarkTheme={isDarkTheme}
+            onToggleTheme={toggleTheme}
           />
         )}
         

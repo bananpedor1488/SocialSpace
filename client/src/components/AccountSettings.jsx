@@ -3,7 +3,7 @@ import { X, User, Shield, Key, Bell, Palette, LogOut } from 'lucide-react';
 import axios from 'axios';
 import './ProfileSettings.css';
 
-const AccountSettings = ({ isOpen, onClose, user, onLogout }) => {
+const AccountSettings = ({ isOpen, onClose, user, onLogout, isDarkTheme, onToggleTheme }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
@@ -95,7 +95,17 @@ const AccountSettings = ({ isOpen, onClose, user, onLogout }) => {
             <h4><Palette size={18} /> Внешний вид</h4>
             <div className="setting-item">
               <span className="setting-label">Тема:</span>
-              <span className="setting-value">Автоматическая</span>
+              <button 
+                className="theme-toggle-btn"
+                onClick={onToggleTheme}
+              >
+                <div className="theme-icon">
+                  {isDarkTheme ? <Sun size={18} /> : <Moon size={18} />}
+                </div>
+                <span className="theme-text">
+                  {isDarkTheme ? 'Светлая' : 'Темная'}
+                </span>
+              </button>
             </div>
           </div>
 

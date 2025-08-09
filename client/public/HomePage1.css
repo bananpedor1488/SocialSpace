@@ -5714,3 +5714,115 @@ body {
 .transfer-modal {
   z-index: 99999;
 }
+
+/* Стили для кнопки настроек аккаунта */
+.account-settings-btn {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.account-settings-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.account-settings-btn:hover::before {
+  left: 100%;
+}
+
+.account-settings-btn:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+.account-settings-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(59, 130, 246, 0.3);
+}
+
+/* Стили для кнопки смены темы в настройках */
+.theme-toggle-btn {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.theme-toggle-btn:hover {
+  background: linear-gradient(135deg, #5855eb 0%, #4338ca 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+}
+
+.theme-toggle-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(99, 102, 241, 0.3);
+}
+
+.theme-toggle-btn .theme-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+}
+
+.theme-toggle-btn:hover .theme-icon {
+  transform: rotate(180deg);
+}
+
+.theme-toggle-btn .theme-text {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Адаптивность для кнопок */
+@media (max-width: 768px) {
+  .account-settings-btn {
+    padding: 8px;
+    border-radius: 10px;
+  }
+  
+  .theme-toggle-btn {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .theme-toggle-btn {
+    padding: 8px 12px;
+    font-size: 12px;
+    gap: 8px;
+  }
+  
+  .theme-toggle-btn .theme-text {
+    display: none;
+  }
+}
