@@ -47,6 +47,13 @@ const MobileMessenger = ({
   const handleBackToChats = () => {
     setCurrentView('chats');
     setActiveChat(null);
+    // Восстанавливаем глобальный хедер при возврате к списку чатов
+    const headerEl = document.querySelector('.header');
+    if (headerEl) {
+      headerEl.style.display = 'flex';
+    }
+    // Убираем класс для корректной высоты
+    document.body.classList.remove('mobile-chat-open');
   };
 
   const handleSendMessage = () => {
