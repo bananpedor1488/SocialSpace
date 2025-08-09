@@ -1997,13 +1997,19 @@ const HomePage = () => {
       return;
     }
     
-    if (!transferData.amount || transferData.amount <= 0) {
+    const amount = parseInt(transferData.amount);
+    if (!amount || isNaN(amount)) {
       setWalletError('Введите корректную сумму');
       return;
     }
     
-    if (transferData.amount > walletBalance) {
-      setWalletError('Недостаточно баллов');
+    if (amount <= 0) {
+      setWalletError('Сумма должна быть больше 0');
+      return;
+    }
+    
+    if (amount > walletBalance) {
+      setWalletError(`Недостаточно баллов. Ваш баланс: ${formatWalletAmount(walletBalance)} баллов`);
       return;
     }
     
@@ -2012,7 +2018,7 @@ const HomePage = () => {
       setWalletError('');
       const response = await axios.post('https://server-pqqy.onrender.com/api/points/transfer', {
         recipientUsername: (transferData.recipientUsername || '').replace(/^@/, ''),
-        amount: transferData.amount,
+        amount: amount,
         description: transferData.description
       });
       
@@ -2820,10 +2826,13 @@ const HomePage = () => {
                       <input
                         type="number"
                         value={transferData.amount}
-                        onChange={(e) => setTransferData(prev => ({ ...prev, amount: parseInt(e.target.value) || '' }))}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value === '' || (parseInt(value) > 0)) {
+                            setTransferData(prev => ({ ...prev, amount: value }));
+                          }
+                        }}
                         placeholder="Введите сумму"
-                        min="1"
-                        max={walletBalance}
                         className="form-input"
                       />
                     </div>
