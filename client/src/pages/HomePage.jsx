@@ -13,6 +13,7 @@ import {
 import CallInterface from '../components/CallInterface';
 import OnlineStatus from '../components/OnlineStatus';
 import ProfileSettings from '../components/ProfileSettings';
+  import AccountSettings from '../components/AccountSettings';
 import Avatar from '../components/Avatar';
 import Points from '../components/Points';
 import PointsModals from '../components/PointsModals';
@@ -26,6 +27,7 @@ const HomePage = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [postText, setPostText] = useState('');
   const [showProfileSettings, setShowProfileSettings] = useState(false);
+  const [showAccountSettings, setShowAccountSettings] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [posts, setPosts] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
@@ -778,10 +780,12 @@ const HomePage = () => {
       setIsDarkTheme(true);
       loadCSS('HomePage.css');
       document.body.className = 'dark-theme';
+      document.documentElement.setAttribute('data-theme', 'dark');
     } else {
       setIsDarkTheme(false);
       loadCSS('HomePage1.css');
       document.body.className = 'light-theme';
+      document.documentElement.setAttribute('data-theme', 'light');
     }
   }, []);
 
@@ -794,9 +798,11 @@ const HomePage = () => {
     if (newTheme) {
       loadCSS('HomePage.css');
       document.body.className = 'dark-theme';
+      document.documentElement.setAttribute('data-theme', 'dark');
     } else {
       loadCSS('HomePage1.css');
       document.body.className = 'light-theme';
+      document.documentElement.setAttribute('data-theme', 'light');
     }
   };
 
@@ -2490,13 +2496,36 @@ const HomePage = () => {
                             )}
                           </h2>
                           {isOwnProfile() && (
-                            <button 
-                              className="profile-settings-btn"
-                              onClick={() => setShowProfileSettings(true)}
-                              title="Настройки профиля"
-                            >
-                              <Settings size={20} />
-                            </button>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                              <button 
+                                className="profile-settings-btn"
+                                onClick={() => setShowProfileSettings(true)}
+                                title="Настройки профиля"
+                              >
+                                <Settings size={20} />
+                              </button>
+                              <button 
+                                className="profile-settings-btn"
+                                onClick={() => setShowAccountSettings(true)}
+                                title="Настройки аккаунта"
+                                style={{
+                                  backgroundColor: '#3b82f6',
+                                  color: 'white',
+                                  border: 'none',
+                                  padding: '8px',
+                                  borderRadius: '8px',
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  transition: 'background-color 0.2s ease'
+                                }}
+                                onMouseEnter={(e) => e.target.style.backgroundColor = '#2563eb'}
+                                onMouseLeave={(e) => e.target.style.backgroundColor = '#3b82f6'}
+                              >
+                                <User size={18} />
+                              </button>
+                            </div>
                           )}
                         </div>
                         <p className="profile-handle">@{profile.username}</p>
@@ -2945,6 +2974,63 @@ const HomePage = () => {
             )}
           </main>
 
+          {/* Мобильная навигация */}
+          <nav className="mobile-nav">
+            <ul className="mobile-nav-menu">
+              <li>
+                <button 
+                  className={getNavItemClass('home')} 
+                  onClick={() => setActiveTab('home')}
+                  title="Главная"
+                >
+                  <Home size={20} />
+                  <span>Главная</span>
+                </button>
+              </li>
+              <li>
+                <button 
+                  className={getNavItemClass('messages')} 
+                  onClick={() => { setActiveTab('messages'); loadChats(); }}
+                  title="Сообщения"
+                >
+                  <MessageCircle size={20} />
+                  <span>Сообщения</span>
+                  {totalUnread > 0 && <span className="mobile-unread-badge">{totalUnread}</span>}
+                </button>
+              </li>
+              <li>
+                <button 
+                  className={getNavItemClass('leaderboard')} 
+                  onClick={() => { setActiveTab('leaderboard'); loadLeaderboard(); }}
+                  title="Топ игроков"
+                >
+                  <Trophy size={20} />
+                  <span>Топ</span>
+                </button>
+              </li>
+              <li>
+                <button 
+                  className={getNavItemClass('wallet')} 
+                  onClick={() => setActiveTab('wallet')}
+                  title="Кошелек"
+                >
+                  <DollarSign size={20} />
+                  <span>Кошелек</span>
+                </button>
+              </li>
+              <li>
+                <button 
+                  className={getNavItemClass('profile')} 
+                  onClick={() => { setActiveTab('profile'); if(user) loadUserProfile(user._id || user.id); }}
+                  title="Профиль"
+                >
+                  <User size={20} />
+                  <span>Профиль</span>
+                </button>
+              </li>
+            </ul>
+          </nav>
+
           <aside className="right-sidebar">
             <div className="changelog">
               <h3><Clock size={18} /> Список изменений</h3>
@@ -3163,6 +3249,15 @@ const HomePage = () => {
             onClose={() => setShowProfileSettings(false)}
             user={user}
             onProfileUpdate={handleProfileUpdate}
+            onLogout={handleLogout}
+          />
+        )}
+        {showAccountSettings && (
+          <AccountSettings
+            isOpen={showAccountSettings}
+            onClose={() => setShowAccountSettings(false)}
+            user={user}
+            onLogout={handleLogout}
           />
         )}
         

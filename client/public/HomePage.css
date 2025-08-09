@@ -1268,8 +1268,10 @@ body {
   .home-container.show-right-sidebar {
     grid-template-areas: 
       "header"
-      "main";
+      "main"
+      "mobile-nav";
     grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
     gap: 0;
     padding: 0;
   }
@@ -1308,228 +1310,183 @@ body {
   
   .user-info {
     order: 3;
-    justify-content: center;
-    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
   }
 
   .main-content {
-    margin-top: 140px;
-    height: calc(100vh - 140px);
-    border: none;
-    border-radius: 0;
+    margin-top: 120px;
+    margin-bottom: 80px;
     padding: 15px;
-    background: rgba(15, 23, 42, 0.98);
-  }
-  
-  .main-content.messages-active {
-    margin-top: 140px;
-    height: calc(100vh - 140px);
-    padding: 0;
-    overflow: hidden;
   }
 
-  .profile-main-info {
-    flex-direction: column;
-    text-align: center;
-    gap: 20px;
+  .mobile-nav {
+    display: block;
   }
 
-  .profile-stats {
-    justify-content: center;
+  .create-post {
+    margin-bottom: 20px;
   }
-  
+
+  .post {
+    margin-bottom: 15px;
+  }
+
+  .post-content {
+    padding: 15px;
+  }
+
   .post-actions {
-    justify-content: space-between;
-  }
-  
-  .create-post-footer {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-  }
-  
-  .profile-posts-header {
-    flex-direction: column;
-    align-items: flex-start;
-    text-align: left;
+    padding: 10px 15px;
   }
 
-  .create-post, .post {
-    border-radius: 15px;
-    padding: 20px;
+  .post-actions button {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+
+  .comments-section {
+    padding: 15px;
+  }
+
+  .comment-input {
+    padding: 12px;
+  }
+
+  .chat-list {
+    margin-top: 120px;
+    margin-bottom: 80px;
+  }
+
+  .chat-item {
+    padding: 15px;
+  }
+
+  .chat-messages {
+    margin-top: 120px;
+    margin-bottom: 80px;
+  }
+
+  .message-input-container {
+    position: fixed;
+    bottom: 80px;
+    left: 15px;
+    right: 15px;
+    z-index: 999;
+  }
+
+  .message-input {
+    padding: 12px;
+    font-size: 16px;
+  }
+
+  .leaderboard {
+    margin-top: 120px;
+    margin-bottom: 80px;
+  }
+
+  .leaderboard-item {
+    padding: 15px;
+  }
+
+  .wallet {
+    margin-top: 120px;
+    margin-bottom: 80px;
+  }
+
+  .wallet-section {
+    margin-bottom: 20px;
+  }
+
+  .profile {
+    margin-top: 120px;
+    margin-bottom: 80px;
   }
 
   .profile-header {
-    border-radius: 15px;
-    padding: 20px;
+    padding: 20px 15px;
   }
 
-  /* Мобильная навигация снизу */
-  .mobile-nav {
-    grid-area: mobile-nav;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(15, 23, 42, 0.95);
-    backdrop-filter: blur(20px);
-    border-top: 1px solid rgba(71, 85, 105, 0.4);
-    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.3);
-    z-index: 9999;
-    padding: 8px 0;
+  .profile-stats {
+    padding: 15px;
   }
 
-  .mobile-nav-menu {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    max-width: 500px;
-    margin: 0 auto;
+  .profile-posts {
+    padding: 15px;
   }
 
-  .mobile-nav-item {
-    flex: 1;
-    display: flex;
-    justify-content: center;
+  .modal-content {
+    margin: 20px;
+    max-width: calc(100vw - 40px);
+    max-height: calc(100vh - 40px);
   }
 
-  .mobile-nav-button {
-    background: transparent;
-    border: none;
-    color: rgba(148, 163, 184, 0.8);
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  .form-input {
     padding: 12px;
-    border-radius: 12px;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    font-size: 10px;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    min-width: 60px;
-    position: relative;
+    font-size: 16px;
   }
 
-  .mobile-nav-button:hover {
-    color: #f1f5f9;
-    background: rgba(255, 255, 255, 0.1);
-  }
-
-  .mobile-nav-button.active {
-    color: #3b82f6;
-    background: rgba(59, 130, 246, 0.2);
-  }
-
-  .mobile-nav-button.active::before {
-    content: '';
-    position: absolute;
-    top: -8px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 20px;
-    height: 3px;
-    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-    border-radius: 0 0 3px 3px;
-  }
-
-  .mobile-nav-icon {
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 2px;
-  }
-
-  .mobile-nav-text {
-    font-size: 9px;
-    font-weight: 600;
-    line-height: 1;
-    white-space: nowrap;
-  }
-
-  /* Скрываем десктопную навигацию */
-  .nav-menu {
-    display: none;
+  .submit-btn {
+    padding: 12px 20px;
+    font-size: 16px;
   }
 }
 
-/* Очень маленькие мобильные (до 480px) */
+/* Мобильная навигация для темной темы */
+[data-theme="dark"] .mobile-nav {
+  background: rgba(15, 23, 42, 0.98);
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+[data-theme="dark"] .mobile-nav-menu button {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .mobile-nav-menu button:hover {
+  color: #e2e8f0;
+  background: rgba(148, 163, 184, 0.1);
+}
+
+[data-theme="dark"] .mobile-nav-menu button.active {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+[data-theme="dark"] .mobile-unread-badge {
+  background: #ef4444;
+  color: white;
+}
+
 @media (max-width: 480px) {
   html {
     font-size: 14px;
   }
-  
+
   .header-content {
-    padding: 12px;
+    padding: 10px;
   }
-  
+
   .logo h1 {
-    font-size: 20px;
+    font-size: 1.5rem;
   }
-  
+
   .user-info {
-    font-size: 12px;
+    gap: 10px;
   }
 
   .main-content {
-    margin-top: 130px;
-    height: calc(100vh - 130px);
-    padding: 12px;
+    margin-top: 120px;
+    padding: 10px;
   }
-  
+
   .main-content.messages-active {
-    margin-top: 130px;
-    height: calc(100vh - 130px);
-    padding: 0;
-    overflow: hidden;
-  }
-
-  .create-post, .post {
-    padding: 15px;
-    border-radius: 12px;
-  }
-
-  .profile-header {
-    padding: 15px;
-  }
-
-  .profile-username {
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    font-size: 24px;
-  }
-
-  .profile-stats {
-    gap: 25px;
-  }
-  
-  .post-actions {
-    gap: 10px;
-  }
-  
-  .action-btn, .repost-btn {
-    font-size: 11px;
-    padding: 6px 12px;
-  }
-  
-  .comment-input-wrapper {
-    flex-direction: column;
-    gap: 8px;
-  }
-  
-  .comment-input {
-    width: 100%;
-  }
-  
-  .send-comment-btn {
-    align-self: flex-end;
-    width: fit-content;
+    margin-top: 120px;
   }
 
   .mobile-nav {
@@ -1537,9 +1494,8 @@ body {
   }
 
   .mobile-nav-button {
-    padding: 10px;
+    padding: 6px 8px;
     min-width: 50px;
-    font-size: 9px;
   }
 
   .mobile-nav-icon {
@@ -1548,54 +1504,77 @@ body {
   }
 
   .mobile-nav-text {
-    font-size: 8px;
+    font-size: 9px;
   }
-}
 
-/* Поддержка безопасной зоны для мобильных браузеров */
-@supports (padding: max(0px)) {
+  .create-post, .post {
+    margin: 10px;
+  }
+
+  .profile-header {
+    padding: 15px 10px;
+  }
+
+  .profile-username {
+    font-size: 1.2rem;
+  }
+
+  .profile-stats {
+    gap: 15px;
+  }
+
+  .post-actions {
+    gap: 10px;
+  }
+
+  .comment-input-wrapper {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .comment-input {
+    width: 100%;
+  }
+
+  .send-comment-btn {
+    align-self: flex-end;
+  }
+
   .header-content {
-    padding-left: max(15px, env(safe-area-inset-left));
-    padding-right: max(15px, env(safe-area-inset-right));
+    gap: 10px;
   }
-  
+
   .main-content {
-    padding-left: max(15px, env(safe-area-inset-left));
-    padding-right: max(15px, env(safe-area-inset-right));
-    padding-bottom: max(15px, env(safe-area-inset-bottom));
+    margin-top: 110px;
   }
 }
 
-/* Горизонтальная ориентация на мобильных */
 @media (max-height: 500px) and (orientation: landscape) and (max-width: 767px) {
   .header-content {
     flex-direction: row;
-    padding: 10px 15px;
+    gap: 10px;
   }
-  
+
   .header-search {
-    max-width: 250px;
-    order: 1;
-  }
-  
-  .logo {
+    max-width: 200px;
+    min-width: 200px;
     order: 2;
   }
-  
+
+  .logo {
+    order: 1;
+  }
+
   .user-info {
     order: 3;
   }
-  
+
   .main-content {
-    margin-top: 70px;
-    height: calc(100vh - 70px);
+    margin-top: 80px;
   }
-  
+
   .main-content.messages-active {
-    margin-top: 70px;
-    height: calc(100vh - 70px);
-    padding: 0;
-    overflow: hidden;
+    margin-top: 80px;
   }
 
   .mobile-nav {
@@ -1603,9 +1582,7 @@ body {
   }
 
   .mobile-nav-button {
-    padding: 8px;
-    min-width: 45px;
-    font-size: 8px;
+    padding: 4px 6px;
   }
 
   .mobile-nav-icon {
@@ -1614,9 +1591,10 @@ body {
   }
 
   .mobile-nav-text {
-    font-size: 7px;
+    font-size: 8px;
   }
 }
+
 /* ИСПРАВЛЕННЫЕ И ДОПОЛНЕННЫЕ СТИЛИ ДЛЯ ЧАТОВ */
 
 /* Основной контент когда активны сообщения */
@@ -5286,4 +5264,291 @@ body {
 /* Специальные стили для модального окна переводов */
 .transfer-modal {
   z-index: 99999;
+}
+
+/* Мобильная навигация */
+.mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(15, 23, 42, 0.98);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+  z-index: 1000;
+  padding: 8px 0;
+}
+
+.mobile-nav-menu {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mobile-nav-menu li {
+  flex: 1;
+  text-align: center;
+}
+
+.mobile-nav-menu button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  padding: 8px 4px;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 8px;
+  margin: 0 2px;
+}
+
+.mobile-nav-menu button:hover {
+  color: #e2e8f0;
+  background: rgba(148, 163, 184, 0.1);
+}
+
+.mobile-nav-menu button.active {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.mobile-nav-menu button svg {
+  width: 20px;
+  height: 20px;
+}
+
+.mobile-nav-menu button span:first-of-type {
+  font-size: 10px;
+  opacity: 0.8;
+}
+
+.mobile-unread-badge {
+  position: absolute;
+  top: 2px;
+  right: 50%;
+  transform: translateX(50%);
+  background: #ef4444;
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* Мобильные устройства (до 767px) */
+@media (max-width: 767px) {
+  .home-container,
+  .home-container.show-right-sidebar {
+    grid-template-areas: 
+      "header"
+      "main"
+      "mobile-nav";
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+    gap: 0;
+    padding: 0;
+  }
+
+  .sidebar, .right-sidebar {
+    display: none !important;
+  }
+
+  .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10000;
+    height: auto;
+    border-radius: 0;
+  }
+
+  .header-content {
+    flex-direction: column;
+    gap: 15px;
+    align-items: stretch;
+    padding: 15px;
+  }
+  
+  .header-search {
+    max-width: 100%;
+    min-width: 100%;
+    order: 2;
+  }
+  
+  .logo {
+    order: 1;
+    text-align: center;
+  }
+  
+  .user-info {
+    order: 3;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .main-content {
+    margin-top: 120px;
+    margin-bottom: 80px;
+    padding: 15px;
+  }
+
+  .mobile-nav {
+    display: block;
+  }
+
+  .create-post {
+    margin-bottom: 20px;
+  }
+
+  .post {
+    margin-bottom: 15px;
+  }
+
+  .post-content {
+    padding: 15px;
+  }
+
+  .post-actions {
+    padding: 10px 15px;
+  }
+
+  .post-actions button {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+
+  .comments-section {
+    padding: 15px;
+  }
+
+  .comment-input {
+    padding: 12px;
+  }
+
+  .chat-list {
+    margin-top: 120px;
+    margin-bottom: 80px;
+  }
+
+  .chat-item {
+    padding: 15px;
+  }
+
+  .chat-messages {
+    margin-top: 120px;
+    margin-bottom: 80px;
+  }
+
+  .message-input-container {
+    position: fixed;
+    bottom: 80px;
+    left: 15px;
+    right: 15px;
+    z-index: 999;
+  }
+
+  .message-input {
+    padding: 12px;
+    font-size: 16px;
+  }
+
+  .leaderboard {
+    margin-top: 120px;
+    margin-bottom: 80px;
+  }
+
+  .leaderboard-item {
+    padding: 15px;
+  }
+
+  .wallet {
+    margin-top: 120px;
+    margin-bottom: 80px;
+  }
+
+  .wallet-section {
+    margin-bottom: 20px;
+  }
+
+  .profile {
+    margin-top: 120px;
+    margin-bottom: 80px;
+  }
+
+  .profile-header {
+    padding: 20px 15px;
+  }
+
+  .profile-stats {
+    padding: 15px;
+  }
+
+  .profile-posts {
+    padding: 15px;
+  }
+
+  .modal-content {
+    margin: 20px;
+    max-width: calc(100vw - 40px);
+    max-height: calc(100vh - 40px);
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  .form-input {
+    padding: 12px;
+    font-size: 16px;
+  }
+
+  .submit-btn {
+    padding: 12px 20px;
+    font-size: 16px;
+  }
+}
+
+/* Мобильная навигация для темной темы */
+[data-theme="dark"] .mobile-nav {
+  background: rgba(15, 23, 42, 0.98);
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+[data-theme="dark"] .mobile-nav-menu button {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .mobile-nav-menu button:hover {
+  color: #e2e8f0;
+  background: rgba(148, 163, 184, 0.1);
+}
+
+[data-theme="dark"] .mobile-nav-menu button.active {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+[data-theme="dark"] .mobile-unread-badge {
+  background: #ef4444;
+  color: white;
 }
