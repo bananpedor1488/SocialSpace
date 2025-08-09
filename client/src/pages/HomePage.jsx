@@ -1844,6 +1844,8 @@ const HomePage = () => {
     if (showTransfer) {
       setShowWalletTransfer(true);
       setShowTransfer(false); // Сбрасываем флаг в контексте
+      // Загружаем актуальный баланс при открытии модальки
+      loadWalletBalance();
     }
   }, [showTransfer, setShowTransfer]);
 
@@ -2601,7 +2603,11 @@ const HomePage = () => {
                   <div className="wallet-actions">
                     <button 
                       className="wallet-action-btn"
-                      onClick={() => setShowWalletTransfer(true)}
+                      onClick={() => {
+                        setShowWalletTransfer(true);
+                        // Загружаем актуальный баланс при открытии модальки
+                        loadWalletBalance();
+                      }}
                       disabled={walletLoading}
                     >
                       <Send size={20} />
