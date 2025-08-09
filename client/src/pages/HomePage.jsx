@@ -2108,7 +2108,7 @@ const HomePage = () => {
                   </div>
                 )}
               </div>
-              <div className="user-info">
+              <div className="user-info desktop-only">
                 <Points />
               </div>
             </div>
@@ -2490,13 +2490,6 @@ const HomePage = () => {
                               >
                                 <Settings size={20} />
                               </button>
-                              <button 
-                                className="profile-settings-btn account-settings-btn"
-                                onClick={() => setShowAccountSettings(true)}
-                                title="Настройки аккаунта"
-                              >
-                                <Settings size={18} />
-                              </button>
                             </div>
                           )}
                         </div>
@@ -2544,6 +2537,19 @@ const HomePage = () => {
                             </button>
                           </div>
                         )}
+                        
+                        {isOwnProfile() && (
+                          <div className="account-settings-section">
+                            <button 
+                              className="account-settings-btn-new"
+                              onClick={() => setShowAccountSettings(true)}
+                            >
+                              <Settings size={16} />
+                              <span>Настройки аккаунта</span>
+                            </button>
+                          </div>
+                        )}
+
                       </div>
                     </div>
                   </div>
