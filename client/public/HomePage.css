@@ -1436,6 +1436,269 @@ body {
     padding: 12px 20px;
     font-size: 16px;
   }
+
+  /* Сообщения на мобильных: когда открыт раздел сообщений — убираем отступ под шапку сайта */
+  .main-content.messages-active {
+    margin-top: 0;
+    padding: 0;
+  }
+
+  /* Контейнер мобильного мессенджера */
+  .mobile-messenger {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 80px);
+    /* отнимаем высоту нижней навигации */
+  }
+
+  /* Список чатов */
+  .mobile-chats-view {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--card-bg, #0f172a);
+  }
+
+  .mobile-chats-header {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    padding: 14px 16px;
+    background: rgba(15, 23, 42, 0.98);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .mobile-chats-header h2 {
+    margin: 0;
+    font-size: 18px;
+  }
+
+  .mobile-total-unread {
+    background: #ef4444;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+
+  .mobile-chats-list {
+    flex: 1;
+    overflow: auto;
+  }
+
+  .mobile-chat-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+  }
+
+  .mobile-chat-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .mobile-chat-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .mobile-chat-name {
+    font-weight: 600;
+  }
+
+  .mobile-chat-last-message {
+    margin-top: 4px;
+    font-size: 13px;
+    color: #94a3b8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mobile-chat-unread {
+    background: #3b82f6;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+
+  /* Активный чат */
+  .mobile-chat-view {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--card-bg, #0f172a);
+  }
+
+  .mobile-chat-header {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    padding: 10px 12px;
+    background: rgba(15, 23, 42, 0.98);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .mobile-back-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: none;
+    background: rgba(148, 163, 184, 0.12);
+    color: #e2e8f0;
+  }
+
+  .mobile-chat-user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .mobile-chat-title-section h3 {
+    margin: 0;
+    font-size: 16px;
+  }
+
+  .mobile-chat-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mobile-call-button,
+  .mobile-more-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: none;
+    background: rgba(148, 163, 184, 0.12);
+    color: #e2e8f0;
+  }
+
+  .mobile-messages-area {
+    flex: 1;
+    overflow: auto;
+    padding: 10px 12px 0;
+  }
+
+  .mobile-load-more-messages {
+    display: flex;
+    justify-content: center;
+    padding: 8px 0;
+  }
+
+  .mobile-load-more-btn {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    background: transparent;
+    color: #e2e8f0;
+  }
+
+  .mobile-messages-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .mobile-message {
+    display: flex;
+    gap: 8px;
+  }
+
+  .mobile-message.own {
+    flex-direction: row-reverse;
+  }
+
+  .mobile-message-body {
+    max-width: 80%;
+    background: rgba(148, 163, 184, 0.08);
+    padding: 8px 10px;
+    border-radius: 12px;
+  }
+
+  .mobile-message.own .mobile-message-body {
+    background: rgba(59, 130, 246, 0.15);
+  }
+
+  .mobile-message-header {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-bottom: 4px;
+    font-size: 12px;
+    color: #94a3b8;
+  }
+
+  .mobile-message-content {
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: #e2e8f0;
+  }
+
+  .mobile-message-input-area {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    padding: 10px 12px;
+    background: rgba(15, 23, 42, 0.98);
+    border-top: 1px solid rgba(148, 163, 184, 0.15);
+  }
+
+  .mobile-message-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(148, 163, 184, 0.12);
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    border-radius: 12px;
+    padding: 8px;
+  }
+
+  .mobile-message-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #e2e8f0;
+    resize: none;
+    outline: none;
+    max-height: 120px;
+  }
+
+  .mobile-send-message-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: none;
+    background: #3b82f6;
+    color: #fff;
+  }
 }
 
 /* Мобильная навигация для темной темы */
@@ -1461,8 +1724,6 @@ body {
 [data-theme="dark"] .mobile-unread-badge {
   background: #ef4444;
   color: white;
-}
-
 @media (max-width: 480px) {
   html {
     font-size: 14px;

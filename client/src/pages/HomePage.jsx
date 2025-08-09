@@ -13,10 +13,11 @@ import {
 import CallInterface from '../components/CallInterface';
 import OnlineStatus from '../components/OnlineStatus';
 import ProfileSettings from '../components/ProfileSettings';
-  import AccountSettings from '../components/AccountSettings';
+import AccountSettings from '../components/AccountSettings';
 import Avatar from '../components/Avatar';
 import Points from '../components/Points';
 import PointsModals from '../components/PointsModals';
+import MobileMessenger from '../components/MobileMessenger';
 import { usePoints } from '../context/PointsContext';
 
 import useOnlineStatus from '../hooks/useOnlineStatus';
@@ -94,6 +95,14 @@ const HomePage = () => {
   const [leaderboard, setLeaderboard] = useState([]);
   const [leaderboardLoading, setLeaderboardLoading] = useState(false);
   const messagesEndRef = useRef(null);
+  
+  // Состояние для мобильного мессенджера
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // Функция для определения мобильного устройства
+  const checkMobile = () => {
+    setIsMobile(window.innerWidth <= 767);
+  };
   
   // Функция для прокрутки вниз чата
   const scrollToBottom = () => {
@@ -870,6 +879,13 @@ const HomePage = () => {
       loadChats();
     }  
   }, [user]);
+
+  // Отслеживаем размер экрана для мобильной адаптации
+  useEffect(() => {
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // useEffect для автоскролла сообщений
   useEffect(() => {
@@ -2067,6 +2083,7 @@ const HomePage = () => {
   return (
     <>
       <div className={`home-container ${activeTab === 'home' ? 'show-right-sidebar' : ''}`}>
+          {!(isMobile && activeTab === 'messages') && (
           <header className="header">
             <div className="header-content">
               <div className="logo"><h1><Flame size={24} /> SocialSpace</h1></div>
@@ -2113,7 +2130,9 @@ const HomePage = () => {
               </div>
             </div>
           </header>
+          )}
 
+          {!(isMobile && activeTab === 'messages') && (
           <nav className="sidebar">
             <ul className="nav-menu">
               <li><button className={getNavItemClass('home')} onClick={() => setActiveTab('home')}><Home size={18} /> Главная</button></li>
@@ -2133,6 +2152,7 @@ const HomePage = () => {
               <li><button className={getNavItemClass('profile')} onClick={() => { setActiveTab('profile'); if(user) loadUserProfile(user._id || user.id); }}><User size={18} /> Профиль</button></li>
             </ul>
           </nav>
+          )}
 
           <main className={`main-content ${activeTab === 'messages' ? 'messages-active' : ''}`}>
             {activeTab === 'home' && (
@@ -2198,111 +2218,64 @@ const HomePage = () => {
             )}
             
             {activeTab === 'messages' && (
-              <div className="messages-container">
-                <div className="chats-sidebar">
-                  <div className="chats-header">
-                    <h3>Чаты</h3>
-                    {totalUnread > 0 && <span className="total-unread">{totalUnread}</span>}
-                  </div>
-                  
-                  <div className="chats-list">
-                    {chats.length > 0 ? (
-                      chats
-                        .sort((a, b) => {
-                          // Сортируем по времени последнего сообщения (новые вверху)
-                          const aTime = a.lastMessage?.createdAt || a.lastMessageTime || a.createdAt;
-                          const bTime = b.lastMessage?.createdAt || b.lastMessageTime || b.createdAt;
-                          return new Date(bTime) - new Date(aTime);
-                        })
-                        .map(chat => {
-                        // Находим собеседника для получения его аватарки
-                        const otherUser = chat.participants && chat.participants.length === 2 
-                          ? chat.participants.find(p => p._id !== user._id && p._id !== user.id)
-                          : null;
-                        
-                        return (
-                          <div 
-                            key={chat._id} 
-                            className={`chat-item ${activeChat?._id === chat._id ? 'active' : ''}`}
-                            onClick={() => { setActiveChat(chat); loadMessages(chat._id); }}
-                          >
-                            <Avatar 
-                              src={otherUser?.avatar || null}
-                              alt={otherUser?.displayName || otherUser?.username || chat.name}
-                              size="medium"
-                              className="chat-avatar"
-                            />
-                            <div className="chat-info">
-                              <div className="chat-header-row">
-                                <div className="chat-name">
-                                  {chat.name}
-                                  {otherUser?.premium && (
-                                    <span className="premium-badge">
-                                      <svg viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
-                                      </svg>
-                                    </span>
-                                  )}
-                                </div>
-                                {otherUser && (() => {
-                                  const userStatus = getUserStatus(otherUser._id);
-                                  return (
-                                    <OnlineStatus
-                                      userId={otherUser._id}
-                                      isOnline={userStatus.isOnline}
-                                      lastSeen={userStatus.lastSeen}
-                                      showText={false}
-                                      size="small"
-                                    />
-                                  );
-                                })()}
-                              </div>
-                              {chat.lastMessage && (
-                                <div className="chat-last-message">
-                                  {chat.lastMessage.sender.username}: {chat.lastMessage.content.substring(0, 30)}...
-                                </div>
-                              )}
-                            </div>
-                            {chat.unreadCount > 0 && (
-                              <span className="chat-unread">{chat.unreadCount}</span>
-                            )}
-                          </div>
-                        );
-                      })
-                    ) : (
-                      <div className="no-chats">Чатов пока нет</div>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="chat-area">
-                  {activeChat ? (
-                    <>
-                      <div className="connection-status">
-                        {isConnected ? (
-                          <><Wifi size={16} /> {connectionStatus}</>
-                        ) : (
-                          <><WifiOff size={16} /> {connectionStatus}</>
-                        )}
+              <>
+                {isMobile ? (
+                  <MobileMessenger
+                    chats={chats}
+                    activeChat={activeChat}
+                    messages={messages}
+                    newMessage={newMessage}
+                    setNewMessage={setNewMessage}
+                    sendMessage={sendMessage}
+                    setActiveChat={setActiveChat}
+                    loadMessages={loadMessages}
+                    messagesLoading={messagesLoading}
+                    loadingOlderMessages={loadingOlderMessages}
+                    loadOlderMessages={loadOlderMessages}
+                    totalUnread={totalUnread}
+                    initiateCall={initiateCall}
+                    getUserStatus={getUserStatus}
+                    user={user}
+                  />
+                ) : (
+                  <div className="messages-container">
+                    <div className="chats-sidebar">
+                      <div className="chats-header">
+                        <h3>Чаты</h3>
+                        {totalUnread > 0 && <span className="total-unread">{totalUnread}</span>}
                       </div>
-                      <div className="chat-header">
-                        <div className="chat-header-content">
-                          <div className="chat-user-info">
-                            {/* Аватарка и информация о собеседнике */}
-                            {activeChat.participants && activeChat.participants.length === 2 && (() => {
-                              const otherUser = activeChat.participants.find(p => p._id !== user._id && p._id !== user.id);
-                              const userStatus = getUserStatus(otherUser?._id);
-                              return (
-                                <div className="chat-user-section">
-                                  <Avatar 
-                                    src={otherUser?.avatar || null}
-                                    alt={otherUser?.displayName || otherUser?.username || 'User'}
-                                    size="medium"
-                                    className="chat-header-avatar"
-                                  />
-                                  <div className="chat-title-section">
-                                    <h3>
-                                      {activeChat.name}
+                      
+                      <div className="chats-list">
+                        {chats.length > 0 ? (
+                          chats
+                            .sort((a, b) => {
+                              // Сортируем по времени последнего сообщения (новые вверху)
+                              const aTime = a.lastMessage?.createdAt || a.lastMessageTime || a.createdAt;
+                              const bTime = b.lastMessage?.createdAt || b.lastMessageTime || b.createdAt;
+                              return new Date(bTime) - new Date(aTime);
+                            })
+                            .map(chat => {
+                            // Находим собеседника для получения его аватарки
+                            const otherUser = chat.participants && chat.participants.length === 2 
+                              ? chat.participants.find(p => p._id !== user._id && p._id !== user.id)
+                              : null;
+                            
+                            return (
+                              <div 
+                                key={chat._id} 
+                                className={`chat-item ${activeChat?._id === chat._id ? 'active' : ''}`}
+                                onClick={() => { setActiveChat(chat); loadMessages(chat._id); }}
+                              >
+                                <Avatar 
+                                  src={otherUser?.avatar || null}
+                                  alt={otherUser?.displayName || otherUser?.username || chat.name}
+                                  size="medium"
+                                  className="chat-avatar"
+                                />
+                                <div className="chat-info">
+                                  <div className="chat-header-row">
+                                    <div className="chat-name">
+                                      {chat.name}
                                       {otherUser?.premium && (
                                         <span className="premium-badge">
                                           <svg viewBox="0 0 24 24" fill="currentColor">
@@ -2310,146 +2283,214 @@ const HomePage = () => {
                                           </svg>
                                         </span>
                                       )}
-                                    </h3>
-                                    <OnlineStatus
-                                      userId={otherUser?._id}
-                                      isOnline={userStatus.isOnline}
-                                      lastSeen={userStatus.lastSeen}
-                                      showText={true}
-                                      size="small"
-                                    />
+                                    </div>
+                                    {otherUser && (() => {
+                                      const userStatus = getUserStatus(otherUser._id);
+                                      return (
+                                        <OnlineStatus
+                                          userId={otherUser._id}
+                                          isOnline={userStatus.isOnline}
+                                          lastSeen={userStatus.lastSeen}
+                                          showText={false}
+                                          size="small"
+                                        />
+                                      );
+                                    })()}
                                   </div>
+                                  {chat.lastMessage && (
+                                    <div className="chat-last-message">
+                                      {chat.lastMessage.sender.username}: {chat.lastMessage.content.substring(0, 30)}...
+                                    </div>
+                                  )}
                                 </div>
-                              );
-                            })()}
-                          </div>
-                          <div className="chat-call-buttons">
-                            <button 
-                              onClick={() => initiateCall('audio')}
-                              className="call-button audio-call"
-                              title="Голосовой звонок"
-                            >
-                              <Phone size={18} />
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="messages-area">
-                        {messagesLoading ? (
-                          <div className="messages-loading">Загрузка сообщений...</div>
-                        ) : (
-                          <>
-                            {/* Кнопка загрузки старых сообщений */}
-                            {messagesPagination[activeChat._id]?.hasMore && (
-                              <div className="load-more-messages">
-                                <button 
-                                  onClick={() => loadOlderMessages(activeChat._id)}
-                                  disabled={loadingOlderMessages}
-                                  className="load-more-btn"
-                                >
-                                  {loadingOlderMessages ? 'Загрузка...' : 'Загрузить старые сообщения'}
-                                </button>
+                                {chat.unreadCount > 0 && (
+                                  <span className="chat-unread">{chat.unreadCount}</span>
+                                )}
                               </div>
+                            );
+                          })
+                        ) : (
+                          <div className="no-chats">Чатов пока нет</div>
+                        )}
+                      </div>
+                    </div>
+                
+                    <div className="chat-area">
+                      {activeChat ? (
+                        <>
+                          <div className="connection-status">
+                            {isConnected ? (
+                              <><Wifi size={16} /> {connectionStatus}</>
+                            ) : (
+                              <><WifiOff size={16} /> {connectionStatus}</>
                             )}
-                            
-                            {(messages[activeChat._id] || []).map(message => {
-                              // Пропускаем сообщения о звонках - не отображаем их
-                              if (message.type === 'call') {
-                                return null;
-                              }
-                              
-                              // Обычное сообщение
-                              return (
-                                <div 
-                                  key={message._id} 
-                                  className={`message ${message.sender._id === (user._id || user.id) ? 'own' : 'other'}`}
-                                >
-                                  <div className="message-avatar">
-
-                                    <Avatar 
-                                      src={message.sender?.avatar || null}
-                                      alt={message.sender?.displayName || message.sender?.username || 'Unknown'}
-                                      size="small"
-                                      className="chat-message-avatar"
-                                    />
-                                  </div>
-                                  <div className="message-body">
-                                    <div className="message-header">
-                                      <span className="message-sender">
-                                        {message.sender.username}
-                                        {message.sender.premium && (
-                                          <span className="premium-badge">
-                                            <svg viewBox="0 0 24 24" fill="currentColor">
-                                              <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
+                          </div>
+                          <div className="chat-header">
+                            <div className="chat-header-content">
+                              <div className="chat-user-info">
+                                {/* Аватарка и информация о собеседнике */}
+                                {activeChat.participants && activeChat.participants.length === 2 && (() => {
+                                  const otherUser = activeChat.participants.find(p => p._id !== user._id && p._id !== user.id);
+                                  const userStatus = getUserStatus(otherUser?._id);
+                                  return (
+                                    <div className="chat-user-section">
+                                      <Avatar 
+                                        src={otherUser?.avatar || null}
+                                        alt={otherUser?.displayName || otherUser?.username || 'User'}
+                                        size="medium"
+                                        className="chat-header-avatar"
+                                      />
+                                      <div className="chat-title-section">
+                                        <h3>
+                                          {activeChat.name}
+                                          {otherUser?.premium && (
+                                            <span className="premium-badge">
+                                              <svg viewBox="0 0 24 24" fill="currentColor">
+                                                <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
                                             </svg>
                                           </span>
                                         )}
-                                      </span>
-                                      <span className="message-time">
-                                        {new Date(message.createdAt).toLocaleTimeString('ru-RU', {
-                                          hour: '2-digit',
-                                          minute: '2-digit'
-                                        })}
-                                      </span>
-                                      {message.sender._id === (user._id || user.id) && (
-                                        <button 
-                                          onClick={() => deleteMessage(message._id)}
-                                          className="delete-message-btn"
-                                        >
-                                          <Trash2 size={14} />
-                                        </button>
-                                      )}
+                                        </h3>
+                                        <OnlineStatus
+                                          userId={otherUser?._id}
+                                          isOnline={userStatus.isOnline}
+                                          lastSeen={userStatus.lastSeen}
+                                          showText={true}
+                                          size="small"
+                                        />
+                                      </div>
                                     </div>
-                                    <div className="message-content">{message.content}</div>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                            {typingUsers[activeChat?._id] && (
-                              <div className="typing-indicator">
-                                {typingUsers[activeChat._id].username} печатает...
+                                  );
+                                })()}
                               </div>
+                              <div className="chat-call-buttons">
+                                <button 
+                                  onClick={() => initiateCall('audio')}
+                                  className="call-button audio-call"
+                                  title="Голосовой звонок"
+                                >
+                                  <Phone size={18} />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="messages-area">
+                            {messagesLoading ? (
+                              <div className="messages-loading">Загрузка сообщений...</div>
+                            ) : (
+                              <>
+                                {/* Кнопка загрузки старых сообщений */}
+                                {messagesPagination[activeChat._id]?.hasMore && (
+                                  <div className="load-more-messages">
+                                    <button 
+                                      onClick={() => loadOlderMessages(activeChat._id)}
+                                      disabled={loadingOlderMessages}
+                                      className="load-more-btn"
+                                    >
+                                      {loadingOlderMessages ? 'Загрузка...' : 'Загрузить старые сообщения'}
+                                    </button>
+                                  </div>
+                                )}
+                                
+                                {(messages[activeChat._id] || []).map(message => {
+                                  // Пропускаем сообщения о звонках - не отображаем их
+                                  if (message.type === 'call') {
+                                    return null;
+                                  }
+                                  
+                                  // Обычное сообщение
+                                  return (
+                                    <div 
+                                      key={message._id} 
+                                      className={`message ${message.sender._id === (user._id || user.id) ? 'own' : 'other'}`}
+                                    >
+                                      <div className="message-avatar">
+                                        <Avatar 
+                                          src={message.sender?.avatar || null}
+                                          alt={message.sender?.displayName || message.sender?.username || 'Unknown'}
+                                          size="small"
+                                          className="chat-message-avatar"
+                                        />
+                                      </div>
+                                      <div className="message-body">
+                                        <div className="message-header">
+                                          <span className="message-sender">
+                                            {message.sender.username}
+                                            {message.sender.premium && (
+                                              <span className="premium-badge">
+                                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                                  <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
+                                                </svg>
+                                              </span>
+                                            )}
+                                          </span>
+                                          <span className="message-time">
+                                            {new Date(message.createdAt).toLocaleTimeString('ru-RU', {
+                                              hour: '2-digit',
+                                              minute: '2-digit'
+                                            })}
+                                          </span>
+                                          {message.sender._id === (user._id || user.id) && (
+                                            <button 
+                                              onClick={() => deleteMessage(message._id)}
+                                              className="delete-message-btn"
+                                            >
+                                              <Trash2 size={14} />
+                                            </button>
+                                          )}
+                                        </div>
+                                        <div className="message-content">{message.content}</div>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                                {typingUsers[activeChat?._id] && (
+                                  <div className="typing-indicator">
+                                    {typingUsers[activeChat._id].username} печатает...
+                                  </div>
+                                )}
+                                <div ref={messagesEndRef} />
+                              </>
                             )}
-                            <div ref={messagesEndRef} />
-                          </>
-                        )}
-                      </div>
-                      
-                      <div className="message-input-area">
-                        <input
-                          type="text"
-                          value={newMessage}
-                          onChange={(e) => {
-                            setNewMessage(e.target.value);
-                            if (activeChat) {
-                              socketRef.current.emit('typing', {
-                                chatId: activeChat._id,
-                                isTyping: e.target.value.length > 0
-                              });
-                            }
-                          }}
-                          placeholder="Написать сообщение..."
-                          className="message-input"
-                          onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                        />
-                        <button 
-                          onClick={sendMessage} 
-                          className="send-message-btn"
-                          disabled={!newMessage.trim()}
-                        >
-                          <Send size={18} />
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <div className="no-active-chat">
-                      <h3>Выберите чат для начала общения</h3>
-                      <p>Вы можете начать новый чат, нажав "Написать" под постом пользователя</p>
+                          </div>
+                          
+                          <div className="message-input-area">
+                            <input
+                              type="text"
+                              value={newMessage}
+                              onChange={(e) => {
+                                setNewMessage(e.target.value);
+                                if (activeChat) {
+                                  socketRef.current.emit('typing', {
+                                    chatId: activeChat._id,
+                                    isTyping: e.target.value.length > 0
+                                  });
+                                }
+                              }}
+                              placeholder="Написать сообщение..."
+                              className="message-input"
+                              onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                            />
+                            <button 
+                              onClick={sendMessage} 
+                              className="send-message-btn"
+                              disabled={!newMessage.trim()}
+                            >
+                              <Send size={18} />
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="no-active-chat">
+                          <h3>Выберите чат для начала общения</h3>
+                          <p>Вы можете начать новый чат, нажав "Написать" под постом пользователя</p>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              </div>
+                  </div>
+                )}
+              </>
             )}
             
             {activeTab === 'profile' && profile && (
