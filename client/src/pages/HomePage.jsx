@@ -2247,12 +2247,13 @@ const HomePage = () => {
                     getUserStatus={getUserStatus}
                     user={user}
                     onViewChange={(v) => {
-                      // Скрываем глобальный хедер на мобильном, когда открыт активный чат
+                      // На мобильном всегда скрываем глобальный хедер во вкладке сообщений
                       const headerEl = document.querySelector('.header');
                       if (headerEl) {
-                        if (v === 'chat') headerEl.style.display = 'none';
-                        else headerEl.style.display = '';
+                        headerEl.style.display = 'none';
                       }
+                      // Добавляем класс для корректной высоты и фиксации
+                      document.body.classList.add('mobile-chat-open');
                     }}
                   />
                 ) : (
