@@ -2083,7 +2083,6 @@ const HomePage = () => {
   return (
     <>
       <div className={`home-container ${activeTab === 'home' ? 'show-right-sidebar' : ''}`}>
-          {!(isMobile && activeTab === 'messages') && (
           <header className="header">
             <div className="header-content">
               <div className="logo"><h1><Flame size={24} /> SocialSpace</h1></div>
@@ -2130,9 +2129,7 @@ const HomePage = () => {
               </div>
             </div>
           </header>
-          )}
 
-          {!(isMobile && activeTab === 'messages') && (
           <nav className="sidebar">
             <ul className="nav-menu">
               <li><button className={getNavItemClass('home')} onClick={() => setActiveTab('home')}><Home size={18} /> Главная</button></li>
@@ -2152,7 +2149,6 @@ const HomePage = () => {
               <li><button className={getNavItemClass('profile')} onClick={() => { setActiveTab('profile'); if(user) loadUserProfile(user._id || user.id); }}><User size={18} /> Профиль</button></li>
             </ul>
           </nav>
-          )}
 
           <main className={`main-content ${activeTab === 'messages' ? 'messages-active' : ''}`}>
             {activeTab === 'home' && (
