@@ -2255,17 +2255,17 @@ body {
 
 /* Темная тема для боковой панели чатов */
 .dark-theme .chats-sidebar {
-  background: rgba(15, 23, 42, 0.95);
-  border-right: 1px solid rgba(71, 85, 105, 0.3);
+  background: rgba(15, 23, 42, 0.95) !important;
+  border-right: 1px solid rgba(71, 85, 105, 0.3) !important;
 }
 
 .dark-theme .chats-header {
-  background: rgba(30, 41, 59, 0.9);
-  border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+  background: rgba(30, 41, 59, 0.9) !important;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.3) !important;
 }
 
 .dark-theme .chats-header h3 {
-  color: #f1f5f9;
+  color: #f1f5f9 !important;
 }
 
 .total-unread {
@@ -2316,14 +2316,19 @@ body {
 
 /* Темная тема для десктопных чатов */
 .dark-theme .chat-item {
-  background: rgba(15, 23, 42, 0.8);
-  border-color: rgba(255, 255, 255, 0.06);
+  background: rgba(15, 23, 42, 0.8) !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
 }
 
 .dark-theme .chat-item.active {
-  background: rgba(59, 130, 246, 0.2);
-  border-color: rgba(59, 130, 246, 0.4);
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  background: rgba(59, 130, 246, 0.2) !important;
+  border-color: rgba(59, 130, 246, 0.4) !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+}
+
+.dark-theme .chat-item:hover {
+  background: rgba(51, 65, 85, 0.8) !important;
+  border-color: rgba(100, 116, 139, 0.6) !important;
 }
 
 .chat-info {
@@ -2344,15 +2349,17 @@ body {
   gap: 4px;
 }
 
+.dark-theme .chat-name {
+  color: #f1f5f9 !important;
+}
+
 .chat-last-message {
   color: rgba(148, 163, 184, 0.8);
   font-size: 12px;
-  white-space: nowrap;
-  overflow: visible;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  line-height: 1.3;
+}
+
+.dark-theme .chat-last-message {
+  color: rgba(148, 163, 184, 0.8) !important;
 }
 
 .chat-unread {
@@ -2638,24 +2645,24 @@ body {
 
 /* Темная тема для области ввода сообщений */
 .dark-theme .message-input-area {
-  background: rgba(30, 41, 59, 0.9);
-  border-top: 1px solid rgba(71, 85, 105, 0.3);
+  background: rgba(30, 41, 59, 0.9) !important;
+  border-top: 1px solid rgba(71, 85, 105, 0.3) !important;
 }
 
 .dark-theme .message-input {
-  background: rgba(51, 65, 85, 0.9);
-  border: 1px solid rgba(71, 85, 105, 0.4);
-  color: #e2e8f0;
+  background: rgba(51, 65, 85, 0.9) !important;
+  border: 1px solid rgba(71, 85, 105, 0.4) !important;
+  color: #e2e8f0 !important;
 }
 
 .dark-theme .message-input::placeholder {
-  color: rgba(148, 163, 184, 0.8);
+  color: rgba(148, 163, 184, 0.8) !important;
 }
 
 .dark-theme .message-input:focus {
-  border-color: rgba(59, 130, 246, 0.6);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-  background: rgba(51, 65, 85, 0.95);
+  border-color: rgba(59, 130, 246, 0.6) !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important;
+  background: rgba(51, 65, 85, 0.95) !important;
 }
 
 .send-message-btn {
