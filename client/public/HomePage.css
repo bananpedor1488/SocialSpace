@@ -261,7 +261,7 @@ body.mobile-chat-open .mobile-messenger {
     flex: 1;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    background: rgba(15, 23, 42, 0.95);
+    background: rgba(30, 41, 59, 0.9);
   }
 
   .mobile-messages-loading { 
@@ -316,7 +316,7 @@ body.mobile-chat-open .mobile-messenger {
     flex-direction: column; 
     gap: 8px;
     padding: 16px;
-    background: rgba(15, 23, 42, 0.95);
+    background: rgba(30, 41, 59, 0.9);
   }
 
   .mobile-message {
@@ -325,6 +325,7 @@ body.mobile-chat-open .mobile-messenger {
     gap: 8px;
     max-width: 85%;
     margin-bottom: 12px;
+    width: 100%;
   }
 
   .mobile-message.other {
@@ -517,7 +518,7 @@ body.mobile-chat-open .mobile-messenger {
   }
 
   .dark-theme .mobile-messages-area { 
-    background: #0f141a; 
+    background: rgba(30, 41, 59, 0.9); 
   }
 
   .dark-theme .mobile-load-more-btn {
