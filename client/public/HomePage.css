@@ -488,12 +488,12 @@ body.mobile-chat-open .mobile-messenger {
 /* Dark theme adjustments */
 @media (max-width: 767px) {
   .dark-theme .mobile-messenger { 
-    background: #0b0f14; 
+    background: rgba(15, 23, 42, 0.95); 
   }
 
   .dark-theme .mobile-chats-header { 
-    background: #0b0f14; 
-    border-color: rgba(255,255,255,0.08); 
+    background: rgba(30, 41, 59, 0.9); 
+    border-color: rgba(71, 85, 105, 0.3); 
   }
 
   .dark-theme .mobile-chats-header h2 {
@@ -523,12 +523,12 @@ body.mobile-chat-open .mobile-messenger {
   }
 
   .dark-theme .mobile-chat-view { 
-    background: #0f141a; 
+    background: rgba(15, 23, 42, 0.95); 
   }
 
   .dark-theme .mobile-chat-header { 
-    background: #0b0f14; 
-    border-color: rgba(255,255,255,0.08); 
+    background: rgba(30, 41, 59, 0.9); 
+    border-color: rgba(71, 85, 105, 0.3); 
   }
 
   .dark-theme .mobile-back-btn,
@@ -572,13 +572,13 @@ body.mobile-chat-open .mobile-messenger {
   }
 
   .dark-theme .mobile-message-input-area { 
-    background: #0b0f14; 
-    border-color: rgba(255,255,255,0.08); 
+    background: rgba(30, 41, 59, 0.9); 
+    border-color: rgba(71, 85, 105, 0.3); 
   }
 
   .dark-theme .mobile-message-input-wrapper { 
-    background: #1f2937; 
-    border-color: rgba(255,255,255,0.08); 
+    background: rgba(51, 65, 85, 0.9); 
+    border-color: rgba(71, 85, 105, 0.4); 
   }
 
   .dark-theme .mobile-message-input {
@@ -2253,6 +2253,21 @@ body {
   margin: 0;
 }
 
+/* Темная тема для боковой панели чатов */
+.dark-theme .chats-sidebar {
+  background: rgba(15, 23, 42, 0.95);
+  border-right: 1px solid rgba(71, 85, 105, 0.3);
+}
+
+.dark-theme .chats-header {
+  background: rgba(30, 41, 59, 0.9);
+  border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+}
+
+.dark-theme .chats-header h3 {
+  color: #f1f5f9;
+}
+
 .total-unread {
   background: linear-gradient(135deg, #ef4444, #dc2626);
   color: white;
@@ -2619,6 +2634,28 @@ body {
   border-color: rgba(59, 130, 246, 0.6);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
   background: #ffffff;
+}
+
+/* Темная тема для области ввода сообщений */
+.dark-theme .message-input-area {
+  background: rgba(30, 41, 59, 0.9);
+  border-top: 1px solid rgba(71, 85, 105, 0.3);
+}
+
+.dark-theme .message-input {
+  background: rgba(51, 65, 85, 0.9);
+  border: 1px solid rgba(71, 85, 105, 0.4);
+  color: #e2e8f0;
+}
+
+.dark-theme .message-input::placeholder {
+  color: rgba(148, 163, 184, 0.8);
+}
+
+.dark-theme .message-input:focus {
+  border-color: rgba(59, 130, 246, 0.6);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  background: rgba(51, 65, 85, 0.95);
 }
 
 .send-message-btn {
