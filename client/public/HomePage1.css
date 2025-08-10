@@ -15,7 +15,6 @@ body.mobile-chat-open {
 /* Полный экран чат в светлой теме - скрываем все кроме чата и навигации */
 @media (max-width: 767px) {
   body.mobile-chat-open .header,
-  body.mobile-chat-open .main-content,
   body.mobile-chat-open .sidebar,
   body.mobile-chat-open .right-sidebar {
     display: none !important;

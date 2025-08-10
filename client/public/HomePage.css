@@ -15,7 +15,6 @@ body.mobile-chat-open .mobile-messenger {
 /* Полный экран чат в темной теме - скрываем все кроме чата и навигации */
 @media (max-width: 767px) {
   body.mobile-chat-open.dark-theme .header,
-  body.mobile-chat-open.dark-theme .main-content,
   body.mobile-chat-open.dark-theme .sidebar,
   body.mobile-chat-open.dark-theme .right-sidebar {
     display: none !important;
