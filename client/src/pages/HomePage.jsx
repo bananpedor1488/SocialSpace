@@ -2267,7 +2267,9 @@ const HomePage = () => {
                                         if (view === 'chat') {
                                           // Скрываем хедер при открытии чата
                                           headerEl.style.display = 'none';
-                                          document.body.classList.add('mobile-chat-open');
+                                          if (!document.body.classList.contains('mobile-chat-open')) {
+                                            document.body.classList.add('mobile-chat-open');
+                                          }
                                         } else {
                                           // Показываем хедер при возврате к списку чатов
                                           headerEl.style.display = 'flex';

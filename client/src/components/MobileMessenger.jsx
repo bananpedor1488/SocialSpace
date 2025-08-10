@@ -48,8 +48,10 @@ const MobileMessenger = ({
     if (headerEl) {
       headerEl.style.display = 'none';
     }
-    // Добавляем класс для корректной высоты
-    document.body.classList.add('mobile-chat-open');
+    // Добавляем класс для корректной высоты, сохраняя существующие классы
+    if (!document.body.classList.contains('mobile-chat-open')) {
+      document.body.classList.add('mobile-chat-open');
+    }
   };
 
   const handleBackToChats = () => {

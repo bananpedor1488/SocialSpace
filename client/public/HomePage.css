@@ -85,6 +85,53 @@ body.mobile-chat-open .mobile-messenger {
   body.mobile-chat-open.dark-theme .mobile-message-content {
     color: #e5e7eb !important;
   }
+
+  /* Дополнительные стили для обеспечения видимости */
+  body.mobile-chat-open.dark-theme .mobile-chats-view {
+    display: block !important;
+    height: 100% !important;
+    background: #0f172a !important;
+  }
+
+  body.mobile-chat-open.dark-theme .mobile-chats-header {
+    display: flex !important;
+    background: #1e293b !important;
+    color: #e5e7eb !important;
+  }
+
+  body.mobile-chat-open.dark-theme .mobile-chats-list {
+    display: block !important;
+    background: #0f172a !important;
+  }
+
+  body.mobile-chat-open.dark-theme .mobile-chat-item {
+    display: flex !important;
+    background: #1e293b !important;
+    color: #e5e7eb !important;
+  }
+
+  body.mobile-chat-open.dark-theme .mobile-chat-name {
+    color: #e5e7eb !important;
+  }
+
+  body.mobile-chat-open.dark-theme .mobile-chat-last-message {
+    color: #94a3b8 !important;
+  }
+
+  body.mobile-chat-open.dark-theme .mobile-message-input {
+    background: #1e293b !important;
+    color: #e5e7eb !important;
+    border-color: #475569 !important;
+  }
+
+  body.mobile-chat-open.dark-theme .mobile-message-input::placeholder {
+    color: #94a3b8 !important;
+  }
+
+  body.mobile-chat-open.dark-theme .mobile-send-message-btn {
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6) !important;
+    color: white !important;
+  }
 }
 
 /* Исправление бага с хедером в мобильных чатах */
@@ -101,6 +148,45 @@ body.mobile-chat-open .mobile-messenger {
   
   /* Показываем хедер когда чат закрыт */
   body:not(.mobile-chat-open) .header {
+    display: block !important;
+  }
+
+  /* Стили для мобильного чата в светлой теме */
+  body.mobile-chat-open:not(.dark-theme) .mobile-messenger {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 60px !important;
+    width: 100vw !important;
+    height: calc(100vh - 60px) !important;
+    z-index: 99999 !important;
+    background: #ffffff !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  body.mobile-chat-open:not(.dark-theme) .mobile-nav {
+    display: block !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 100000 !important;
+  }
+
+  body.mobile-chat-open:not(.dark-theme) .mobile-chat-view {
+    height: 100% !important;
+    background: #ffffff !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  body.mobile-chat-open:not(.dark-theme) .mobile-messages-area {
+    height: calc(100% - 120px) !important;
+    background: #ffffff !important;
+    flex: 1 !important;
+    overflow-y: auto !important;
     display: block !important;
   }
 }
