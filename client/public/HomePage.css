@@ -12,14 +12,23 @@ body.mobile-chat-open .mobile-messenger {
   top: 0;
 }
 
-/* Полный экран чат в темной теме - скрываем все кроме чата */
+/* Полный экран чат в темной теме - скрываем все кроме чата и навигации */
 @media (max-width: 767px) {
   body.mobile-chat-open.dark-theme .header,
-  body.mobile-chat-open.dark-theme .mobile-nav,
   body.mobile-chat-open.dark-theme .main-content,
   body.mobile-chat-open.dark-theme .sidebar,
   body.mobile-chat-open.dark-theme .right-sidebar {
     display: none !important;
+  }
+
+  /* Показываем мобильную навигацию в чате */
+  body.mobile-chat-open.dark-theme .mobile-nav {
+    display: block !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 100000 !important;
   }
 
   body.mobile-chat-open.dark-theme .mobile-messenger {
@@ -27,9 +36,9 @@ body.mobile-chat-open .mobile-messenger {
     top: 0 !important;
     left: 0 !important;
     right: 0 !important;
-    bottom: 0 !important;
+    bottom: 60px !important; /* Оставляем место для навигации */
     width: 100vw !important;
-    height: 100vh !important;
+    height: calc(100vh - 60px) !important;
     z-index: 99999 !important;
     background: #0f172a !important;
     display: flex !important;
@@ -37,7 +46,7 @@ body.mobile-chat-open .mobile-messenger {
   }
 
   body.mobile-chat-open.dark-theme .mobile-chat-view {
-    height: 100vh !important;
+    height: 100% !important;
     background: #0f172a !important;
     display: flex !important;
     flex-direction: column !important;
@@ -51,7 +60,7 @@ body.mobile-chat-open .mobile-messenger {
   }
 
   body.mobile-chat-open.dark-theme .mobile-messages-area {
-    height: calc(100vh - 120px) !important;
+    height: calc(100% - 120px) !important;
     background: #0f172a !important;
     flex: 1 !important;
     overflow-y: auto !important;
