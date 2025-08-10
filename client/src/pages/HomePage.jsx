@@ -2277,24 +2277,15 @@ const HomePage = () => {
                         getUserStatus={getUserStatus}
                         user={user}
                         onViewChange={(view) => {
-                          // Управляем видимостью хедера в зависимости от состояния
+                          // Хедер всегда видим. Управляем только классом на body
                           const headerEl = document.querySelector('.header');
                           if (headerEl) {
-                            if (view === 'chat') {
-                              // Скрываем хедер при открытии чата
-                              headerEl.style.display = 'none';
-                              if (!document.body.classList.contains('mobile-chat-open')) {
-                                document.body.classList.add('mobile-chat-open');
-                              }
-                              // Отладочная информация
-                              console.log('Mobile chat opened, body classes:', document.body.className);
-                            } else {
-                              // Показываем хедер при возврате к списку чатов
-                              headerEl.style.display = 'flex';
-                              document.body.classList.remove('mobile-chat-open');
-                              // Отладочная информация
-                              console.log('Mobile chat closed, body classes:', document.body.className);
-                            }
+                            headerEl.style.display = 'flex';
+                          }
+                          if (view === 'chat') {
+                            document.body.classList.add('mobile-chat-open');
+                          } else {
+                            document.body.classList.remove('mobile-chat-open');
                           }
                         }}
                       />
