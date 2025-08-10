@@ -54,6 +54,11 @@ const MobileMessenger = ({
     }
     // Убираем класс для корректной высоты
     document.body.classList.remove('mobile-chat-open');
+    // Прокручиваем в начало списка чатов
+    const chatsList = document.querySelector('.mobile-chats-list');
+    if (chatsList) {
+      chatsList.scrollTop = 0;
+    }
   };
 
   const handleSendMessage = () => {
@@ -79,6 +84,15 @@ const MobileMessenger = ({
       e.preventDefault();
       handleSendMessage();
     }
+  };
+
+  const handleInputFocus = () => {
+    // Прокручиваем к последнему сообщению при фокусе на поле ввода
+    setTimeout(() => {
+      if (messagesEndRef.current) {
+        messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 300);
   };
 
   const formatMessageTime = (timestamp) => {
@@ -228,7 +242,7 @@ const MobileMessenger = ({
             {messagesLoading ? (
               <div className="mobile-messages-loading">
                 <div className="mobile-loading-spinner"></div>
-                Загрузка сообщений...
+                <div>Загрузка сообщений...</div>
               </div>
             ) : (
               <>
@@ -245,39 +259,47 @@ const MobileMessenger = ({
                 )}
                 
                 <div className="mobile-messages-list">
-                  {chatMessages.map(message => {
-                    if (message.type === 'call') return null;
-                    
-                    const isOwn = message.sender._id === user._id || message.sender.id === user.id;
-                    const messageTime = formatMessageTime(message.createdAt);
-                    
-                    return (
-                      <div 
-                        key={message._id} 
-                        className={`mobile-message ${isOwn ? 'own' : 'other'}`}
-                      >
-                        {!isOwn && (
-                          <Avatar 
-                            src={message.sender.avatar || null}
-                            alt={message.sender.displayName || message.sender.username}
-                            size="small"
-                            className="mobile-message-avatar"
-                          />
-                        )}
-                        <div className="mobile-message-body">
-                          <div className="mobile-message-header">
-                            {!isOwn && (
-                              <span className="mobile-message-sender">{message.sender.displayName || message.sender.username}</span>
-                            )}
-                            <span className="mobile-message-time">{messageTime}</span>
-                          </div>
-                          <div className="mobile-message-content">
-                            {message.content}
+                  {chatMessages.length === 0 ? (
+                    <div className="mobile-no-chats" style={{ padding: '40px 20px' }}>
+                      <MessageCircle className="mobile-no-chats-icon" />
+                      <h3>Сообщений пока нет</h3>
+                      <p>Начните разговор первым</p>
+                    </div>
+                  ) : (
+                    chatMessages.map(message => {
+                      if (message.type === 'call') return null;
+                      
+                      const isOwn = message.sender._id === user._id || message.sender.id === user.id;
+                      const messageTime = formatMessageTime(message.createdAt);
+                      
+                      return (
+                        <div 
+                          key={message._id} 
+                          className={`mobile-message ${isOwn ? 'own' : 'other'}`}
+                        >
+                          {!isOwn && (
+                            <Avatar 
+                              src={message.sender.avatar || null}
+                              alt={message.sender.displayName || message.sender.username}
+                              size="small"
+                              className="mobile-message-avatar"
+                            />
+                          )}
+                          <div className="mobile-message-body">
+                            <div className="mobile-message-header">
+                              {!isOwn && (
+                                <span className="mobile-message-sender">{message.sender.displayName || message.sender.username}</span>
+                              )}
+                              <span className="mobile-message-time">{messageTime}</span>
+                            </div>
+                            <div className="mobile-message-content">
+                              {message.content}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })
+                  )}
                 </div>
                 <div ref={messagesEndRef} />
               </>
@@ -293,6 +315,7 @@ const MobileMessenger = ({
                 value={newMessage}
                 onChange={handleInputChange}
                 onKeyPress={handleKeyPress}
+                onFocus={handleInputFocus}
                 rows={1}
               />
               <button 
