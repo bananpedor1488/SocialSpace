@@ -39,37 +39,37 @@ body.mobile-chat-open .mobile-messenger {
     bottom: 60px !important; /* Оставляем место для навигации */
     width: 100vw !important;
     height: calc(100vh - 60px) !important;
-    z-index: 99999 !important;
-    background: #0f172a !important;
+    z-index: 999999 !important;
+    background: #1f2937 !important;
     display: flex !important;
     flex-direction: column !important;
   }
 
   body.mobile-chat-open.dark-theme .mobile-chat-view {
     height: 100% !important;
-    background: #0f172a !important;
+    background: #1f2937 !important;
     display: flex !important;
     flex-direction: column !important;
   }
 
   body.mobile-chat-open.dark-theme .mobile-chat-header {
-    background: #1e293b !important;
-    border-color: #475569 !important;
+    background: #374151 !important;
+    border-color: #4b5563 !important;
     display: flex !important;
     flex-shrink: 0 !important;
   }
 
   body.mobile-chat-open.dark-theme .mobile-messages-area {
     height: calc(100% - 120px) !important;
-    background: #0f172a !important;
+    background: #1f2937 !important;
     flex: 1 !important;
     overflow-y: auto !important;
     display: block !important;
   }
 
   body.mobile-chat-open.dark-theme .mobile-message-input-area {
-    background: #1e293b !important;
-    border-color: #475569 !important;
+    background: #374151 !important;
+    border-color: #4b5563 !important;
     display: flex !important;
     flex-shrink: 0 !important;
   }
@@ -84,190 +84,6 @@ body.mobile-chat-open .mobile-messenger {
 
   body.mobile-chat-open.dark-theme .mobile-message-content {
     color: #e5e7eb !important;
-  }
-
-  /* Дополнительные стили для обеспечения видимости */
-  body.mobile-chat-open.dark-theme .mobile-chats-view {
-    display: block !important;
-    height: 100% !important;
-    background: #0f172a !important;
-  }
-
-  body.mobile-chat-open.dark-theme .mobile-chats-header {
-    display: flex !important;
-    background: #1e293b !important;
-    color: #e5e7eb !important;
-  }
-
-  body.mobile-chat-open.dark-theme .mobile-chats-list {
-    display: block !important;
-    background: #0f172a !important;
-  }
-
-  body.mobile-chat-open.dark-theme .mobile-chat-item {
-    display: flex !important;
-    background: #1e293b !important;
-    color: #e5e7eb !important;
-  }
-
-  body.mobile-chat-open.dark-theme .mobile-chat-name {
-    color: #e5e7eb !important;
-  }
-
-  body.mobile-chat-open.dark-theme .mobile-chat-last-message {
-    color: #94a3b8 !important;
-  }
-
-  body.mobile-chat-open.dark-theme .mobile-message-input {
-    background: #1e293b !important;
-    color: #e5e7eb !important;
-    border-color: #475569 !important;
-  }
-
-  body.mobile-chat-open.dark-theme .mobile-message-input::placeholder {
-    color: #94a3b8 !important;
-  }
-
-  body.mobile-chat-open.dark-theme .mobile-send-message-btn {
-    background: linear-gradient(135deg, #3b82f6, #8b5cf6) !important;
-    color: white !important;
-  }
-
-  /* Принудительно показываем все элементы чата в темной теме */
-  body.mobile-chat-open.dark-theme .mobile-messenger,
-  body.mobile-chat-open.dark-theme .mobile-chat-view,
-  body.mobile-chat-open.dark-theme .mobile-chat-header,
-  body.mobile-chat-open.dark-theme .mobile-messages-area,
-  body.mobile-chat-open.dark-theme .mobile-message-input-area,
-  body.mobile-chat-open.dark-theme .mobile-messages-list,
-  body.mobile-chat-open.dark-theme .mobile-message,
-  body.mobile-chat-open.dark-theme .mobile-message-body,
-  body.mobile-chat-open.dark-theme .mobile-message-content {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    position: static !important;
-  }
-
-  body.mobile-chat-open.dark-theme .mobile-messenger {
-    display: flex !important;
-  }
-
-  body.mobile-chat-open.dark-theme .mobile-chat-view {
-    display: flex !important;
-  }
-
-  body.mobile-chat-open.dark-theme .mobile-chat-header {
-    display: flex !important;
-  }
-
-  body.mobile-chat-open.dark-theme .mobile-message-input-area {
-    display: flex !important;
-  }
-
-  body.mobile-chat-open.dark-theme .mobile-message {
-    display: flex !important;
-  }
-
-  /* Дополнительные стили для обеспечения видимости всех элементов */
-  body.mobile-chat-open.dark-theme .mobile-chat-header-left,
-  body.mobile-chat-open.dark-theme .mobile-back-btn,
-  body.mobile-chat-open.dark-theme .mobile-chat-header-avatar,
-  body.mobile-chat-open.dark-theme .mobile-chat-user-info,
-  body.mobile-chat-open.dark-theme .mobile-chat-title-section,
-  body.mobile-chat-open.dark-theme .mobile-chat-actions,
-  body.mobile-chat-open.dark-theme .mobile-call-button,
-  body.mobile-chat-open.dark-theme .mobile-message-input-wrapper,
-  body.mobile-chat-open.dark-theme .mobile-message-input,
-  body.mobile-chat-open.dark-theme .mobile-send-message-btn {
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-  }
-
-  body.mobile-chat-open.dark-theme .mobile-message-avatar {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-  }
-
-  /* Принудительно показываем все элементы чата с максимальным приоритетом */
-  body.mobile-chat-open.dark-theme .mobile-messenger * {
-    visibility: visible !important;
-  }
-
-  body.mobile-chat-open.dark-theme .mobile-chat-view * {
-    visibility: visible !important;
-  }
-
-  body.mobile-chat-open.dark-theme .mobile-messages-area * {
-    visibility: visible !important;
-  }
-
-  body.mobile-chat-open.dark-theme .mobile-messages-list * {
-    visibility: visible !important;
-  }
-
-  body.mobile-chat-open.dark-theme .mobile-message * {
-    visibility: visible !important;
-  }
-
-  body.mobile-chat-open.dark-theme .mobile-message-body * {
-    visibility: visible !important;
-  }
-
-  body.mobile-chat-open.dark-theme .mobile-message-content {
-    visibility: visible !important;
-    opacity: 1 !important;
-  }
-
-  /* Простые стили для отладки - принудительно показываем чат */
-  .mobile-messenger {
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-  }
-
-  .mobile-chat-view {
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-  }
-
-  .mobile-chat-header {
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-  }
-
-  .mobile-messages-area {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-  }
-
-  .mobile-messages-list {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-  }
-
-  .mobile-message {
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-  }
-
-  .mobile-message-content {
-    visibility: visible !important;
-    opacity: 1 !important;
-    color: #e5e7eb !important;
-  }
-
-  .mobile-message-input-area {
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
   }
 }
 
@@ -6703,4 +6519,43 @@ body {
   .theme-toggle-btn .theme-text {
     display: none;
   }
+}
+
+/* Тестовый стиль для отладки - принудительно показываем чат */
+.mobile-messenger {
+  background: red !important;
+  border: 5px solid yellow !important;
+  min-height: 200px !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  z-index: 999999 !important;
+}
+
+.mobile-chat-view {
+  background: blue !important;
+  border: 3px solid green !important;
+  min-height: 150px !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.mobile-chat-header {
+  background: orange !important;
+  border: 2px solid purple !important;
+  min-height: 50px !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.mobile-messages-area {
+  background: pink !important;
+  border: 2px solid brown !important;
+  min-height: 100px !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }

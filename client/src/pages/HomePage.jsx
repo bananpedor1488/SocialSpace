@@ -2251,45 +2251,55 @@ const HomePage = () => {
             {activeTab === 'messages' && (
               <>
                 {isMobile ? (
-                  <MobileMessenger
-                    chats={chats}
-                    activeChat={activeChat}
-                    messages={messages}
-                    newMessage={newMessage}
-                    setNewMessage={setNewMessage}
-                    sendMessage={sendMessage}
-                    setActiveChat={setActiveChat}
-                    loadMessages={loadMessages}
-                    messagesLoading={messagesLoading}
-                    loadingOlderMessages={loadingOlderMessages}
-                    loadOlderMessages={loadOlderMessages}
-                    messagesPagination={messagesPagination}
-                    totalUnread={totalUnread}
-                    initiateCall={initiateCall}
-                    getUserStatus={getUserStatus}
-                                                        user={user}
-                                    onViewChange={(view) => {
-                                      // Управляем видимостью хедера в зависимости от состояния
-                                      const headerEl = document.querySelector('.header');
-                                      if (headerEl) {
-                                                if (view === 'chat') {
-          // Скрываем хедер при открытии чата
-          headerEl.style.display = 'none';
-          if (!document.body.classList.contains('mobile-chat-open')) {
-            document.body.classList.add('mobile-chat-open');
-          }
-          // Отладочная информация
-          console.log('Mobile chat opened, body classes:', document.body.className);
-        } else {
-          // Показываем хедер при возврате к списку чатов
-          headerEl.style.display = 'flex';
-          document.body.classList.remove('mobile-chat-open');
-          // Отладочная информация
-          console.log('Mobile chat closed, body classes:', document.body.className);
-        }
-                                      }
-                                    }}
-                  />
+                  (() => {
+                    console.log('HomePage rendering MobileMessenger with props:', {
+                      chatsCount: chats.length,
+                      activeChat: activeChat ? { id: activeChat._id, name: activeChat.name } : null,
+                      user: user ? { id: user._id || user.id } : null,
+                      isMobile
+                    });
+                                        return (
+                      <MobileMessenger
+                        chats={chats}
+                        activeChat={activeChat}
+                        messages={messages}
+                        newMessage={newMessage}
+                        setNewMessage={setNewMessage}
+                        sendMessage={sendMessage}
+                        setActiveChat={setActiveChat}
+                        loadMessages={loadMessages}
+                        messagesLoading={messagesLoading}
+                        loadingOlderMessages={loadingOlderMessages}
+                        loadOlderMessages={loadOlderMessages}
+                        messagesPagination={messagesPagination}
+                        totalUnread={totalUnread}
+                        initiateCall={initiateCall}
+                        getUserStatus={getUserStatus}
+                        user={user}
+                        onViewChange={(view) => {
+                          // Управляем видимостью хедера в зависимости от состояния
+                          const headerEl = document.querySelector('.header');
+                          if (headerEl) {
+                            if (view === 'chat') {
+                              // Скрываем хедер при открытии чата
+                              headerEl.style.display = 'none';
+                              if (!document.body.classList.contains('mobile-chat-open')) {
+                                document.body.classList.add('mobile-chat-open');
+                              }
+                              // Отладочная информация
+                              console.log('Mobile chat opened, body classes:', document.body.className);
+                            } else {
+                              // Показываем хедер при возврате к списку чатов
+                              headerEl.style.display = 'flex';
+                              document.body.classList.remove('mobile-chat-open');
+                              // Отладочная информация
+                              console.log('Mobile chat closed, body classes:', document.body.className);
+                            }
+                          }
+                        }}
+                      />
+                    );
+                  })()
                 ) : (
                   <div className="messages-container">
                     <div className="chats-sidebar">

@@ -26,6 +26,9 @@ const MobileMessenger = ({
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
+  // Простая проверка - всегда показываем что-то
+  console.log('MobileMessenger component is rendering!');
+
   // Отладочная информация при каждом рендере
   console.log('MobileMessenger render:', {
     currentView,
@@ -147,6 +150,7 @@ const MobileMessenger = ({
   };
 
   if (currentView === 'chats') {
+    console.log('Rendering chats list view');
     return (
       <div className="mobile-messenger">
         <div className="mobile-chats-view">
@@ -382,8 +386,23 @@ const MobileMessenger = ({
     );
   }
 
-  console.log('MobileMessenger returning null - no chat view or no active chat');
-  return null;
+  console.log('MobileMessenger returning fallback - no chat view or no active chat');
+  return (
+    <div className="mobile-messenger" style={{ 
+      background: 'red', 
+      color: 'white', 
+      padding: '20px',
+      border: '5px solid yellow',
+      minHeight: '200px'
+    }}>
+      <h2>MobileMessenger Fallback</h2>
+      <p>currentView: {currentView}</p>
+      <p>activeChat: {activeChat ? 'exists' : 'null'}</p>
+      <p>chats count: {chats.length}</p>
+      <p>user: {user ? 'exists' : 'null'}</p>
+      <p>body classes: {document.body.className}</p>
+    </div>
+  );
 };
 
 export default MobileMessenger;
