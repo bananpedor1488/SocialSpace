@@ -64,15 +64,23 @@ const MobileMessenger = ({
     console.log('handleChatSelect called with:', chat);
     console.log('Before setActiveChat - currentView:', currentView);
     
+    // Мгновенно переключаем вид, чтобы сразу зафиксировать чат к верху
+    if (onViewChange) {
+      onViewChange('chat');
+    }
+    setCurrentView('chat');
+
     setActiveChat(chat);
     loadMessages(chat._id);
-    setCurrentView('chat');
     
     console.log('After setActiveChat - new currentView will be: chat');
     // Управление видимостью и классами делает родитель через onViewChange
   };
 
   const handleBackToChats = () => {
+    if (onViewChange) {
+      onViewChange('chats');
+    }
     setCurrentView('chats');
     setActiveChat(null);
     // Прокручиваем в начало списка чатов

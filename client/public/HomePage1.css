@@ -28,6 +28,7 @@ body.mobile-chat-open {
     left: 0 !important;
     right: 0 !important;
     z-index: 100000 !important;
+    height: var(--mobile-nav-height, 60px) !important; /* фиксируем высоту */
   }
 
   body.mobile-chat-open .mobile-messenger {
@@ -35,9 +36,9 @@ body.mobile-chat-open {
     top: 0 !important;
     left: 0 !important;
     right: 0 !important;
-    bottom: 60px !important; /* место для нижней навигации */
+    bottom: var(--mobile-nav-height, 60px) !important; /* место для нижней навигации */
     width: 100vw !important;
-    height: calc(100vh - 60px) !important; /* заполняем до верха, где был хедер */
+    height: calc(100vh - var(--mobile-nav-height, 60px)) !important; /* до самого верха */
     z-index: 10000 !important;
     background: #ffffff !important;
     display: flex !important;
@@ -53,6 +54,7 @@ body.mobile-chat-open {
 
   /* Синхронизируем цвета хедера и инпута с мобильной навигацией (светлая тема) */
   body.mobile-chat-open .mobile-chat-header {
+    /* Цвет верхней панели = цвет мобильной навигации (светлая тема) */
     background: rgba(255, 255, 255, 0.95) !important;
     border-color: rgba(0, 0, 0, 0.1) !important;
     display: flex !important;
@@ -71,6 +73,7 @@ body.mobile-chat-open {
     border-color: rgba(0, 0, 0, 0.1) !important;
     display: flex !important;
     flex-shrink: 0 !important;
+    margin-bottom: 0 !important; /* убираем зазор над навигацией */
   }
 
   body.mobile-chat-open .mobile-messages-list {
