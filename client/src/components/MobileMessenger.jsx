@@ -387,22 +387,7 @@ const MobileMessenger = ({
   }
 
   console.log('MobileMessenger returning fallback - no chat view or no active chat');
-  return (
-    <div className="mobile-messenger" style={{ 
-      background: 'red', 
-      color: 'white', 
-      padding: '20px',
-      border: '5px solid yellow',
-      minHeight: '200px'
-    }}>
-      <h2>MobileMessenger Fallback</h2>
-      <p>currentView: {currentView}</p>
-      <p>activeChat: {activeChat ? 'exists' : 'null'}</p>
-      <p>chats count: {chats.length}</p>
-      <p>user: {user ? 'exists' : 'null'}</p>
-      <p>body classes: {document.body.className}</p>
-    </div>
-  );
+  return null;
 };
 
 export default MobileMessenger;

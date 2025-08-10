@@ -35,10 +35,10 @@ body.mobile-chat-open .mobile-messenger {
     top: 0 !important;
     left: 0 !important;
     right: 0 !important;
-    bottom: 60px !important; /* Оставляем место для навигации */
+    bottom: 60px !important; /* место для нижней навигации */
     width: 100vw !important;
-    height: calc(100vh - 60px) !important;
-    z-index: 999999 !important;
+    height: calc(100vh - 60px) !important; /* заполняем до верха, где был хедер */
+    z-index: 10000 !important;
     background: #1f2937 !important;
     display: flex !important;
     flex-direction: column !important;
@@ -59,11 +59,10 @@ body.mobile-chat-open .mobile-messenger {
   }
 
   body.mobile-chat-open.dark-theme .mobile-messages-area {
-    height: calc(100% - 120px) !important;
+    height: auto !important;
     background: #1f2937 !important;
-    flex: 1 !important;
+    flex: 1 1 auto !important;
     overflow-y: auto !important;
-    display: block !important;
   }
 
   body.mobile-chat-open.dark-theme .mobile-message-input-area {
@@ -6520,41 +6519,4 @@ body {
   }
 }
 
-/* Тестовый стиль для отладки - принудительно показываем чат */
-.mobile-messenger {
-  background: red !important;
-  border: 5px solid yellow !important;
-  min-height: 200px !important;
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  position: relative !important;
-  z-index: 999999 !important;
-}
-
-.mobile-chat-view {
-  background: blue !important;
-  border: 3px solid green !important;
-  min-height: 150px !important;
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-
-.mobile-chat-header {
-  background: orange !important;
-  border: 2px solid purple !important;
-  min-height: 50px !important;
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-
-.mobile-messages-area {
-  background: pink !important;
-  border: 2px solid brown !important;
-  min-height: 100px !important;
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-}
+/* Удалены отладочные принудительные стили */
