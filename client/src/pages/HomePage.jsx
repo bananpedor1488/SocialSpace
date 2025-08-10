@@ -111,6 +111,20 @@ const HomePage = () => {
   // СОСТОЯНИЯ ДЛЯ ЗВОНКОВ
   const [currentCall, setCurrentCall] = useState(null);
   const [isIncomingCall, setIsIncomingCall] = useState(false);
+  
+  // Effect to manage header visibility based on call status
+  useEffect(() => {
+    const headerEl = document.querySelector('.header');
+    if (headerEl) {
+      if (currentCall) {
+        // Hide header when call is active
+        headerEl.style.display = 'none';
+      } else {
+        // Show header when no call is active
+        headerEl.style.display = 'flex';
+      }
+    }
+  }, [currentCall]);
   const [userStatuses, setUserStatuses] = useState({}); // Онлайн статусы пользователей
 
   const navigate = useNavigate();
@@ -2245,16 +2259,22 @@ const HomePage = () => {
                     totalUnread={totalUnread}
                     initiateCall={initiateCall}
                     getUserStatus={getUserStatus}
-                    user={user}
-                    onViewChange={(view) => {
-                      // Хедер всегда остается видимым
-                      const headerEl = document.querySelector('.header');
-                      if (headerEl) {
-                        headerEl.style.display = 'flex';
-                      }
-                      // Убираем класс для корректной высоты
-                      document.body.classList.remove('mobile-chat-open');
-                    }}
+                                                        user={user}
+                                    onViewChange={(view) => {
+                                      // Управляем видимостью хедера в зависимости от состояния
+                                      const headerEl = document.querySelector('.header');
+                                      if (headerEl) {
+                                        if (view === 'chat') {
+                                          // Скрываем хедер при открытии чата
+                                          headerEl.style.display = 'none';
+                                          document.body.classList.add('mobile-chat-open');
+                                        } else {
+                                          // Показываем хедер при возврате к списку чатов
+                                          headerEl.style.display = 'flex';
+                                          document.body.classList.remove('mobile-chat-open');
+                                        }
+                                      }
+                                    }}
                   />
                 ) : (
                   <div className="messages-container">

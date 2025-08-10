@@ -43,19 +43,19 @@ const MobileMessenger = ({
     loadMessages(chat._id);
     setCurrentView('chat');
     
-    // Хедер остается видимым
+    // Скрываем глобальный хедер при входе в чат
     const headerEl = document.querySelector('.header');
     if (headerEl) {
-      headerEl.style.display = 'flex';
+      headerEl.style.display = 'none';
     }
-    // Убираем класс для корректной высоты
-    document.body.classList.remove('mobile-chat-open');
+    // Добавляем класс для корректной высоты
+    document.body.classList.add('mobile-chat-open');
   };
 
   const handleBackToChats = () => {
     setCurrentView('chats');
     setActiveChat(null);
-    // Хедер остается видимым
+    // Восстанавливаем глобальный хедер при возврате к списку чатов
     const headerEl = document.querySelector('.header');
     if (headerEl) {
       headerEl.style.display = 'flex';
