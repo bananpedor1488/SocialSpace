@@ -2842,15 +2842,7 @@ body.mobile-chat-open {
     }
   
     .mobile-nav-button.active::before {
-      content: '';
-      position: absolute;
-      top: -8px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 20px;
-      height: 3px;
-      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-      border-radius: 0 0 3px 3px;
+      display: none;
     }
     
     /* Light theme specific styles for mobile navigation */
@@ -2876,7 +2868,7 @@ body.mobile-chat-open {
     }
     
     .mobile-nav-button.active::before {
-      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      display: none;
     }
   
     .mobile-nav-icon {
