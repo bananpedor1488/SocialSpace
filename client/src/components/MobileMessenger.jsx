@@ -42,6 +42,14 @@ const MobileMessenger = ({
     setActiveChat(chat);
     loadMessages(chat._id);
     setCurrentView('chat');
+    
+    // Скрываем глобальный хедер при входе в чат
+    const headerEl = document.querySelector('.header');
+    if (headerEl) {
+      headerEl.style.display = 'none';
+    }
+    // Добавляем класс для корректной высоты
+    document.body.classList.add('mobile-chat-open');
   };
 
   const handleBackToChats = () => {
