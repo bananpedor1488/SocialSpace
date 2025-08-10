@@ -12,6 +12,49 @@ body.mobile-chat-open .mobile-messenger {
   top: 0;
 }
 
+/* Полный экран чат в темной теме - скрываем все кроме чата */
+@media (max-width: 767px) {
+  body.mobile-chat-open.dark-theme .header,
+  body.mobile-chat-open.dark-theme .mobile-nav,
+  body.mobile-chat-open.dark-theme .main-content,
+  body.mobile-chat-open.dark-theme .sidebar,
+  body.mobile-chat-open.dark-theme .right-sidebar {
+    display: none !important;
+  }
+
+  body.mobile-chat-open.dark-theme .mobile-messenger {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 99999;
+    background: #0f172a;
+  }
+
+  body.mobile-chat-open.dark-theme .mobile-chat-view {
+    height: 100vh;
+    background: #0f172a;
+  }
+
+  body.mobile-chat-open.dark-theme .mobile-chat-header {
+    background: #1e293b;
+    border-color: #475569;
+  }
+
+  body.mobile-chat-open.dark-theme .mobile-messages-area {
+    height: calc(100vh - 120px);
+    background: #0f172a;
+  }
+
+  body.mobile-chat-open.dark-theme .mobile-message-input-area {
+    background: #1e293b;
+    border-color: #475569;
+  }
+}
+
 /* Исправление бага с хедером в мобильных чатах */
 @media (max-width: 767px) {
   body.mobile-chat-open .header {
