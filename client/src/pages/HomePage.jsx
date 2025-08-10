@@ -2247,19 +2247,13 @@ const HomePage = () => {
                     getUserStatus={getUserStatus}
                     user={user}
                     onViewChange={(view) => {
-                      // Управляем видимостью хедера в зависимости от состояния
+                      // Хедер всегда остается видимым
                       const headerEl = document.querySelector('.header');
                       if (headerEl) {
-                        if (view === 'chat') {
-                          // Скрываем хедер при открытии чата
-                          headerEl.style.display = 'none';
-                          document.body.classList.add('mobile-chat-open');
-                        } else {
-                          // Показываем хедер при возврате к списку чатов
-                          headerEl.style.display = 'flex';
-                          document.body.classList.remove('mobile-chat-open');
-                        }
+                        headerEl.style.display = 'flex';
                       }
+                      // Убираем класс для корректной высоты
+                      document.body.classList.remove('mobile-chat-open');
                     }}
                   />
                 ) : (

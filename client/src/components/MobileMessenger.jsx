@@ -43,19 +43,19 @@ const MobileMessenger = ({
     loadMessages(chat._id);
     setCurrentView('chat');
     
-    // Скрываем глобальный хедер при входе в чат
+    // Хедер остается видимым
     const headerEl = document.querySelector('.header');
     if (headerEl) {
-      headerEl.style.display = 'none';
+      headerEl.style.display = 'flex';
     }
-    // Добавляем класс для корректной высоты
-    document.body.classList.add('mobile-chat-open');
+    // Убираем класс для корректной высоты
+    document.body.classList.remove('mobile-chat-open');
   };
 
   const handleBackToChats = () => {
     setCurrentView('chats');
     setActiveChat(null);
-    // Восстанавливаем глобальный хедер при возврате к списку чатов
+    // Хедер остается видимым
     const headerEl = document.querySelector('.header');
     if (headerEl) {
       headerEl.style.display = 'flex';
@@ -277,7 +277,7 @@ const MobileMessenger = ({
                     chatMessages.map(message => {
                       if (message.type === 'call') return null;
                       
-                      const isOwn = message.sender._id === user._id || message.sender.id === user.id;
+                      const isOwn = message.sender._id === (user._id || user.id);
                       const messageTime = formatMessageTime(message.createdAt);
                       
                       return (
