@@ -11,6 +11,24 @@ body.mobile-chat-open .mobile-messenger {
   height: 100vh;
   top: 0;
 }
+
+/* Исправление бага с хедером в мобильных чатах */
+@media (max-width: 767px) {
+  body.mobile-chat-open .header {
+    display: none !important;
+  }
+  
+  body.mobile-chat-open .mobile-messenger {
+    height: 100vh;
+    top: 0;
+    z-index: 10001;
+  }
+  
+  /* Показываем хедер когда чат закрыт */
+  body:not(.mobile-chat-open) .header {
+    display: block !important;
+  }
+}
 @media (max-width: 767px) {
   .mobile-messenger {
     display: flex;
@@ -85,6 +103,11 @@ body.mobile-chat-open .mobile-messenger {
 
   .mobile-chat-item:active { 
     background: rgba(0,0,0,0.03); 
+  }
+  
+  .mobile-chat-item.active {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.3);
   }
 
   .mobile-chat-avatar img { 
@@ -479,10 +502,16 @@ body.mobile-chat-open .mobile-messenger {
 
   .dark-theme .mobile-chat-item { 
     border-color: rgba(255,255,255,0.06); 
+    background: rgba(15, 23, 42, 0.8);
   }
 
   .dark-theme .mobile-chat-item:active {
     background: rgba(255,255,255,0.03);
+  }
+  
+  .dark-theme .mobile-chat-item.active {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: rgba(59, 130, 246, 0.4);
   }
 
   .dark-theme .mobile-chat-name {
@@ -2257,6 +2286,12 @@ body {
   overflow: hidden;
 }
 
+.chat-item.active {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
 .chat-item:hover {
   background: rgba(51, 65, 85, 0.8);
   border-color: rgba(100, 116, 139, 0.6);
@@ -2264,9 +2299,15 @@ body {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
-.chat-item.active {
+/* Темная тема для десктопных чатов */
+.dark-theme .chat-item {
+  background: rgba(15, 23, 42, 0.8);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.dark-theme .chat-item.active {
   background: rgba(59, 130, 246, 0.2);
-  border-color: rgba(59, 130, 246, 0.5);
+  border-color: rgba(59, 130, 246, 0.4);
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
