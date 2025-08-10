@@ -60,14 +60,14 @@ body.mobile-chat-open .mobile-messenger {
 
   body.mobile-chat-open.dark-theme .mobile-messages-area {
     height: auto !important;
-    background: #1f2937 !important;
+    background: rgba(15, 23, 42, 0.98) !important;
     flex: 1 1 auto !important;
     overflow-y: auto !important;
   }
 
   body.mobile-chat-open.dark-theme .mobile-message-input-area {
-    background: #374151 !important;
-    border-color: #4b5563 !important;
+    background: rgba(15, 23, 42, 0.98) !important;
+    border-color: rgba(148, 163, 184, 0.2) !important;
     display: flex !important;
     flex-shrink: 0 !important;
   }

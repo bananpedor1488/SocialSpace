@@ -51,9 +51,10 @@ body.mobile-chat-open {
     flex-direction: column !important;
   }
 
+  /* Синхронизируем цвета хедера и инпута с мобильной навигацией (светлая тема) */
   body.mobile-chat-open .mobile-chat-header {
-    background: #f8fafc !important;
-    border-color: #e2e8f0 !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
     display: flex !important;
     flex-shrink: 0 !important;
   }
@@ -66,8 +67,8 @@ body.mobile-chat-open {
   }
 
   body.mobile-chat-open .mobile-message-input-area {
-    background: #f8fafc !important;
-    border-color: #e2e8f0 !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
     display: flex !important;
     flex-shrink: 0 !important;
   }
@@ -171,31 +172,20 @@ body.mobile-chat-open {
   body.mobile-chat-open .mobile-message,
   body.mobile-chat-open .mobile-message-body,
   body.mobile-chat-open .mobile-message-content {
-    display: block !important;
+    display: revert !important;
     visibility: visible !important;
     opacity: 1 !important;
-    position: static !important;
   }
 
-  body.mobile-chat-open .mobile-messenger {
-    display: flex !important;
-  }
+  body.mobile-chat-open .mobile-messenger { display: flex !important; }
 
-  body.mobile-chat-open .mobile-chat-view {
-    display: flex !important;
-  }
+  body.mobile-chat-open .mobile-chat-view { display: flex !important; }
 
-  body.mobile-chat-open .mobile-chat-header {
-    display: flex !important;
-  }
+  body.mobile-chat-open .mobile-chat-header { display: flex !important; }
 
-  body.mobile-chat-open .mobile-message-input-area {
-    display: flex !important;
-  }
+  body.mobile-chat-open .mobile-message-input-area { display: flex !important; }
 
-  body.mobile-chat-open .mobile-message {
-    display: flex !important;
-  }
+  body.mobile-chat-open .mobile-message { display: flex !important; }
 }
   @media (max-width: 767px) {
     .mobile-messenger {

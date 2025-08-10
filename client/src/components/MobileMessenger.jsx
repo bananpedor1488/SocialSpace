@@ -44,6 +44,16 @@ const MobileMessenger = ({
     }
   }, [currentView, onViewChange]);
 
+  // Гарантируем мгновенную синхронизацию при выборе/выходе из чата
+  useEffect(() => {
+    if (!onViewChange) return;
+    if (currentView === 'chat') {
+      onViewChange('chat');
+    } else {
+      onViewChange('chats');
+    }
+  }, [currentView, onViewChange]);
+
   useEffect(() => {
     if (currentView === 'chat' && messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -59,37 +69,12 @@ const MobileMessenger = ({
     setCurrentView('chat');
     
     console.log('After setActiveChat - new currentView will be: chat');
-    
-    // Скрываем глобальный хедер при входе в чат
-    const headerEl = document.querySelector('.header');
-    if (headerEl) {
-      headerEl.style.display = 'none';
-      console.log('Header hidden');
-    } else {
-      console.log('Header element not found');
-    }
-    
-    // Добавляем класс для корректной высоты, сохраняя существующие классы
-    if (!document.body.classList.contains('mobile-chat-open')) {
-      document.body.classList.add('mobile-chat-open');
-      console.log('mobile-chat-open class added');
-    } else {
-      console.log('mobile-chat-open class already exists');
-    }
-    
-    console.log('Final body classes:', document.body.className);
+    // Управление видимостью и классами делает родитель через onViewChange
   };
 
   const handleBackToChats = () => {
     setCurrentView('chats');
     setActiveChat(null);
-    // Восстанавливаем глобальный хедер при возврате к списку чатов
-    const headerEl = document.querySelector('.header');
-    if (headerEl) {
-      headerEl.style.display = 'flex';
-    }
-    // Убираем класс для корректной высоты
-    document.body.classList.remove('mobile-chat-open');
     // Прокручиваем в начало списка чатов
     const chatsList = document.querySelector('.mobile-chats-list');
     if (chatsList) {
