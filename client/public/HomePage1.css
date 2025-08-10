@@ -190,6 +190,61 @@ body.mobile-chat-open {
 
   body.mobile-chat-open .mobile-message { display: flex !important; }
 }
+
+/* Оверрайды для мобильной вёрстки: фиксируем чат под хедером и над навигацией,
+   убираем скачки до загрузки сообщений, растягиваем инпуты и поиск на всю ширину */
+@media (max-width: 767px) {
+  /* Даже до применения класса на body позиционируем контейнер чата корректно */
+  .mobile-messenger {
+    position: fixed !important;
+    top: var(--mobile-header-height, 56px) !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: var(--mobile-nav-height, 60px) !important;
+    height: calc(100vh - var(--mobile-header-height, 56px) - var(--mobile-nav-height, 60px)) !important;
+    z-index: 10001 !important;
+  }
+
+  .mobile-chat-view {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    min-height: 0 !important;
+  }
+
+  .mobile-messages-area {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+  }
+
+  .mobile-message-input-area {
+    flex-shrink: 0 !important;
+  }
+
+  .mobile-message-input-wrapper {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  .mobile-message-input {
+    flex: 1 1 auto !important;
+    width: 100% !important;
+  }
+
+  /* Поиск в хедере на всю ширину на мобильных */
+  .header-search {
+    max-width: none !important;
+    width: 100% !important;
+    flex: 1 1 auto !important;
+  }
+
+  .header-search-input {
+    width: 100% !important;
+  }
+}
   @media (max-width: 767px) {
     .mobile-messenger {
       display: flex;

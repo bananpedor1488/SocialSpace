@@ -60,11 +60,18 @@ const MobileMessenger = ({
     }
   }, [currentView, onViewChange]);
 
+  // Умный автоскролл: не скроллим вниз, пока сообщения грузятся;
+  // на первое открытие чата — мгновенно, далее — плавно
+  const openedChatIdRef = useRef(null);
   useEffect(() => {
-    if (currentView === 'chat' && messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages, currentView]);
+    if (currentView !== 'chat' || !activeChat) return;
+    if (messagesLoading) return;
+    if (!messagesEndRef.current) return;
+
+    const isNewChat = openedChatIdRef.current !== activeChat._id;
+    messagesEndRef.current.scrollIntoView({ behavior: isNewChat ? 'auto' : 'smooth' });
+    openedChatIdRef.current = activeChat._id;
+  }, [currentView, activeChat, messagesLoading, messages]);
 
   const handleChatSelect = (chat) => {
     console.log('handleChatSelect called with:', chat);
