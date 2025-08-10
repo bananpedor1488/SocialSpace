@@ -484,6 +484,12 @@ body.mobile-chat-open {
     padding: 0;
     margin: 0;
   }
+
+  @media (max-width: 767px) {
+    body {
+      background: #ffffff;
+    }
+  }
   
   /* Контейнер с улучшенной адаптивностью */
   .home-container {
