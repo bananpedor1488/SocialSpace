@@ -42,6 +42,12 @@ const MobileMessenger = ({
     if (onViewChange) {
       onViewChange(currentView);
     }
+    // При входе в чат сразу добавляем класс на body, чтобы применились размеры
+    if (currentView === 'chat') {
+      document.body.classList.add('mobile-chat-open');
+    } else {
+      document.body.classList.remove('mobile-chat-open');
+    }
   }, [currentView, onViewChange]);
 
   // Гарантируем мгновенную синхронизацию при выборе/выходе из чата

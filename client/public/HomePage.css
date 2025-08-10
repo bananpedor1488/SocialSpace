@@ -3,18 +3,17 @@
    ========================== */
 
 /* Скрытие хедера при открытии мобильного чата */
-body.mobile-chat-open .header {
-  display: none !important;
-}
-
-body.mobile-chat-open .mobile-messenger {
-  height: 100vh;
-  top: 0;
+/* Оставляем header видимым при открытом чате */
+/* Зададим переменные высот для мобильного режима */
+@media (max-width: 767px) {
+  body { 
+    --mobile-header-height: 56px; 
+    --mobile-nav-height: var(--mobile-nav-height, 60px); 
+  }
 }
 
 /* Полный экран чат в темной теме - скрываем все кроме чата и навигации */
 @media (max-width: 767px) {
-  body.mobile-chat-open.dark-theme .header,
   body.mobile-chat-open.dark-theme .sidebar,
   body.mobile-chat-open.dark-theme .right-sidebar {
     display: none !important;
@@ -33,12 +32,12 @@ body.mobile-chat-open .mobile-messenger {
 
   body.mobile-chat-open.dark-theme .mobile-messenger {
     position: fixed !important;
-    top: 0 !important;
+    top: var(--mobile-header-height, 56px) !important;
     left: 0 !important;
     right: 0 !important;
-    bottom: 60px !important; /* место для нижней навигации */
+    bottom: var(--mobile-nav-height, 60px) !important; /* место для нижней навигации */
     width: 100vw !important;
-    height: calc(100vh - 60px) !important; /* заполняем до верха, где был хедер */
+    height: calc(100vh - var(--mobile-header-height, 56px) - var(--mobile-nav-height, 60px)) !important; /* от под хедера до верха навигации */
     z-index: 10000 !important;
     background: #1f2937 !important;
     display: flex !important;
@@ -87,24 +86,18 @@ body.mobile-chat-open .mobile-messenger {
   }
 }
 
-/* Исправление бага с хедером в мобильных чатах */
+/* Мобильная компоновка: чат под хедером и над нижней навигацией */
 @media (max-width: 767px) {
-  body.mobile-chat-open .header {
-    display: none !important;
-  }
-  
   body.mobile-chat-open .mobile-messenger {
-    height: 100vh;
-    top: 0;
-    z-index: 10001;
+    position: fixed !important;
+    top: var(--mobile-header-height, 56px) !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: var(--mobile-nav-height, 60px) !important;
+    width: 100vw !important;
+    height: calc(100vh - var(--mobile-header-height, 56px) - var(--mobile-nav-height, 60px)) !important;
+    z-index: 10001 !important;
   }
-  
-  /* Показываем хедер когда чат закрыт */
-  body:not(.mobile-chat-open) .header {
-    display: block !important;
-  }
-
-
 }
 @media (max-width: 767px) {
   .mobile-messenger {
