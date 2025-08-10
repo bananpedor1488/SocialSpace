@@ -220,6 +220,12 @@ const MobileMessenger = ({
     );
   }
 
+  console.log('Rendering condition check:', {
+    currentView,
+    activeChat: activeChat ? { id: activeChat._id, name: activeChat.name } : null,
+    shouldRender: currentView === 'chat' && activeChat
+  });
+
   if (currentView === 'chat' && activeChat) {
     const otherUser = activeChat.participants && activeChat.participants.length === 2 
       ? activeChat.participants.find(p => p._id !== user._id && p._id !== user.id)
@@ -376,6 +382,7 @@ const MobileMessenger = ({
     );
   }
 
+  console.log('MobileMessenger returning null - no chat view or no active chat');
   return null;
 };
 
