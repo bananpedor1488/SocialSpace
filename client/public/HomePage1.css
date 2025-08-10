@@ -11,6 +11,196 @@ body.mobile-chat-open {
   body.mobile-chat-open .mobile-messenger {
     height: 100vh;
   }
+
+/* Полный экран чат в светлой теме - скрываем все кроме чата и навигации */
+@media (max-width: 767px) {
+  body.mobile-chat-open .header,
+  body.mobile-chat-open .main-content,
+  body.mobile-chat-open .sidebar,
+  body.mobile-chat-open .right-sidebar {
+    display: none !important;
+  }
+
+  /* Показываем мобильную навигацию в чате */
+  body.mobile-chat-open .mobile-nav {
+    display: block !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 100000 !important;
+  }
+
+  body.mobile-chat-open .mobile-messenger {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 60px !important; /* Оставляем место для навигации */
+    width: 100vw !important;
+    height: calc(100vh - 60px) !important;
+    z-index: 999999 !important; /* Increased z-index */
+    background: #ffffff !important;
+    display: flex !important;
+    flex-direction: column !important;
+    visibility: visible !important; /* Added */
+    opacity: 1 !important; /* Added */
+  }
+
+  body.mobile-chat-open .mobile-chat-view {
+    height: 100% !important;
+    background: #ffffff !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  body.mobile-chat-open .mobile-chat-header {
+    background: #f8fafc !important;
+    border-color: #e2e8f0 !important;
+    display: flex !important;
+    flex-shrink: 0 !important;
+  }
+
+  body.mobile-chat-open .mobile-messages-area {
+    height: calc(100% - 120px) !important;
+    background: #ffffff !important;
+    flex: 1 !important;
+    overflow-y: auto !important;
+    display: block !important;
+  }
+
+  body.mobile-chat-open .mobile-message-input-area {
+    background: #f8fafc !important;
+    border-color: #e2e8f0 !important;
+    display: flex !important;
+    flex-shrink: 0 !important;
+  }
+
+  body.mobile-chat-open .mobile-messages-list {
+    display: block !important;
+  }
+
+  body.mobile-chat-open .mobile-message {
+    display: flex !important;
+  }
+
+  body.mobile-chat-open .mobile-message-content {
+    color: #1f2937 !important;
+  }
+
+  /* Дополнительные стили для обеспечения видимости */
+  body.mobile-chat-open .mobile-chats-view {
+    display: block !important;
+    height: 100% !important;
+    background: #ffffff !important;
+  }
+
+  body.mobile-chat-open .mobile-chats-header {
+    display: flex !important;
+    background: #f8fafc !important;
+    color: #1f2937 !important;
+  }
+
+  body.mobile-chat-open .mobile-chats-list {
+    display: block !important;
+    background: #ffffff !important;
+  }
+
+  body.mobile-chat-open .mobile-chat-item {
+    display: flex !important;
+    background: #ffffff !important;
+    color: #1f2937 !important;
+  }
+
+  body.mobile-chat-open .mobile-chat-name {
+    color: #1f2937 !important;
+  }
+
+  body.mobile-chat-open .mobile-chat-last-message {
+    color: #6b7280 !important;
+  }
+
+  body.mobile-chat-open .mobile-message-input {
+    background: #f8fafc !important;
+    color: #1f2937 !important;
+    border-color: #e2e8f0 !important;
+  }
+
+  body.mobile-chat-open .mobile-message-input::placeholder {
+    color: #9ca3af !important;
+  }
+
+  body.mobile-chat-open .mobile-send-message-btn {
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6) !important;
+    color: white !important;
+  }
+
+  /* Принудительно показываем все элементы чата */
+  body.mobile-chat-open .mobile-messenger * {
+    visibility: visible !important;
+  }
+
+  body.mobile-chat-open .mobile-chat-view * {
+    visibility: visible !important;
+  }
+
+  body.mobile-chat-open .mobile-messages-area * {
+    visibility: visible !important;
+  }
+
+  body.mobile-chat-open .mobile-messages-list * {
+    visibility: visible !important;
+  }
+
+  body.mobile-chat-open .mobile-message * {
+    visibility: visible !important;
+  }
+
+  body.mobile-chat-open .mobile-message-body * {
+    visibility: visible !important;
+  }
+
+  body.mobile-chat-open .mobile-message-content {
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  /* Принудительно показываем все элементы чата с максимальным приоритетом */
+  body.mobile-chat-open .mobile-messenger,
+  body.mobile-chat-open .mobile-chat-view,
+  body.mobile-chat-open .mobile-chat-header,
+  body.mobile-chat-open .mobile-messages-area,
+  body.mobile-chat-open .mobile-message-input-area,
+  body.mobile-chat-open .mobile-messages-list,
+  body.mobile-chat-open .mobile-message,
+  body.mobile-chat-open .mobile-message-body,
+  body.mobile-chat-open .mobile-message-content {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: static !important;
+  }
+
+  body.mobile-chat-open .mobile-messenger {
+    display: flex !important;
+  }
+
+  body.mobile-chat-open .mobile-chat-view {
+    display: flex !important;
+  }
+
+  body.mobile-chat-open .mobile-chat-header {
+    display: flex !important;
+  }
+
+  body.mobile-chat-open .mobile-message-input-area {
+    display: flex !important;
+  }
+
+  body.mobile-chat-open .mobile-message {
+    display: flex !important;
+  }
+}
   @media (max-width: 767px) {
     .mobile-messenger {
       display: flex;

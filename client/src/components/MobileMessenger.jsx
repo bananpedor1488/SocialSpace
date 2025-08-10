@@ -204,6 +204,17 @@ const MobileMessenger = ({
     const userStatus = getUserStatus(otherUser?._id);
     const chatMessages = messages[activeChat._id] || [];
 
+    // Отладочная информация
+    console.log('Chat Debug Info:', {
+      chat: activeChat,
+      currentView,
+      documentBodyClasses: document.body.className,
+      activeChat,
+      chatMessages,
+      otherUser,
+      userStatus
+    });
+
     return (
       <div className="mobile-messenger">
         <div className="mobile-chat-view">

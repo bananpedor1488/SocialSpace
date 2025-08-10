@@ -132,6 +132,143 @@ body.mobile-chat-open .mobile-messenger {
     background: linear-gradient(135deg, #3b82f6, #8b5cf6) !important;
     color: white !important;
   }
+
+  /* Принудительно показываем все элементы чата в темной теме */
+  body.mobile-chat-open.dark-theme .mobile-messenger,
+  body.mobile-chat-open.dark-theme .mobile-chat-view,
+  body.mobile-chat-open.dark-theme .mobile-chat-header,
+  body.mobile-chat-open.dark-theme .mobile-messages-area,
+  body.mobile-chat-open.dark-theme .mobile-message-input-area,
+  body.mobile-chat-open.dark-theme .mobile-messages-list,
+  body.mobile-chat-open.dark-theme .mobile-message,
+  body.mobile-chat-open.dark-theme .mobile-message-body,
+  body.mobile-chat-open.dark-theme .mobile-message-content {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: static !important;
+  }
+
+  body.mobile-chat-open.dark-theme .mobile-messenger {
+    display: flex !important;
+  }
+
+  body.mobile-chat-open.dark-theme .mobile-chat-view {
+    display: flex !important;
+  }
+
+  body.mobile-chat-open.dark-theme .mobile-chat-header {
+    display: flex !important;
+  }
+
+  body.mobile-chat-open.dark-theme .mobile-message-input-area {
+    display: flex !important;
+  }
+
+  body.mobile-chat-open.dark-theme .mobile-message {
+    display: flex !important;
+  }
+
+  /* Дополнительные стили для обеспечения видимости всех элементов */
+  body.mobile-chat-open.dark-theme .mobile-chat-header-left,
+  body.mobile-chat-open.dark-theme .mobile-back-btn,
+  body.mobile-chat-open.dark-theme .mobile-chat-header-avatar,
+  body.mobile-chat-open.dark-theme .mobile-chat-user-info,
+  body.mobile-chat-open.dark-theme .mobile-chat-title-section,
+  body.mobile-chat-open.dark-theme .mobile-chat-actions,
+  body.mobile-chat-open.dark-theme .mobile-call-button,
+  body.mobile-chat-open.dark-theme .mobile-message-input-wrapper,
+  body.mobile-chat-open.dark-theme .mobile-message-input,
+  body.mobile-chat-open.dark-theme .mobile-send-message-btn {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  body.mobile-chat-open.dark-theme .mobile-message-avatar {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  /* Принудительно показываем все элементы чата с максимальным приоритетом */
+  body.mobile-chat-open.dark-theme .mobile-messenger * {
+    visibility: visible !important;
+  }
+
+  body.mobile-chat-open.dark-theme .mobile-chat-view * {
+    visibility: visible !important;
+  }
+
+  body.mobile-chat-open.dark-theme .mobile-messages-area * {
+    visibility: visible !important;
+  }
+
+  body.mobile-chat-open.dark-theme .mobile-messages-list * {
+    visibility: visible !important;
+  }
+
+  body.mobile-chat-open.dark-theme .mobile-message * {
+    visibility: visible !important;
+  }
+
+  body.mobile-chat-open.dark-theme .mobile-message-body * {
+    visibility: visible !important;
+  }
+
+  body.mobile-chat-open.dark-theme .mobile-message-content {
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  /* Простые стили для отладки - принудительно показываем чат */
+  .mobile-messenger {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  .mobile-chat-view {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  .mobile-chat-header {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  .mobile-messages-area {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  .mobile-messages-list {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  .mobile-message {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  .mobile-message-content {
+    visibility: visible !important;
+    opacity: 1 !important;
+    color: #e5e7eb !important;
+  }
+
+  .mobile-message-input-area {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
 }
 
 /* Исправление бага с хедером в мобильных чатах */
@@ -151,44 +288,7 @@ body.mobile-chat-open .mobile-messenger {
     display: block !important;
   }
 
-  /* Стили для мобильного чата в светлой теме */
-  body.mobile-chat-open:not(.dark-theme) .mobile-messenger {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 60px !important;
-    width: 100vw !important;
-    height: calc(100vh - 60px) !important;
-    z-index: 99999 !important;
-    background: #ffffff !important;
-    display: flex !important;
-    flex-direction: column !important;
-  }
 
-  body.mobile-chat-open:not(.dark-theme) .mobile-nav {
-    display: block !important;
-    position: fixed !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    z-index: 100000 !important;
-  }
-
-  body.mobile-chat-open:not(.dark-theme) .mobile-chat-view {
-    height: 100% !important;
-    background: #ffffff !important;
-    display: flex !important;
-    flex-direction: column !important;
-  }
-
-  body.mobile-chat-open:not(.dark-theme) .mobile-messages-area {
-    height: calc(100% - 120px) !important;
-    background: #ffffff !important;
-    flex: 1 !important;
-    overflow-y: auto !important;
-    display: block !important;
-  }
 }
 @media (max-width: 767px) {
   .mobile-messenger {

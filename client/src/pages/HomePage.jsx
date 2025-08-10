@@ -802,12 +802,16 @@ const HomePage = () => {
     if (savedTheme === 'dark') {
       setIsDarkTheme(true);
       loadCSS('HomePage.css');
-      document.body.className = 'dark-theme';
+      // Сохраняем существующие классы и добавляем dark-theme
+      const existingClasses = document.body.className.split(' ').filter(cls => cls !== 'light-theme' && cls !== 'dark-theme');
+      document.body.className = [...existingClasses, 'dark-theme'].join(' ');
       document.documentElement.setAttribute('data-theme', 'dark');
     } else {
       setIsDarkTheme(false);
       loadCSS('HomePage1.css');
-      document.body.className = 'light-theme';
+      // Сохраняем существующие классы и добавляем light-theme
+      const existingClasses = document.body.className.split(' ').filter(cls => cls !== 'light-theme' && cls !== 'dark-theme');
+      document.body.className = [...existingClasses, 'light-theme'].join(' ');
       document.documentElement.setAttribute('data-theme', 'light');
     }
   }, []);
@@ -820,11 +824,15 @@ const HomePage = () => {
     
     if (newTheme) {
       loadCSS('HomePage.css');
-      document.body.className = 'dark-theme';
+      // Сохраняем существующие классы и добавляем dark-theme
+      const existingClasses = document.body.className.split(' ').filter(cls => cls !== 'light-theme' && cls !== 'dark-theme');
+      document.body.className = [...existingClasses, 'dark-theme'].join(' ');
       document.documentElement.setAttribute('data-theme', 'dark');
     } else {
       loadCSS('HomePage1.css');
-      document.body.className = 'light-theme';
+      // Сохраняем существующие классы и добавляем light-theme
+      const existingClasses = document.body.className.split(' ').filter(cls => cls !== 'light-theme' && cls !== 'dark-theme');
+      document.body.className = [...existingClasses, 'light-theme'].join(' ');
       document.documentElement.setAttribute('data-theme', 'light');
     }
   };
@@ -2264,17 +2272,21 @@ const HomePage = () => {
                                       // Управляем видимостью хедера в зависимости от состояния
                                       const headerEl = document.querySelector('.header');
                                       if (headerEl) {
-                                        if (view === 'chat') {
-                                          // Скрываем хедер при открытии чата
-                                          headerEl.style.display = 'none';
-                                          if (!document.body.classList.contains('mobile-chat-open')) {
-                                            document.body.classList.add('mobile-chat-open');
-                                          }
-                                        } else {
-                                          // Показываем хедер при возврате к списку чатов
-                                          headerEl.style.display = 'flex';
-                                          document.body.classList.remove('mobile-chat-open');
-                                        }
+                                                if (view === 'chat') {
+          // Скрываем хедер при открытии чата
+          headerEl.style.display = 'none';
+          if (!document.body.classList.contains('mobile-chat-open')) {
+            document.body.classList.add('mobile-chat-open');
+          }
+          // Отладочная информация
+          console.log('Mobile chat opened, body classes:', document.body.className);
+        } else {
+          // Показываем хедер при возврате к списку чатов
+          headerEl.style.display = 'flex';
+          document.body.classList.remove('mobile-chat-open');
+          // Отладочная информация
+          console.log('Mobile chat closed, body classes:', document.body.className);
+        }
                                       }
                                     }}
                   />
