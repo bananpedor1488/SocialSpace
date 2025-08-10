@@ -26,6 +26,15 @@ const MobileMessenger = ({
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
+  // Отладочная информация при каждом рендере
+  console.log('MobileMessenger render:', {
+    currentView,
+    activeChat: activeChat ? { id: activeChat._id, name: activeChat.name } : null,
+    chatsCount: chats.length,
+    user: user ? { id: user._id || user.id } : null,
+    bodyClasses: document.body.className
+  });
+
   useEffect(() => {
     if (onViewChange) {
       onViewChange(currentView);
@@ -39,19 +48,33 @@ const MobileMessenger = ({
   }, [messages, currentView]);
 
   const handleChatSelect = (chat) => {
+    console.log('handleChatSelect called with:', chat);
+    console.log('Before setActiveChat - currentView:', currentView);
+    
     setActiveChat(chat);
     loadMessages(chat._id);
     setCurrentView('chat');
+    
+    console.log('After setActiveChat - new currentView will be: chat');
     
     // Скрываем глобальный хедер при входе в чат
     const headerEl = document.querySelector('.header');
     if (headerEl) {
       headerEl.style.display = 'none';
+      console.log('Header hidden');
+    } else {
+      console.log('Header element not found');
     }
+    
     // Добавляем класс для корректной высоты, сохраняя существующие классы
     if (!document.body.classList.contains('mobile-chat-open')) {
       document.body.classList.add('mobile-chat-open');
+      console.log('mobile-chat-open class added');
+    } else {
+      console.log('mobile-chat-open class already exists');
     }
+    
+    console.log('Final body classes:', document.body.className);
   };
 
   const handleBackToChats = () => {
