@@ -98,6 +98,31 @@ const HomePage = () => {
   // Состояние для мобильного мессенджера
   const [isMobile, setIsMobile] = useState(false);
   const [mobileView, setMobileView] = useState('chats'); // 'chats' | 'chat'
+
+  const updateMobileChatOffsets = () => {
+    try {
+      const headerEl = document.querySelector('.header');
+      const navEl = document.querySelector('.mobile-nav');
+      const headerHeight = headerEl ? headerEl.offsetHeight : 56;
+      const navHeight = navEl ? navEl.offsetHeight : 60;
+      document.body.style.setProperty('--mobile-header-height', `${headerHeight}px`);
+      document.body.style.setProperty('--mobile-nav-height', `${navHeight}px`);
+    } catch (e) {
+      // no-op
+    }
+  };
+
+  useEffect(() => {
+    if (!isMobile || activeTab !== 'messages') return;
+    updateMobileChatOffsets();
+    const handleResize = () => updateMobileChatOffsets();
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
+    };
+  }, [isMobile, activeTab, mobileView]);
   
   // Функция для определения мобильного устройства
   const checkMobile = () => {

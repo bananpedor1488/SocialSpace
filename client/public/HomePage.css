@@ -8,7 +8,7 @@
 @media (max-width: 767px) {
   body { 
     --mobile-header-height: 56px; 
-    --mobile-nav-height: var(--mobile-nav-height, 60px); 
+    --mobile-nav-height: 60px; 
   }
 }
 
@@ -32,12 +32,12 @@
 
   body.mobile-chat-open.dark-theme .mobile-messenger {
     position: fixed !important;
-    top: var(--mobile-header-height, 56px) !important;
+    top: var(--mobile-header-height) !important;
     left: 0 !important;
     right: 0 !important;
-    bottom: var(--mobile-nav-height, 60px) !important; /* место для нижней навигации */
+    bottom: var(--mobile-nav-height) !important; /* место для нижней навигации */
     width: 100vw !important;
-    height: calc(100vh - var(--mobile-header-height, 56px) - var(--mobile-nav-height, 60px)) !important; /* от под хедера до верха навигации */
+    height: calc(100vh - var(--mobile-header-height) - var(--mobile-nav-height)) !important; /* от под хедера до верха навигации */
     z-index: 10000 !important;
     background: #1f2937 !important;
     display: flex !important;
@@ -90,12 +90,12 @@
 @media (max-width: 767px) {
   body.mobile-chat-open .mobile-messenger {
     position: fixed !important;
-    top: var(--mobile-header-height, 56px) !important;
+    top: var(--mobile-header-height) !important;
     left: 0 !important;
     right: 0 !important;
-    bottom: var(--mobile-nav-height, 60px) !important;
+    bottom: var(--mobile-nav-height) !important;
     width: 100vw !important;
-    height: calc(100vh - var(--mobile-header-height, 56px) - var(--mobile-nav-height, 60px)) !important;
+    height: calc(100vh - var(--mobile-header-height) - var(--mobile-nav-height)) !important;
     z-index: 10001 !important;
   }
 }
@@ -104,11 +104,11 @@
 @media (max-width: 767px) {
   .mobile-messenger {
     position: fixed !important;
-    top: var(--mobile-header-height, 56px) !important;
+    top: var(--mobile-header-height) !important;
     left: 0 !important;
     right: 0 !important;
-    bottom: var(--mobile-nav-height, 60px) !important;
-    height: calc(100vh - var(--mobile-header-height, 56px) - var(--mobile-nav-height, 60px)) !important;
+    bottom: var(--mobile-nav-height) !important;
+    height: calc(100vh - var(--mobile-header-height) - var(--mobile-nav-height)) !important;
     z-index: 10001 !important;
   }
 
