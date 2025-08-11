@@ -333,7 +333,7 @@
     background: #e0f2fe;
     border-bottom: 1px solid rgba(59, 130, 246, 0.1);
     position: sticky;
-    top: 0;
+    top: 0; /* фикс в режиме chat: контейнер уже отступлен сверху */
     z-index: 2;
   }
 
@@ -501,7 +501,7 @@
   .mobile-message.own { 
     align-self: flex-end;
     flex-direction: row-reverse;
-    margin-right: -14px; /* сильнее прижать к правой границе */
+    margin-right: -20px; /* максимальный прижим к правой границе */
   }
 
   .mobile-message.own .mobile-message-body {
