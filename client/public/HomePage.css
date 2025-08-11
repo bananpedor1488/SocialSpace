@@ -416,6 +416,7 @@
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     background: rgba(30, 41, 59, 0.9);
+    padding-right: 0 !important; /* не резервировать правый отступ */
   }
 
   .mobile-messages-loading { 
@@ -472,6 +473,7 @@
     padding: 10px 0 10px 10px;
     background: rgba(30, 41, 59, 0.9);
     overflow-x: hidden;
+    margin-right: 0;
   }
 
   .mobile-message {
@@ -500,7 +502,7 @@
   .mobile-message.own { 
     align-self: flex-end;
     flex-direction: row-reverse;
-    margin-right: -24px; /* максимальный прижим к правой границе */
+    margin-right: -32px; /* прижать максимально к правой кромке */
     gap: 0; /* не резервировать место под аватар */
   }
 
@@ -540,6 +542,7 @@
 
   .mobile-message.own .mobile-message-body {
     max-width: 70%;
+    margin-right: -2px; /* доводим пузырь до самого края */
   }
 
   .mobile-message-header {
