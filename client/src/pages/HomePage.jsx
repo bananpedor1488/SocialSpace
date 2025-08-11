@@ -101,11 +101,10 @@ const HomePage = () => {
 
   const updateMobileChatOffsets = () => {
     try {
-      const headerEl = document.querySelector('.header');
       const navEl = document.querySelector('.mobile-nav');
       // Для списка чатов — ниже глобального хедера, для окна чата — вплотную
       const headerHeight = mobileView === 'chats' 
-        ? (headerEl ? headerEl.offsetHeight : 0) 
+        ? 56 
         : 0;
       const safeInset = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-bottom)')) || 0;
       const navHeight = (navEl ? navEl.offsetHeight : 60) + safeInset;
