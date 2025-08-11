@@ -32,16 +32,18 @@
 
   body.mobile-chat-open.dark-theme .mobile-messenger {
     position: fixed !important;
-    top: var(--mobile-header-height) !important;
+    top: 0 !important;
     left: 0 !important;
     right: 0 !important;
     bottom: var(--mobile-nav-height) !important; /* место для нижней навигации */
+    padding-top: var(--mobile-header-height) !important; /* смещение под глобальный header */
     width: 100vw !important;
-    height: calc(100vh - var(--mobile-header-height) - var(--mobile-nav-height)) !important; /* от под хедера до верха навигации */
-    z-index: 10000 !important;
+    height: calc(100vh - var(--mobile-nav-height)) !important; /* от самого верха окна до навигации */
+    z-index: 900 !important; /* ниже глобального header */
     background: #1f2937 !important;
     display: flex !important;
     flex-direction: column !important;
+    box-sizing: border-box !important;
   }
 
   body.mobile-chat-open.dark-theme .mobile-chat-view {
@@ -90,13 +92,15 @@
 @media (max-width: 767px) {
   body.mobile-chat-open .mobile-messenger {
     position: fixed !important;
-    top: var(--mobile-header-height) !important;
+    top: 0 !important;
     left: 0 !important;
     right: 0 !important;
     bottom: var(--mobile-nav-height) !important;
+    padding-top: var(--mobile-header-height) !important;
     width: 100vw !important;
-    height: calc(100vh - var(--mobile-header-height) - var(--mobile-nav-height)) !important;
-    z-index: 10001 !important;
+    height: calc(100vh - var(--mobile-nav-height)) !important;
+    z-index: 900 !important;
+    box-sizing: border-box !important;
   }
 }
 
@@ -104,12 +108,14 @@
 @media (max-width: 767px) {
   .mobile-messenger {
     position: fixed !important;
-    top: var(--mobile-header-height) !important;
+    top: 0 !important;
     left: 0 !important;
     right: 0 !important;
     bottom: var(--mobile-nav-height) !important;
-    height: calc(100vh - var(--mobile-header-height) - var(--mobile-nav-height)) !important;
-    z-index: 10001 !important;
+    padding-top: var(--mobile-header-height) !important;
+    height: calc(100vh - var(--mobile-nav-height)) !important;
+    z-index: 900 !important;
+    box-sizing: border-box !important;
   }
 
   .mobile-chat-view { 
