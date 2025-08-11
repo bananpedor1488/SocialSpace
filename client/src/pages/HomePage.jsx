@@ -104,7 +104,7 @@ const HomePage = () => {
       const navEl = document.querySelector('.mobile-nav');
       // Для мобильного чата тянем контейнер вплотную к хедеру
       const headerHeight = 0;
-      const navHeight = navEl ? navEl.offsetHeight : 60;
+      const navHeight = (navEl ? navEl.offsetHeight : 60) + (parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-bottom)')) || 0);
       document.body.style.setProperty('--mobile-header-height', `${headerHeight}px`);
       document.body.style.setProperty('--mobile-nav-height', `${navHeight}px`);
     } catch (e) {

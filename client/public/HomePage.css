@@ -468,8 +468,9 @@
     display: flex; 
     flex-direction: column; 
     gap: 6px;
-    padding: 10px 4px 10px 10px; /* минимальный правый отступ */
+    padding: 10px 0 10px 10px; /* убираем правый отступ */
     background: rgba(30, 41, 59, 0.9);
+    overflow-x: hidden;
   }
 
   .mobile-message {
@@ -498,7 +499,7 @@
   .mobile-message.own { 
     align-self: flex-end;
     flex-direction: row-reverse;
-    margin-right: -4px; /* прижать вплотную к правой границе */
+    margin-right: -10px; /* прижать вплотную к правой границе */
   }
 
   .mobile-message.own .mobile-message-body {
@@ -523,11 +524,11 @@
   }
 
   .mobile-message.other .mobile-message-body {
-    max-width: 78%;
+    max-width: 76%;
   }
 
   .mobile-message.own .mobile-message-body {
-    max-width: 74%;
+    max-width: 70%;
   }
 
   .mobile-message-header {
@@ -582,6 +583,8 @@
     position: sticky;
     bottom: 0;
     margin-bottom: 0 !important; /* убираем микрозазор над навигацией */
+    z-index: 100001; /* поверх мобильной навигации */
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
   }
 
   .mobile-message-input-wrapper {
@@ -630,6 +633,8 @@
     cursor: pointer;
     transition: background-color 0.2s ease;
     flex-shrink: 0;
+    position: relative;
+    z-index: 100002;
   }
 
   .mobile-send-message-btn:hover:not(:disabled) {
