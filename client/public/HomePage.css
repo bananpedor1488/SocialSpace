@@ -177,6 +177,8 @@
     display: flex;
     flex-direction: column;
     height: 100%;
+    padding-top: var(--mobile-header-height, 56px);
+    box-sizing: border-box;
   }
 
   .mobile-chats-header {
@@ -189,7 +191,7 @@
     border-bottom: 1px solid rgba(59, 130, 246, 0.1);
     z-index: 2;
     position: sticky;
-    top: 0;
+    top: var(--mobile-header-height, 56px);
   }
 
   .mobile-chats-header h2 {
@@ -468,7 +470,7 @@
     display: flex; 
     flex-direction: column; 
     gap: 6px;
-    padding: 10px 0 10px 10px; /* убираем правый отступ */
+    padding: 10px 0 10px 10px;
     background: rgba(30, 41, 59, 0.9);
     overflow-x: hidden;
   }
@@ -499,7 +501,7 @@
   .mobile-message.own { 
     align-self: flex-end;
     flex-direction: row-reverse;
-    margin-right: -10px; /* прижать вплотную к правой границе */
+    margin-right: -14px; /* сильнее прижать к правой границе */
   }
 
   .mobile-message.own .mobile-message-body {
