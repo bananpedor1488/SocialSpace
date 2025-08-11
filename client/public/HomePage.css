@@ -501,6 +501,16 @@
     align-self: flex-end;
     flex-direction: row-reverse;
     margin-right: -24px; /* максимальный прижим к правой границе */
+    gap: 0; /* не резервировать место под аватар */
+  }
+
+  /* На всякий случай: если контейнер аватарки присутствует — скрыть его у своих сообщений */
+  .mobile-message.own .mobile-message-avatar {
+    display: none !important;
+  }
+
+  .mobile-message.own .mobile-message-body {
+    margin-right: 0;
   }
 
   .mobile-message.own .mobile-message-body {
