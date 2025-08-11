@@ -101,9 +101,8 @@ const HomePage = () => {
 
   const updateMobileChatOffsets = () => {
     try {
-      const headerEl = document.querySelector('.header');
       const navEl = document.querySelector('.mobile-nav');
-      // На мобиле для вкладки сообщений принудительно используем компактный отступ
+      // Для мобильного чата тянем контейнер вплотную к хедеру
       const headerHeight = 0;
       const navHeight = navEl ? navEl.offsetHeight : 60;
       document.body.style.setProperty('--mobile-header-height', `${headerHeight}px`);
