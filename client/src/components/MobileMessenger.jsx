@@ -337,12 +337,14 @@ const MobileMessenger = ({
                           key={message._id} 
                           className={`mobile-message ${isOwn ? 'own' : 'other'}`}
                         >
-                          <Avatar 
-                            src={message.sender.avatar || null}
-                            alt={message.sender.displayName || message.sender.username}
-                            size="small"
-                            className="mobile-message-avatar"
-                          />
+                          {!isOwn && (
+                            <Avatar 
+                              src={message.sender.avatar || null}
+                              alt={message.sender.displayName || message.sender.username}
+                              size="small"
+                              className="mobile-message-avatar"
+                            />
+                          )}
                           <div className="mobile-message-body">
                             <div className="mobile-message-header">
                               <span className="mobile-message-sender">
