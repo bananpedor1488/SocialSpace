@@ -7,7 +7,7 @@ import {
   Home, MessageCircle, User, LogOut, Plus,
   Heart, MessageSquare, Repeat, Pencil, Trash2, Users, UserCheck, Send, X, ChevronDown,
   Moon, Sun, Wifi, WifiOff, Flame, Clock, Phone, Settings, Trophy, DollarSign,
-  Check, Play, HelpCircle, History, Crown, Gift
+  Check, Play, HelpCircle, History, Crown, Gift, ArrowLeft, MoreVertical
 } from 'lucide-react';
 
 import CallInterface from '../components/CallInterface';
@@ -17,7 +17,6 @@ import AccountSettings from '../components/AccountSettings';
 import Avatar from '../components/Avatar';
 import Points from '../components/Points';
 import PointsModals from '../components/PointsModals';
-import MobileMessenger from '../components/MobileMessenger';
 import { usePoints } from '../context/PointsContext';
 
 import useOnlineStatus from '../hooks/useOnlineStatus';
@@ -98,6 +97,7 @@ const HomePage = () => {
   
   // Состояние для мобильного мессенджера
   const [isMobile, setIsMobile] = useState(false);
+  const [mobileView, setMobileView] = useState('chats'); // 'chats' | 'chat'
   
   // Функция для определения мобильного устройства
   const checkMobile = () => {
@@ -2251,46 +2251,204 @@ const HomePage = () => {
             {activeTab === 'messages' && (
               <>
                 {isMobile ? (
-                  (() => {
-                    console.log('HomePage rendering MobileMessenger with props:', {
-                      chatsCount: chats.length,
-                      activeChat: activeChat ? { id: activeChat._id, name: activeChat.name } : null,
-                      user: user ? { id: user._id || user.id } : null,
-                      isMobile
-                    });
+                  <div className="mobile-messenger">
+                    {mobileView === 'chats' && (
+                      <div className="mobile-chats-view">
+                        <div className="mobile-chats-header">
+                          <h2>Сообщения</h2>
+                          {totalUnread > 0 && (
+                            <span className="mobile-total-unread">{totalUnread}</span>
+                          )}
+                        </div>
+                        <div className="mobile-chats-list">
+                          {chats.length > 0 ? (
+                            chats
+                              .sort((a, b) => {
+                                const aTime = a.lastMessage?.createdAt || a.lastMessageTime || a.createdAt;
+                                const bTime = b.lastMessage?.createdAt || b.lastMessageTime || b.createdAt;
+                                return new Date(bTime) - new Date(aTime);
+                              })
+                              .map(chat => {
+                                const otherUser = chat.participants && chat.participants.length === 2 
+                                  ? chat.participants.find(p => p._id !== (user._id || user.id))
+                                  : null;
                                         return (
-                      <MobileMessenger
-                        chats={chats}
-                        activeChat={activeChat}
-                        messages={messages}
-                        newMessage={newMessage}
-                        setNewMessage={setNewMessage}
-                        sendMessage={sendMessage}
-                        setActiveChat={setActiveChat}
-                        loadMessages={loadMessages}
-                        messagesLoading={messagesLoading}
-                        loadingOlderMessages={loadingOlderMessages}
-                        loadOlderMessages={loadOlderMessages}
-                        messagesPagination={messagesPagination}
-                        totalUnread={totalUnread}
-                        initiateCall={initiateCall}
-                        getUserStatus={getUserStatus}
-                        user={user}
-                        onViewChange={(view) => {
-                          // Хедер всегда видим. Управляем только классом на body
-                          const headerEl = document.querySelector('.header');
-                          if (headerEl) {
-                            headerEl.style.display = 'flex';
-                          }
-                          if (view === 'chat') {
-                            document.body.classList.add('mobile-chat-open');
-                          } else {
-                            document.body.classList.remove('mobile-chat-open');
-                          }
-                        }}
-                      />
-                    );
-                  })()
+                                  <div
+                                    key={chat._id}
+                                    className="mobile-chat-item"
+                                    onClick={() => { setActiveChat(chat); loadMessages(chat._id); setMobileView('chat'); document.body.classList.add('mobile-chat-open'); }}
+                                  >
+                                    <Avatar
+                                      src={otherUser?.avatar || null}
+                                      alt={otherUser?.displayName || otherUser?.username || chat.name}
+                                      size="medium"
+                                      className="mobile-chat-avatar"
+                                    />
+                                    <div className="mobile-chat-info">
+                                      <div className="mobile-chat-header-row">
+                                        <div className="mobile-chat-name">
+                                          {chat.name}
+                                          {otherUser?.premium && (
+                                            <span className="premium-badge">
+                                              <svg viewBox="0 0 24 24" fill="currentColor">
+                                                <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
+                                              </svg>
+                                            </span>
+                                          )}
+                                        </div>
+                                        {chat.unreadCount > 0 && (
+                                          <span className="mobile-chat-unread">{chat.unreadCount}</span>
+                                        )}
+                                      </div>
+                                      {chat.lastMessage && (
+                                        <div className="mobile-chat-last-message">
+                                          {chat.lastMessage.sender.username}: {chat.lastMessage.content.substring(0, 30)}...
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                );
+                              })
+                          ) : (
+                            <div className="mobile-no-chats">
+                              <MessageCircle className="mobile-no-chats-icon" />
+                              <h3>Чатов пока нет</h3>
+                              <p>Начните общение с другими пользователями</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {mobileView === 'chat' && activeChat && (() => {
+                      const otherUser = activeChat.participants && activeChat.participants.length === 2
+                        ? activeChat.participants.find(p => p._id !== (user._id || user.id))
+                        : null;
+                      const userStatus = getUserStatus(otherUser?._id);
+                      const chatMessages = messages[activeChat._id] || [];
+                      return (
+                        <div className="mobile-chat-view">
+                          <div className="mobile-chat-header">
+                            <div className="mobile-chat-header-left">
+                              <button className="mobile-back-btn" onClick={() => { setMobileView('chats'); setActiveChat(null); document.body.classList.remove('mobile-chat-open'); }}>
+                                <ArrowLeft size={20} />
+                              </button>
+                              <Avatar
+                                src={otherUser?.avatar || null}
+                                alt={otherUser?.displayName || otherUser?.username || 'User'}
+                                size="medium"
+                                className="mobile-chat-header-avatar"
+                              />
+                              <div className="mobile-chat-user-info">
+                                <div className="mobile-chat-title-section">
+                                  <h3>{activeChat.name}</h3>
+                                  <OnlineStatus
+                                    userId={otherUser?._id}
+                                    isOnline={userStatus.isOnline}
+                                    lastSeen={userStatus.lastSeen}
+                                    showText={true}
+                                    size="small"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                            <div className="mobile-chat-actions">
+                              <button className="mobile-call-button" onClick={() => initiateCall('audio')} title="Голосовой звонок">
+                                <Phone size={20} />
+                              </button>
+                              <button title="Дополнительно">
+                                <MoreVertical size={20} />
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="mobile-messages-area">
+                            {messagesLoading ? (
+                              <div className="mobile-messages-loading">
+                                <div className="mobile-loading-spinner"></div>
+                                <div>Загрузка сообщений...</div>
+                              </div>
+                            ) : (
+                              <>
+                                {messagesPagination[activeChat._id]?.hasMore && (
+                                  <div className="mobile-load-more-messages">
+                                    <button
+                                      onClick={() => loadOlderMessages(activeChat._id)}
+                                      disabled={loadingOlderMessages}
+                                      className="mobile-load-more-btn"
+                                    >
+                                      {loadingOlderMessages ? 'Загрузка...' : 'Загрузить старые сообщения'}
+                                    </button>
+                                  </div>
+                                )}
+
+                                <div className="mobile-messages-list">
+                                  {chatMessages.length === 0 ? (
+                                    <div className="mobile-no-chats" style={{ padding: '40px 20px' }}>
+                                      <MessageCircle className="mobile-no-chats-icon" />
+                                      <h3>Сообщений пока нет</h3>
+                                      <p>Начните разговор первым</p>
+                                    </div>
+                                  ) : (
+                                    chatMessages.map(message => {
+                                      if (message.type === 'call') return null;
+                                      const isOwn = message.sender._id === (user._id || user.id);
+                                      const date = new Date(message.createdAt);
+                                      const messageTime = date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+                                      return (
+                                        <div key={message._id} className={`mobile-message ${isOwn ? 'own' : 'other'}`}>
+                                          {!isOwn && (
+                                            <Avatar
+                                              src={message.sender.avatar || null}
+                                              alt={message.sender.displayName || message.sender.username}
+                                              size="small"
+                                              className="mobile-message-avatar"
+                                            />
+                                          )}
+                                          <div className="mobile-message-body">
+                                            <div className="mobile-message-header">
+                                              <span className="mobile-message-sender">
+                                                {message.sender.displayName || message.sender.username}
+                                                {message.sender.premium && (
+                                                  <span className="premium-badge" title="Premium">
+                                                    <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14" aria-hidden="true">
+                                                      <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
+                                                    </svg>
+                                                  </span>
+                                                )}
+                                              </span>
+                                              <span className="mobile-message-time">{messageTime}</span>
+                                            </div>
+                                            <div className="mobile-message-content">{message.content}</div>
+                                          </div>
+                                        </div>
+                                      );
+                                    })
+                                  )}
+                                </div>
+                              </>
+                            )}
+                          </div>
+
+                          <div className="mobile-message-input-area">
+                            <div className="mobile-message-input-wrapper">
+                              <input
+                                type="text"
+                                className="mobile-message-input"
+                                placeholder="Введите сообщение..."
+                                value={newMessage}
+                                onChange={(e) => setNewMessage(e.target.value)}
+                                onKeyPress={(e) => e.key === 'Enter' && newMessage.trim() && sendMessage()}
+                              />
+                              <button className="mobile-send-message-btn" onClick={() => newMessage.trim() && sendMessage()} disabled={!newMessage.trim()}>
+                                <Send size={20} />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
                 ) : (
                   <div className="messages-container">
                     <div className="chats-sidebar">
