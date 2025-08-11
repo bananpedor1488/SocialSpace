@@ -337,19 +337,24 @@ const MobileMessenger = ({
                           key={message._id} 
                           className={`mobile-message ${isOwn ? 'own' : 'other'}`}
                         >
-                          {!isOwn && (
-                            <Avatar 
-                              src={message.sender.avatar || null}
-                              alt={message.sender.displayName || message.sender.username}
-                              size="small"
-                              className="mobile-message-avatar"
-                            />
-                          )}
+                          <Avatar 
+                            src={message.sender.avatar || null}
+                            alt={message.sender.displayName || message.sender.username}
+                            size="small"
+                            className="mobile-message-avatar"
+                          />
                           <div className="mobile-message-body">
                             <div className="mobile-message-header">
-                              {!isOwn && (
-                                <span className="mobile-message-sender">{message.sender.displayName || message.sender.username}</span>
-                              )}
+                              <span className="mobile-message-sender">
+                                {message.sender.displayName || message.sender.username}
+                                {message.sender.premium && (
+                                  <span className="premium-badge" title="Premium">
+                                    <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14" aria-hidden="true">
+                                      <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
+                                    </svg>
+                                  </span>
+                                )}
+                              </span>
                               <span className="mobile-message-time">{messageTime}</span>
                             </div>
                             <div className="mobile-message-content">

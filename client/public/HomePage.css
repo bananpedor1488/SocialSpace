@@ -461,17 +461,17 @@
   .mobile-messages-list { 
     display: flex; 
     flex-direction: column; 
-    gap: 8px;
-    padding: 16px;
+    gap: 6px;
+    padding: 12px 12px 80px; /* больше места снизу, чтобы не упиралось в навигацию */
     background: rgba(30, 41, 59, 0.9);
   }
 
   .mobile-message {
     display: flex;
     align-items: flex-start;
-    gap: 8px;
-    max-width: 85%;
-    margin-bottom: 12px;
+    gap: 6px;
+    max-width: 78%;
+    margin-bottom: 8px;
     width: 100%;
   }
 
@@ -483,8 +483,8 @@
   .mobile-message.other .mobile-message-body {
     background: rgba(51, 65, 85, 0.8);
     border: 1px solid rgba(71, 85, 105, 0.3);
-    border-radius: 16px 16px 16px 4px;
-    padding: 12px 16px;
+    border-radius: 14px 14px 14px 4px;
+    padding: 8px 12px;
     color: #e2e8f0;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
@@ -498,8 +498,8 @@
     background: linear-gradient(135deg, #3b82f6, #8b5cf6);
     color: white;
     border: 1px solid rgba(59, 130, 246, 0.4);
-    border-radius: 16px 16px 4px 16px;
-    padding: 12px 16px;
+    border-radius: 14px 14px 4px 14px;
+    padding: 8px 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
@@ -517,19 +517,34 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
-    margin-bottom: 4px;
+    gap: 6px;
+    margin-bottom: 2px;
   }
 
   .mobile-message-sender { 
     font-weight: 600; 
-    font-size: 13px;
+    font-size: 12px;
     color: rgba(148, 163, 184, 0.9);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .mobile-message-sender .premium-badge {
+    display: inline-flex;
+    align-items: center;
+    line-height: 0;
+  }
+
+  .mobile-message-sender .premium-badge svg {
+    width: 12px;
+    height: 12px;
+    color: #facc15;
   }
 
   .mobile-message-time { 
     color: rgba(148, 163, 184, 0.7); 
-    font-size: 12px;
+    font-size: 11px;
   }
 
   .mobile-message.own .mobile-message-time {
@@ -537,9 +552,10 @@
   }
 
   .mobile-message-content {
-    font-size: 14px;
-    line-height: 1.4;
+    font-size: 13px;
+    line-height: 1.35;
     word-wrap: break-word;
+    word-break: break-word;
   }
 
   .mobile-message-input-area {
