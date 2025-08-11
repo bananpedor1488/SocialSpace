@@ -468,7 +468,7 @@
     display: flex; 
     flex-direction: column; 
     gap: 6px;
-    padding: 10px 8px 10px 10px; /* компактные поля, правый край ближе */
+    padding: 10px 4px 10px 10px; /* минимальный правый отступ */
     background: rgba(30, 41, 59, 0.9);
   }
 
@@ -478,7 +478,7 @@
     gap: 6px;
     max-width: 88%;
     margin-bottom: 8px;
-    width: 100%;
+    width: auto;
   }
 
   .mobile-message.other {
@@ -498,7 +498,7 @@
   .mobile-message.own { 
     align-self: flex-end;
     flex-direction: row-reverse;
-    margin-right: -6px; /* визуально прижать вплотную к правой границе */
+    margin-right: -4px; /* прижать вплотную к правой границе */
   }
 
   .mobile-message.own .mobile-message-body {
@@ -516,8 +516,18 @@
   }
 
   .mobile-message-body {
-    flex: 1;
+    flex: 0 1 auto; /* не растягиваемся на всю ширину */
     min-width: 0;
+    display: inline-block;
+    max-width: 100%;
+  }
+
+  .mobile-message.other .mobile-message-body {
+    max-width: 78%;
+  }
+
+  .mobile-message.own .mobile-message-body {
+    max-width: 74%;
   }
 
   .mobile-message-header {
