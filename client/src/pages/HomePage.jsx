@@ -957,12 +957,85 @@ const HomePage = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Мобильные утилиты
+  useEffect(() => {
+    // Устанавливаем правильную высоту viewport для мобильных браузеров
+    const cleanupViewport = setMobileViewportHeight();
+    
+    // Предотвращаем зум при фокусе на input
+    preventZoomOnFocus();
+    
+    // Обрабатываем виртуальную клавиатуру
+    const cleanupKeyboard = handleVirtualKeyboard(messagesEndRef);
+    
+    // Настраиваем свайпы для мобильных устройств
+    const cleanupSwipe = setupSwipeGestures(
+      () => {
+        // Свайп влево - возврат к списку чатов
+        if (isMobile && mobileView === 'chat') {
+          setMobileView('chats');
+        }
+      },
+      () => {
+        // Свайп вправо - открытие чата
+        if (isMobile && mobileView === 'chats' && activeChat) {
+          setMobileView('chat');
+        }
+      }
+    );
+    
+    // Обрабатываем состояние онлайн/оффлайн
+    const cleanupOnline = handleOnlineStatus(
+      () => {
+        console.log('Восстановлено подключение к интернету');
+        setConnectionStatus('Подключено');
+        setIsConnected(true);
+      },
+      () => {
+        console.log('Потеряно подключение к интернету');
+        setConnectionStatus('Нет подключения');
+        setIsConnected(false);
+      }
+    );
+    
+    return () => {
+      cleanupViewport();
+      cleanupKeyboard();
+      cleanupSwipe();
+      cleanupOnline();
+    };
+  }, [isMobile, mobileView, activeChat]);
+
   // useEffect для автоскролла сообщений
   useEffect(() => {
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      scrollToBottom(messagesEndRef, true);
     }
   }, [messages, activeChat]);
+
+  // Оптимизация списка сообщений
+  useEffect(() => {
+    if (activeChat && messages[activeChat._id]) {
+      const cleanup = optimizeMessageList(messagesEndRef);
+      return cleanup;
+    }
+  }, [activeChat, messages]);
+
+  // Сохранение позиции скролла при переключении чатов
+  useEffect(() => {
+    if (activeChat) {
+      // Сохраняем позицию предыдущего чата
+      const prevChat = Object.keys(messages).find(chatId => chatId !== activeChat._id);
+      if (prevChat) {
+        saveScrollPosition(prevChat, messagesEndRef);
+      }
+      
+      // Восстанавливаем позицию текущего чата
+      setTimeout(() => {
+        restoreScrollPosition(activeChat._id, messagesEndRef);
+      }, 100);
+    }
+  }, [activeChat, messages]);
 
   // Функция загрузки рекомендаций
   const loadSuggestions = async () => {
@@ -1282,7 +1355,7 @@ const HomePage = () => {
       
       // Прокручиваем вниз после отправки сообщения
       setTimeout(() => {
-        scrollToBottom();
+        scrollToBottom(messagesEndRef, true);
       }, 100);
       
       // Обновляем чаты в боковом меню
