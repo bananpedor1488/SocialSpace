@@ -246,19 +246,25 @@ export const clearScrollPositions = () => {
 
 // Функция для правильного переключения чатов на мобильных
 export const switchToChat = (chat, setActiveChat, setMobileView, loadMessages) => {
+  console.log('Switching to chat:', chat);
   setActiveChat(chat);
   loadMessages(chat._id);
   
   // На мобильных устройствах переключаемся в режим чата
   if (window.innerWidth <= 767) {
+    console.log('Setting mobile view to chat');
     setMobileView('chat');
     
     // Добавляем класс для body чтобы скрыть другие элементы
     document.body.classList.add('mobile-chat-open');
+    console.log('Added mobile-chat-open class to body');
     
     // Устанавливаем правильные отступы для всех контейнеров
     const messagesContainer = document.querySelector('.messages-container');
     const homeContainer = document.querySelector('.home-container');
+    
+    console.log('Messages container found:', !!messagesContainer);
+    console.log('Home container found:', !!homeContainer);
     
     if (messagesContainer) {
       messagesContainer.style.position = 'fixed';
