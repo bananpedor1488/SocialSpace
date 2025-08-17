@@ -2398,11 +2398,7 @@ const HomePage = () => {
                                 <div
                                   key={chat._id}
                                   className={`chat-item ${activeChat?._id === chat._id ? 'active' : ''}`}
-                                  onClick={() => { 
-                                    setActiveChat(chat); 
-                                    loadMessages(chat._id); 
-                                    setMobileView('chat'); 
-                                  }}
+                                  onClick={() => switchToChat(chat, setActiveChat, setMobileView, loadMessages)}
                                 >
                                   <Avatar
                                     src={otherUser?.avatar || null}

@@ -11,6 +11,19 @@ export const setMobileViewportHeight = () => {
     const navHeight = 60; // Примерная высота нижней навигации
     document.documentElement.style.setProperty('--mobile-header-height', `${headerHeight}px`);
     document.documentElement.style.setProperty('--mobile-nav-height', `${navHeight}px`);
+    
+    // Устанавливаем переменные для safe area
+    const safeAreaTop = getComputedStyle(document.documentElement).getPropertyValue('--safe-area-inset-top') || '0px';
+    const safeAreaBottom = getComputedStyle(document.documentElement).getPropertyValue('--safe-area-inset-bottom') || '0px';
+    
+    document.documentElement.style.setProperty('--safe-area-inset-top', safeAreaTop);
+    document.documentElement.style.setProperty('--safe-area-inset-bottom', safeAreaBottom);
+    
+    // Принудительно обновляем отступы для body
+    if (window.innerWidth <= 767) {
+      document.body.style.paddingTop = `calc(${headerHeight}px + ${safeAreaTop})`;
+      document.body.style.paddingBottom = `calc(${navHeight}px + ${safeAreaBottom})`;
+    }
   };
 
   setVH();
@@ -243,12 +256,30 @@ export const switchToChat = (chat, setActiveChat, setMobileView, loadMessages) =
     // Добавляем класс для body чтобы скрыть другие элементы
     document.body.classList.add('mobile-chat-open');
     
-    // Устанавливаем правильные отступы
+    // Устанавливаем правильные отступы для всех контейнеров
     const messagesContainer = document.querySelector('.messages-container');
+    const homeContainer = document.querySelector('.home-container');
+    
     if (messagesContainer) {
+      messagesContainer.style.position = 'fixed';
+      messagesContainer.style.top = '0';
+      messagesContainer.style.left = '0';
+      messagesContainer.style.right = '0';
+      messagesContainer.style.bottom = '0';
+      messagesContainer.style.zIndex = '1000';
       messagesContainer.style.paddingTop = 'calc(60px + env(safe-area-inset-top))';
       messagesContainer.style.paddingBottom = 'calc(60px + env(safe-area-inset-bottom))';
     }
+    
+    if (homeContainer) {
+      homeContainer.style.display = 'none';
+    }
+    
+    // Принудительно обновляем viewport
+    setTimeout(() => {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+    }, 100);
   }
 };
 
@@ -262,5 +293,24 @@ export const switchToChatsList = (setActiveChat, setMobileView) => {
     
     // Убираем класс для body
     document.body.classList.remove('mobile-chat-open');
+    
+    // Восстанавливаем отображение основного контейнера
+    const homeContainer = document.querySelector('.home-container');
+    if (homeContainer) {
+      homeContainer.style.display = '';
+    }
+    
+    // Сбрасываем стили контейнера сообщений
+    const messagesContainer = document.querySelector('.messages-container');
+    if (messagesContainer) {
+      messagesContainer.style.position = '';
+      messagesContainer.style.top = '';
+      messagesContainer.style.left = '';
+      messagesContainer.style.right = '';
+      messagesContainer.style.bottom = '';
+      messagesContainer.style.zIndex = '';
+      messagesContainer.style.paddingTop = '';
+      messagesContainer.style.paddingBottom = '';
+    }
   }
 };
