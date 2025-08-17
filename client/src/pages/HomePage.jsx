@@ -20,6 +20,19 @@ import PointsModals from '../components/PointsModals';
 import { usePoints } from '../context/PointsContext';
 
 import useOnlineStatus from '../hooks/useOnlineStatus';
+import { 
+  setMobileViewportHeight, 
+  scrollToBottom, 
+  preventZoomOnFocus, 
+  handleVirtualKeyboard,
+  autoScrollToNewMessage,
+  setupSwipeGestures,
+  optimizeMessageList,
+  handleOnlineStatus,
+  saveScrollPosition,
+  restoreScrollPosition,
+  clearScrollPositions
+} from '../utils/mobileMessages';
 
 const HomePage = () => {
   const [user, setUser] = useState(null);
