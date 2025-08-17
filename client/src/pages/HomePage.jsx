@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { io } from 'socket.io-client';
 
-import {
+import { 
   Home, MessageCircle, User, LogOut, Plus,
-  Heart, MessageSquare, Repeat, Pencil, Trash2, Users, UserCheck, Send, X, ChevronDown,
+  Heart, MessageSquare, Repeat, Pencil, Trash2, Users, UserCheck, Send, X, ChevronDown, ChevronLeft,
   Moon, Sun, Wifi, WifiOff, Flame, Clock, Phone, Settings, Trophy, DollarSign,
   Check, Play, HelpCircle, History, Crown, Gift, ArrowLeft, MoreVertical
 } from 'lucide-react';
@@ -102,14 +102,15 @@ const HomePage = () => {
   const updateMobileChatOffsets = () => {
     try {
       const navEl = document.querySelector('.mobile-nav');
-      // Для списка чатов — ниже глобального хедера, для окна чата — вплотную
-      const headerHeight = mobileView === 'chats' 
-        ? 0 
-        : 0;
       const safeInset = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-bottom)')) || 0;
       const navHeight = (navEl ? navEl.offsetHeight : 60) + safeInset;
-      document.body.style.setProperty('--mobile-header-height', `${headerHeight}px`);
       document.body.style.setProperty('--mobile-nav-height', `${navHeight}px`);
+      
+      // Устанавливаем правильную высоту для мобильных устройств
+      if (isMobile) {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+      }
     } catch (e) {
       // no-op
     }
@@ -121,6 +122,12 @@ const HomePage = () => {
     const handleResize = () => updateMobileChatOffsets();
     window.addEventListener('resize', handleResize);
     window.addEventListener('orientationchange', handleResize);
+    
+    // Устанавливаем начальное состояние для мобильных устройств
+    if (isMobile && activeTab === 'messages') {
+      setMobileView('chats');
+    }
+    
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('orientationchange', handleResize);
@@ -2279,141 +2286,159 @@ const HomePage = () => {
             {activeTab === 'messages' && (
               <>
                 {isMobile ? (
-                  <div className="mobile-messenger">
-                    {mobileView === 'chats' && (
-                      <div className="mobile-chats-view">
-                        <div className="mobile-chats-header">
-                          <h2>Сообщения</h2>
-                          {totalUnread > 0 && (
-                            <span className="mobile-total-unread">{totalUnread}</span>
-                          )}
-                        </div>
-                        <div className="mobile-chats-list">
-                          {chats.length > 0 ? (
-                            chats
-                              .sort((a, b) => {
-                                const aTime = a.lastMessage?.createdAt || a.lastMessageTime || a.createdAt;
-                                const bTime = b.lastMessage?.createdAt || b.lastMessageTime || b.createdAt;
-                                return new Date(bTime) - new Date(aTime);
-                              })
-                              .map(chat => {
-                                const otherUser = chat.participants && chat.participants.length === 2 
-                                  ? chat.participants.find(p => p._id !== (user._id || user.id))
-                                  : null;
-                                        return (
-                                  <div
-                                    key={chat._id}
-                                    className="mobile-chat-item"
-                                    onClick={() => { setActiveChat(chat); loadMessages(chat._id); setMobileView('chat'); document.body.classList.add('mobile-chat-open'); }}
-                                  >
-                                    <Avatar
-                                      src={otherUser?.avatar || null}
-                                      alt={otherUser?.displayName || otherUser?.username || chat.name}
-                                      size="medium"
-                                      className="mobile-chat-avatar"
-                                    />
-                                    <div className="mobile-chat-info">
-                                      <div className="mobile-chat-header-row">
-                                        <div className="mobile-chat-name">
-                                          {chat.name}
-                                          {otherUser?.premium && (
-                                            <span className="premium-badge">
-                                              <svg viewBox="0 0 24 24" fill="currentColor">
-                                                <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
-                                              </svg>
-                                            </span>
-                                          )}
-                                        </div>
-                                        {chat.unreadCount > 0 && (
-                                          <span className="mobile-chat-unread">{chat.unreadCount}</span>
-                                        )}
-                                      </div>
-                                      {chat.lastMessage && (
-                                        <div className="mobile-chat-last-message">
-                                          {chat.lastMessage.sender.username}: {chat.lastMessage.content.substring(0, 30)}...
-                                        </div>
+                  <div className="messages-container">
+                    {/* Боковая панель чатов */}
+                    <div className={`chats-sidebar ${mobileView === 'chats' ? 'show' : ''}`}>
+                      <div className="chats-header">
+                        <h3>Сообщения</h3>
+                        {totalUnread > 0 && <span className="total-unread">{totalUnread}</span>}
+                      </div>
+                      
+                      <div className="chats-list">
+                        {chats.length > 0 ? (
+                          chats
+                            .sort((a, b) => {
+                              const aTime = a.lastMessage?.createdAt || a.lastMessageTime || a.createdAt;
+                              const bTime = b.lastMessage?.createdAt || b.lastMessageTime || b.createdAt;
+                              return new Date(bTime) - new Date(aTime);
+                            })
+                            .map(chat => {
+                              const otherUser = chat.participants && chat.participants.length === 2 
+                                ? chat.participants.find(p => p._id !== (user._id || user.id))
+                                : null;
+                              return (
+                                <div
+                                  key={chat._id}
+                                  className={`chat-item ${activeChat?._id === chat._id ? 'active' : ''}`}
+                                  onClick={() => { 
+                                    setActiveChat(chat); 
+                                    loadMessages(chat._id); 
+                                    setMobileView('chat'); 
+                                  }}
+                                >
+                                  <Avatar
+                                    src={otherUser?.avatar || null}
+                                    alt={otherUser?.displayName || otherUser?.username || chat.name}
+                                    size="medium"
+                                  />
+                                  <div className="chat-info">
+                                    <div className="chat-name">
+                                      {chat.name}
+                                      {otherUser?.premium && (
+                                        <span className="premium-badge">
+                                          <svg viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
+                                          </svg>
+                                        </span>
                                       )}
                                     </div>
+                                    {chat.lastMessage && (
+                                      <div className="chat-last-message">
+                                        {chat.lastMessage.sender.username}: {chat.lastMessage.content.substring(0, 30)}...
+                                      </div>
+                                    )}
                                   </div>
-                                );
-                              })
-                          ) : (
-                            <div className="mobile-no-chats">
-                              <MessageCircle className="mobile-no-chats-icon" />
-                              <h3>Чатов пока нет</h3>
-                              <p>Начните общение с другими пользователями</p>
-                            </div>
-                          )}
-                        </div>
+                                  {chat.unreadCount > 0 && (
+                                    <span className="chat-unread">{chat.unreadCount}</span>
+                                  )}
+                                </div>
+                              );
+                            })
+                        ) : (
+                          <div className="no-chats">
+                            <MessageCircle size={48} />
+                            <h3>Чатов пока нет</h3>
+                            <p>Начните общение с другими пользователями</p>
+                          </div>
+                        )}
                       </div>
-                    )}
+                    </div>
 
-                    {mobileView === 'chat' && activeChat && (() => {
-                      const otherUser = activeChat.participants && activeChat.participants.length === 2
-                        ? activeChat.participants.find(p => p._id !== (user._id || user.id))
-                        : null;
-                      const userStatus = getUserStatus(otherUser?._id);
-                      const chatMessages = messages[activeChat._id] || [];
-                      return (
-                        <div className="mobile-chat-view">
-                          <div className="mobile-chat-header">
-                            <div className="mobile-chat-header-left">
-                              <button className="mobile-back-btn" onClick={() => { setMobileView('chats'); setActiveChat(null); document.body.classList.remove('mobile-chat-open'); }}>
-                                <ArrowLeft size={20} />
-                              </button>
-                              <Avatar
-                                src={otherUser?.avatar || null}
-                                alt={otherUser?.displayName || otherUser?.username || 'User'}
-                                size="medium"
-                                className="mobile-chat-header-avatar"
-                              />
-                              <div className="mobile-chat-user-info">
-                                <div className="mobile-chat-title-section">
-                                  <h3>{activeChat.name}</h3>
-                                  <OnlineStatus
-                                    userId={otherUser?._id}
-                                    isOnline={userStatus.isOnline}
-                                    lastSeen={userStatus.lastSeen}
-                                    showText={true}
-                                    size="small"
-                                  />
+                    {/* Область чата */}
+                    <div className={`chat-area ${mobileView === 'chat' ? 'show' : ''}`}>
+                      {activeChat ? (
+                        <>
+                          <div className="chat-header">
+                            <div className="chat-header-content">
+                              <div className="chat-user-info">
+                                <button 
+                                  className="back-to-chats-btn"
+                                  onClick={() => setMobileView('chats')}
+                                  title="Вернуться к чатам"
+                                >
+                                  <ArrowLeft size={20} />
+                                </button>
+                                <div className="chat-user-section">
+                                  <div className="chat-header-avatar">
+                                    {(() => {
+                                      const otherUser = activeChat.participants && activeChat.participants.length === 2
+                                        ? activeChat.participants.find(p => p._id !== (user._id || user.id))
+                                        : null;
+                                      return (
+                                        <Avatar
+                                          src={otherUser?.avatar || null}
+                                          alt={otherUser?.displayName || otherUser?.username || 'User'}
+                                          size="medium"
+                                        />
+                                      );
+                                    })()}
+                                  </div>
+                                  <div className="chat-title-section">
+                                    <h3>{activeChat.name}</h3>
+                                    {(() => {
+                                      const otherUser = activeChat.participants && activeChat.participants.length === 2
+                                        ? activeChat.participants.find(p => p._id !== (user._id || user.id))
+                                        : null;
+                                      const userStatus = getUserStatus(otherUser?._id);
+                                      return (
+                                        <OnlineStatus
+                                          userId={otherUser?._id}
+                                          isOnline={userStatus.isOnline}
+                                          lastSeen={userStatus.lastSeen}
+                                          showText={true}
+                                          size="small"
+                                        />
+                                      );
+                                    })()}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                            <div className="mobile-chat-actions">
-                              <button className="mobile-call-button" onClick={() => initiateCall('audio')} title="Голосовой звонок">
-                                <Phone size={20} />
-                              </button>
-                              <button title="Дополнительно">
-                                <MoreVertical size={20} />
-                              </button>
+                              <div className="chat-call-buttons">
+                                <button 
+                                  className="call-button audio-call"
+                                  onClick={() => initiateCall('audio')}
+                                  title="Голосовой звонок"
+                                >
+                                  <Phone size={18} />
+                                </button>
+                              </div>
                             </div>
                           </div>
 
-                          <div className="mobile-messages-area">
+                          <div className="messages-area">
                             {messagesLoading ? (
-                              <div className="mobile-messages-loading">
-                                <div className="mobile-loading-spinner"></div>
+                              <div className="messages-loading">
                                 <div>Загрузка сообщений...</div>
                               </div>
                             ) : (
                               <>
                                 {messagesPagination[activeChat._id]?.hasMore && (
-                                  <div className="mobile-load-more-messages">
+                                  <div className="load-more-messages">
                                     <button
                                       onClick={() => loadOlderMessages(activeChat._id)}
                                       disabled={loadingOlderMessages}
-                                      className="mobile-load-more-btn"
+                                      className="load-more-btn"
                                     >
                                       {loadingOlderMessages ? 'Загрузка...' : 'Загрузить старые сообщения'}
                                     </button>
                                   </div>
                                 )}
 
-                                <div className="mobile-messages-list">
-                                  {chatMessages.length === 0 ? (
-                                    <div className="mobile-no-chats" style={{ padding: '40px 20px' }}>
-                                      <MessageCircle className="mobile-no-chats-icon" />
+                                {(() => {
+                                  const chatMessages = messages[activeChat._id] || [];
+                                  return chatMessages.length === 0 ? (
+                                    <div className="no-active-chat">
+                                      <MessageCircle size={48} />
                                       <h3>Сообщений пока нет</h3>
                                       <p>Начните разговор первым</p>
                                     </div>
@@ -2424,58 +2449,67 @@ const HomePage = () => {
                                       const date = new Date(message.createdAt);
                                       const messageTime = date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
                                       return (
-                                        <div key={message._id} className={`mobile-message ${isOwn ? 'own' : 'other'}`}>
+                                        <div key={message._id} className={`message ${isOwn ? 'own' : 'other'}`}>
                                           {!isOwn && (
                                             <Avatar
                                               src={message.sender.avatar || null}
                                               alt={message.sender.displayName || message.sender.username}
                                               size="small"
-                                              className="mobile-message-avatar"
+                                              className="message-avatar"
                                             />
                                           )}
-                                          <div className="mobile-message-body">
-                                            <div className="mobile-message-header">
-                                              <span className="mobile-message-sender">
+                                          <div className="message-body">
+                                            <div className="message-header">
+                                              <span className="message-sender">
                                                 {message.sender.displayName || message.sender.username}
                                                 {message.sender.premium && (
                                                   <span className="premium-badge" title="Premium">
-                                                    <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14" aria-hidden="true">
+                                                    <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
                                                       <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
                                                     </svg>
                                                   </span>
                                                 )}
                                               </span>
-                                              <span className="mobile-message-time">{messageTime}</span>
+                                              <span className="message-time">{messageTime}</span>
                                             </div>
-                                            <div className="mobile-message-content">{message.content}</div>
+                                            <div className="message-content">{message.content}</div>
                                           </div>
                                         </div>
                                       );
                                     })
-                                  )}
-                                </div>
+                                  );
+                                })()}
+                                <div ref={messagesEndRef} />
                               </>
                             )}
                           </div>
 
-                          <div className="mobile-message-input-area">
-                            <div className="mobile-message-input-wrapper">
-                              <input
-                                type="text"
-                                className="mobile-message-input"
-                                placeholder="Введите сообщение..."
-                                value={newMessage}
-                                onChange={(e) => setNewMessage(e.target.value)}
-                                onKeyPress={(e) => e.key === 'Enter' && newMessage.trim() && sendMessage()}
-                              />
-                              <button className="mobile-send-message-btn" onClick={() => newMessage.trim() && sendMessage()} disabled={!newMessage.trim()}>
-                                <Send size={20} />
-                              </button>
-                            </div>
+                          <div className="message-input-area">
+                            <textarea
+                              className="message-input"
+                              placeholder="Введите сообщение..."
+                              value={newMessage}
+                              onChange={(e) => setNewMessage(e.target.value)}
+                              onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && newMessage.trim() && sendMessage()}
+                              rows={1}
+                            />
+                            <button 
+                              className="send-message-btn" 
+                              onClick={() => newMessage.trim() && sendMessage()} 
+                              disabled={!newMessage.trim()}
+                            >
+                              <Send size={18} />
+                            </button>
                           </div>
+                        </>
+                      ) : (
+                        <div className="no-active-chat">
+                          <MessageCircle size={48} />
+                          <h3>Выберите чат</h3>
+                          <p>Выберите чат из списка слева для начала общения</p>
                         </div>
-                      );
-                    })()}
+                      )}
+                    </div>
                   </div>
                 ) : (
                   <div className="messages-container">
@@ -2565,6 +2599,30 @@ const HomePage = () => {
                               <><WifiOff size={16} /> {connectionStatus}</>
                             )}
                           </div>
+                          
+                          {/* Мобильная навигация для чата */}
+                          <div className="mobile-chat-navigation">
+                            <button 
+                              className="mobile-back-btn"
+                              onClick={() => setActiveChat(null)}
+                            >
+                              <ChevronLeft size={20} />
+                              Назад
+                            </button>
+                            <h3 className="mobile-chat-title">
+                              {activeChat.name}
+                            </h3>
+                            <div className="mobile-chat-actions">
+                              <button 
+                                onClick={() => initiateCall('audio')}
+                                className="mobile-action-btn"
+                                title="Голосовой звонок"
+                              >
+                                <Phone size={18} />
+                              </button>
+                            </div>
+                          </div>
+                          
                           <div className="chat-header">
                             <div className="chat-header-content">
                               <div className="chat-user-info">
