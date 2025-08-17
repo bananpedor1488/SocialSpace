@@ -5,6 +5,12 @@ export const setMobileViewportHeight = () => {
   const setVH = () => {
     const vh = window.innerHeight * 0.01;
     document.documentElement.style.setProperty('--vh', `${vh}px`);
+    
+    // Также устанавливаем переменные для хедера и навигации
+    const headerHeight = 60; // Примерная высота хедера
+    const navHeight = 60; // Примерная высота нижней навигации
+    document.documentElement.style.setProperty('--mobile-header-height', `${headerHeight}px`);
+    document.documentElement.style.setProperty('--mobile-nav-height', `${navHeight}px`);
   };
 
   setVH();
@@ -223,4 +229,38 @@ export const clearScrollPositions = () => {
       sessionStorage.removeItem(key);
     }
   });
+};
+
+// Функция для правильного переключения чатов на мобильных
+export const switchToChat = (chat, setActiveChat, setMobileView, loadMessages) => {
+  setActiveChat(chat);
+  loadMessages(chat._id);
+  
+  // На мобильных устройствах переключаемся в режим чата
+  if (window.innerWidth <= 767) {
+    setMobileView('chat');
+    
+    // Добавляем класс для body чтобы скрыть другие элементы
+    document.body.classList.add('mobile-chat-open');
+    
+    // Устанавливаем правильные отступы
+    const messagesContainer = document.querySelector('.messages-container');
+    if (messagesContainer) {
+      messagesContainer.style.paddingTop = 'calc(60px + env(safe-area-inset-top))';
+      messagesContainer.style.paddingBottom = 'calc(60px + env(safe-area-inset-bottom))';
+    }
+  }
+};
+
+// Функция для возврата к списку чатов на мобильных
+export const switchToChatsList = (setActiveChat, setMobileView) => {
+  setActiveChat(null);
+  
+  // На мобильных устройствах переключаемся в режим списка чатов
+  if (window.innerWidth <= 767) {
+    setMobileView('chats');
+    
+    // Убираем класс для body
+    document.body.classList.remove('mobile-chat-open');
+  }
 };

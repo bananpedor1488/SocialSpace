@@ -31,7 +31,9 @@ import {
   handleOnlineStatus,
   saveScrollPosition,
   restoreScrollPosition,
-  clearScrollPositions
+  clearScrollPositions,
+  switchToChat,
+  switchToChatsList
 } from '../utils/mobileMessages';
 
 const HomePage = () => {
@@ -2447,11 +2449,11 @@ const HomePage = () => {
                           <div className="chat-header">
                             <div className="chat-header-content">
                               <div className="chat-user-info">
-                                <button 
-                                  className="back-to-chats-btn"
-                                  onClick={() => setMobileView('chats')}
-                                  title="Вернуться к чатам"
-                                >
+                                                        <button
+                          className="back-to-chats-btn"
+                          onClick={() => switchToChatsList(setActiveChat, setMobileView)}
+                          title="Вернуться к чатам"
+                        >
                                   <ArrowLeft size={20} />
                                 </button>
                                 <div className="chat-user-section">
@@ -2624,7 +2626,7 @@ const HomePage = () => {
                               <div 
                                 key={chat._id} 
                                 className={`chat-item ${activeChat?._id === chat._id ? 'active' : ''}`}
-                                onClick={() => { setActiveChat(chat); loadMessages(chat._id); }}
+                                onClick={() => switchToChat(chat, setActiveChat, setMobileView, loadMessages)}
                               >
                                 <Avatar 
                                   src={otherUser?.avatar || null}
@@ -2690,7 +2692,7 @@ const HomePage = () => {
                           <div className="mobile-chat-navigation">
                             <button 
                               className="mobile-back-btn"
-                              onClick={() => setActiveChat(null)}
+                              onClick={() => switchToChatsList(setActiveChat, setMobileView)}
                             >
                               <ChevronLeft size={20} />
                               Назад

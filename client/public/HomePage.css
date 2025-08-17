@@ -44,6 +44,9 @@
     display: flex !important;
     flex-direction: column !important;
     box-sizing: border-box !important;
+    /* Предотвращение наложения под хедер и нижнюю панель */
+    padding-top: calc(var(--mobile-header-height) + env(safe-area-inset-top)) !important;
+    padding-bottom: calc(var(--mobile-nav-height) + env(safe-area-inset-bottom)) !important;
   }
 
   body.mobile-chat-open.dark-theme .mobile-chat-view {
@@ -98,13 +101,40 @@
     bottom: var(--mobile-nav-height) !important;
     padding-top: var(--mobile-header-height) !important;
     width: 100vw !important;
-    height: calc(100vh - var(--mobile-nav-height)) !important;
+    /* Предотвращение наложения под хедер и нижнюю панель */
+    padding-top: calc(var(--mobile-header-height) + env(safe-area-inset-top)) !important;
+    padding-bottom: calc(var(--mobile-nav-height) + env(safe-area-inset-bottom)) !important;
+    box-sizing: border-box !important;
+    height: calc(100vh - var(--mobile-nav-height) - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
     z-index: 900 !important;
     box-sizing: border-box !important;
+    
+    /* Дополнительные исправления для предотвращения наложения */
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  
+  /* Исправления для области сообщений */
+  body.mobile-chat-open .mobile-messages-area {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    /* Отступы для предотвращения наложения */
+    padding-bottom: calc(12px + env(safe-area-inset-bottom)) !important;
+  }
+  
+    /* Исправления для области ввода */
+  body.mobile-chat-open .mobile-message-input-area {
+    flex-shrink: 0 !important;
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 10 !important;
+    /* Отступ для нижней панели */
+    padding-bottom: calc(12px + env(safe-area-inset-bottom)) !important;
   }
 }
-
-/* Дополнительные оверрайды для стабильного позиционирования до загрузки сообщений */
 @media (max-width: 767px) {
   .mobile-messenger {
     position: fixed !important;

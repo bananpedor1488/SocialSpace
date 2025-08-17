@@ -16,15 +16,56 @@
     padding: 0 !important;
     border-radius: 0 !important;
     z-index: 1000 !important;
+    /* Предотвращение наложения под хедер и нижнюю панель */
+    padding-top: env(safe-area-inset-top) !important;
+    padding-bottom: env(safe-area-inset-bottom) !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Боковая панель чатов */
+  .chats-sidebar {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: #0f172a !important;
+    z-index: 1001 !important;
+    transform: translateX(-100%) !important;
+    transition: transform 0.3s ease !important;
+    /* Отступы для хедера и нижней панели */
+    padding-top: calc(60px + env(safe-area-inset-top)) !important;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
+    box-sizing: border-box !important;
+  }
+
+  .chats-sidebar.show {
+    transform: translateX(0) !important;
   }
 
   /* Область чата */
   .chat-area {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
     display: flex !important;
     flex-direction: column !important;
     height: 100% !important;
     width: 100% !important;
     overflow: hidden !important;
+    z-index: 1002 !important;
+    transform: translateX(100%) !important;
+    transition: transform 0.3s ease !important;
+    /* Отступы для хедера и нижней панели */
+    padding-top: env(safe-area-inset-top) !important;
+    padding-bottom: env(safe-area-inset-bottom) !important;
+    box-sizing: border-box !important;
+  }
+
+  .chat-area.show {
+    transform: translateX(0) !important;
   }
 
   /* Заголовок чата */
@@ -37,6 +78,10 @@
     align-items: center !important;
     justify-content: space-between !important;
     min-height: 60px !important;
+    /* Фиксированная позиция под хедером */
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 10 !important;
   }
 
   .chat-header-content {
@@ -66,6 +111,8 @@
     -webkit-overflow-scrolling: touch !important;
     scroll-behavior: smooth !important;
     background: rgba(15, 23, 42, 0.95) !important;
+    /* Отступ снизу для нижней панели */
+    padding-bottom: calc(12px + env(safe-area-inset-bottom)) !important;
   }
 
   /* Сообщения */
@@ -171,6 +218,12 @@
     gap: 10px !important;
     align-items: flex-end !important;
     min-height: 70px !important;
+    /* Фиксированная позиция над нижней панелью */
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 10 !important;
+    /* Отступ для нижней панели */
+    padding-bottom: calc(12px + env(safe-area-inset-bottom)) !important;
   }
 
   /* Поле ввода */
@@ -224,6 +277,33 @@
   .send-message-btn:disabled {
     opacity: 0.5 !important;
     cursor: not-allowed !important;
+  }
+
+  /* Кнопка возврата к чатам */
+  .back-to-chats-btn {
+    background: none !important;
+    border: none !important;
+    color: #f1f5f9 !important;
+    padding: 8px !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.2s ease !important;
+    flex-shrink: 0 !important;
+    margin-right: 12px !important;
+  }
+
+  .back-to-chats-btn:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  /* Скрыть кнопку на десктопе */
+  @media (min-width: 768px) {
+    .back-to-chats-btn {
+      display: none !important;
+    }
   }
 }
 
@@ -461,5 +541,79 @@
   .send-message-btn:hover,
   .chat-action-btn:hover {
     transform: none !important;
+  }
+}
+
+/* Дополнительные исправления для предотвращения наложения */
+@media (max-width: 767px) {
+  /* Глобальные исправления */
+  body {
+    overflow-x: hidden !important;
+    position: relative !important;
+  }
+
+  /* Исправления для всех скроллируемых областей */
+  .messages-area,
+  .chats-sidebar {
+    -webkit-overflow-scrolling: touch !important;
+    scroll-behavior: smooth !important;
+  }
+
+  /* Исправления для input полей */
+  .message-input,
+  input,
+  textarea {
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    font-size: 16px !important; /* Предотвращает зум на iOS */
+  }
+
+  /* Исправления для кнопок */
+  button {
+    -webkit-tap-highlight-color: transparent !important;
+    touch-action: manipulation !important;
+  }
+
+  /* Исправления для контента */
+  .message-content,
+  .chat-avatar {
+    -webkit-user-select: none !important;
+    -webkit-user-drag: none !important;
+  }
+
+  /* Flexbox fallbacks для старых браузеров */
+  .messages-container,
+  .chat-area,
+  .message-input-area {
+    display: -webkit-box !important;
+    display: -webkit-flex !important;
+    display: -ms-flexbox !important;
+    display: flex !important;
+  }
+
+  /* Дополнительные отступы для разных размеров экранов */
+  @media (max-height: 600px) {
+    .chat-header {
+      min-height: 48px !important;
+      padding: 8px 16px !important;
+    }
+
+    .message-input-area {
+      min-height: 60px !important;
+      padding: 8px 16px !important;
+    }
+  }
+
+  @media (max-height: 500px) {
+    .chat-header {
+      min-height: 44px !important;
+      padding: 6px 16px !important;
+    }
+
+    .message-input-area {
+      min-height: 56px !important;
+      padding: 6px 16px !important;
+    }
   }
 }
