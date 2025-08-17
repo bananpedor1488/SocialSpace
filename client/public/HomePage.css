@@ -179,6 +179,24 @@
     right: 0 !important;
     bottom: 0 !important;
     z-index: 1000 !important;
+    background: #0f172a !important;
+  }
+
+  /* Исправления для предотвращения прозрачности */
+  body.mobile-chat-open .messages-container * {
+    background: inherit !important;
+  }
+
+  /* Исправления для правильных отступов */
+  body.mobile-chat-open .chats-sidebar,
+  body.mobile-chat-open .chat-area {
+    background: #0f172a !important;
+  }
+
+  /* Убираем лишние отступы */
+  body.mobile-chat-open .home-container {
+    margin: 0 !important;
+    padding: 0 !important;
   }
 }
 

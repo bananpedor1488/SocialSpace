@@ -267,6 +267,7 @@ export const switchToChat = (chat, setActiveChat, setMobileView, loadMessages) =
       messagesContainer.style.right = '0';
       messagesContainer.style.bottom = '0';
       messagesContainer.style.zIndex = '1000';
+      messagesContainer.style.background = '#0f172a';
       messagesContainer.style.paddingTop = 'calc(60px + env(safe-area-inset-top))';
       messagesContainer.style.paddingBottom = 'calc(60px + env(safe-area-inset-bottom))';
     }

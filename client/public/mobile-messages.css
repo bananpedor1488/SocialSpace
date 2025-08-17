@@ -21,6 +21,8 @@
     padding-bottom: calc(60px + env(safe-area-inset-bottom)) !important;
     box-sizing: border-box !important;
     background: #0f172a !important;
+    display: flex !important;
+    flex-direction: column !important;
   }
 
   /* Боковая панель чатов */
@@ -35,9 +37,11 @@
     transform: translateX(-100%) !important;
     transition: transform 0.3s ease !important;
     /* Отступы для хедера и нижней панели */
-    padding-top: calc(60px + env(safe-area-inset-top)) !important;
-    padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
     box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
   }
 
   .chats-sidebar.show {
@@ -50,6 +54,118 @@
     bottom: 0 !important;
     z-index: 1001 !important;
     background: #0f172a !important;
+  }
+
+  /* Заголовок списка чатов */
+  .chats-header {
+    flex-shrink: 0 !important;
+    padding: 16px !important;
+    background: rgba(30, 41, 59, 0.95) !important;
+    border-bottom: 1px solid rgba(71, 85, 105, 0.3) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    min-height: 60px !important;
+    margin-top: calc(60px + env(safe-area-inset-top)) !important;
+  }
+
+  .chats-header h3 {
+    margin: 0 !important;
+    color: #f1f5f9 !important;
+    font-size: 18px !important;
+    font-weight: 600 !important;
+  }
+
+  /* Список чатов */
+  .chats-list {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #0f172a !important;
+  }
+
+  /* Элемент чата */
+  .chat-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 12px 16px !important;
+    border-bottom: 1px solid rgba(71, 85, 105, 0.2) !important;
+    cursor: pointer !important;
+    transition: background-color 0.2s ease !important;
+    background: #0f172a !important;
+  }
+
+  .chat-item:hover {
+    background: rgba(30, 41, 59, 0.5) !important;
+  }
+
+  .chat-item.active {
+    background: rgba(59, 130, 246, 0.2) !important;
+  }
+
+  /* Информация о чате */
+  .chat-info {
+    flex: 1 !important;
+    min-width: 0 !important;
+  }
+
+  .chat-name {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: #f1f5f9 !important;
+    margin-bottom: 4px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+
+  .chat-last-message {
+    font-size: 12px !important;
+    color: rgba(148, 163, 184, 0.8) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* Счетчик непрочитанных */
+  .chat-unread {
+    background: #3b82f6 !important;
+    color: white !important;
+    border-radius: 50% !important;
+    min-width: 20px !important;
+    height: 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Сообщение об отсутствии чатов */
+  .no-chats {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 40px 20px !important;
+    text-align: center !important;
+    color: rgba(148, 163, 184, 0.8) !important;
+  }
+
+  .no-chats h3 {
+    margin: 16px 0 8px 0 !important;
+    color: #f1f5f9 !important;
+    font-size: 16px !important;
+  }
+
+  .no-chats p {
+    margin: 0 !important;
+    font-size: 14px !important;
   }
 
   /* Область чата */
@@ -68,9 +184,10 @@
     transform: translateX(100%) !important;
     transition: transform 0.3s ease !important;
     /* Отступы для хедера и нижней панели */
-    padding-top: env(safe-area-inset-top) !important;
-    padding-bottom: env(safe-area-inset-bottom) !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
     box-sizing: border-box !important;
+    background: #0f172a !important;
   }
 
   .chat-area.show {
@@ -99,6 +216,7 @@
     position: sticky !important;
     top: 0 !important;
     z-index: 10 !important;
+    margin-top: calc(60px + env(safe-area-inset-top)) !important;
   }
 
   .chat-header-content {
@@ -127,7 +245,7 @@
     overflow-x: hidden !important;
     -webkit-overflow-scrolling: touch !important;
     scroll-behavior: smooth !important;
-    background: rgba(15, 23, 42, 0.95) !important;
+    background: #0f172a !important;
     /* Отступ снизу для нижней панели */
     padding-bottom: calc(12px + env(safe-area-inset-bottom)) !important;
   }
@@ -158,6 +276,25 @@
     height: 28px !important;
     flex-shrink: 0 !important;
     border-radius: 50% !important;
+    object-fit: cover !important;
+  }
+
+  /* Аватары в списке чатов */
+  .chat-item .avatar {
+    width: 40px !important;
+    height: 40px !important;
+    flex-shrink: 0 !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+  }
+
+  /* Аватары в заголовке чата */
+  .chat-header-avatar .avatar {
+    width: 32px !important;
+    height: 32px !important;
+    flex-shrink: 0 !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
   }
 
   /* Тело сообщения */
@@ -241,6 +378,7 @@
     z-index: 10 !important;
     /* Отступ для нижней панели */
     padding-bottom: calc(12px + env(safe-area-inset-bottom)) !important;
+    margin-bottom: calc(60px + env(safe-area-inset-bottom)) !important;
   }
 
   /* Поле ввода */
@@ -314,6 +452,21 @@
 
   .back-to-chats-btn:hover {
     background: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  /* Информация о пользователе в заголовке чата */
+  .chat-user-info {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    flex: 1 !important;
+  }
+
+  .chat-user-section {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    flex: 1 !important;
   }
 
   /* Скрыть кнопку на десктопе */
