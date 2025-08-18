@@ -8655,8 +8655,10 @@ body {
 
   /* Мобильные стили для профиля */
   .profile-header {
+    max-width: 680px !important;
+    width: calc(100% - 24px) !important;
+    margin: 0 auto 20px !important;
     padding: 20px 15px !important;
-    margin-bottom: 20px !important;
     border-radius: 16px !important;
   }
 
@@ -8691,12 +8693,18 @@ body {
   }
 
   .profile-stats {
+    max-width: 680px !important;
+    width: calc(100% - 24px) !important;
+    margin: 0 auto 20px !important;
     padding: 15px !important;
     justify-content: center !important;
     gap: 30px !important;
   }
 
   .profile-actions {
+    max-width: 680px !important;
+    width: calc(100% - 24px) !important;
+    margin: 0 auto 20px !important;
     justify-content: center !important;
     gap: 15px !important;
     flex-wrap: wrap !important;
@@ -8706,5 +8714,37 @@ body {
     justify-content: center !important;
     text-align: center !important;
     margin-bottom: 25px !important;
+  }
+
+  /* Стили для кнопки настроек аккаунта */
+  .profile-actions .settings-btn,
+  .profile-actions button[onclick*="settings"],
+  .profile-actions .account-settings-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    border: none !important;
+    padding: 12px 20px !important;
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3) !important;
+    margin: 0 5px !important;
+  }
+
+  .profile-actions .settings-btn:hover,
+  .profile-actions button[onclick*="settings"]:hover,
+  .profile-actions .account-settings-btn:hover {
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4) !important;
+  }
+
+  .profile-actions .settings-btn:active,
+  .profile-actions button[onclick*="settings"]:active,
+  .profile-actions .account-settings-btn:active {
+    transform: translateY(0) !important;
+    box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3) !important;
   }
 }
