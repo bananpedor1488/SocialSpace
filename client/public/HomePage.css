@@ -8477,4 +8477,56 @@ body {
     width: calc(100% - 24px) !important; /* небольшие поля от краёв экрана */
     margin: 0 auto 16px !important; /* центрируем карточки */
   }
+
+  /* Уменьшаем плашку "постов пока нет" */
+  .no-posts {
+    max-width: 680px !important;
+    width: calc(100% - 24px) !important;
+    margin: 0 auto !important;
+    padding: 40px 20px !important;
+  }
+
+  /* Список топ игроков на всю высоту контейнера */
+  .leaderboard-list {
+    height: calc(100vh - 200px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .leaderboard {
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .leaderboard-header {
+    flex-shrink: 0 !important;
+  }
+
+  .leaderboard-list {
+    flex: 1 !important;
+    min-height: 0 !important;
+  }
+
+  /* Страница рейтинга на всю высоту */
+  .leaderboard-view {
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 15px !important;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .leaderboard-view .leaderboard-header {
+    flex-shrink: 0 !important;
+    margin-bottom: 20px !important;
+  }
+
+  .leaderboard-view .leaderboard-list {
+    flex: 1 !important;
+    min-height: 0 !important;
+    height: auto !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
 }
