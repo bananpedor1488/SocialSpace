@@ -6,21 +6,24 @@
 @media (max-width: 767px) {
   /* Основной контейнер приложения */
   body {
-    padding-top: calc(60px + env(safe-area-inset-top)) !important;
-    padding-bottom: calc(60px + env(safe-area-inset-bottom)) !important;
-    box-sizing: border-box !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin: 0 !important;
     overflow-x: hidden !important;
     position: relative !important;
+    min-height: 100vh !important;
   }
 
   /* Главный контейнер */
   .app-container,
   .main-container,
   #root {
-    padding-top: calc(60px + env(safe-area-inset-top)) !important;
-    padding-bottom: calc(60px + env(safe-area-inset-bottom)) !important;
-    box-sizing: border-box !important;
-    min-height: calc(100vh - 120px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    min-height: 100vh !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
   }
 
   /* Хедер - фиксированная позиция */
@@ -37,6 +40,8 @@
     backdrop-filter: blur(10px) !important;
     border-bottom: 1px solid rgba(71, 85, 105, 0.3) !important;
     padding-top: env(safe-area-inset-top) !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
   }
 
   /* Нижняя навигация - фиксированная позиция */
@@ -53,37 +58,11 @@
     backdrop-filter: blur(10px) !important;
     border-top: 1px solid rgba(71, 85, 105, 0.3) !important;
     padding-bottom: env(safe-area-inset-bottom) !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
   }
 
-  /* Специфичные исправления для хедера приложения */
-  .header {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    z-index: 10000 !important;
-    height: 60px !important;
-    background: rgba(15, 23, 42, 0.98) !important;
-    backdrop-filter: blur(10px) !important;
-    border-bottom: 1px solid rgba(71, 85, 105, 0.3) !important;
-    padding-top: env(safe-area-inset-top) !important;
-  }
-
-  /* Специфичные исправления для мобильной навигации */
-  .mobile-nav {
-    position: fixed !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    z-index: 10000 !important;
-    height: 60px !important;
-    background: rgba(15, 23, 42, 0.98) !important;
-    backdrop-filter: blur(10px) !important;
-    border-top: 1px solid rgba(71, 85, 105, 0.3) !important;
-    padding-bottom: env(safe-area-inset-bottom) !important;
-  }
-
-  /* Основной контент */
+  /* Основной контент - правильные отступы */
   .main-content,
   .content,
   .page-content {
@@ -91,15 +70,22 @@
     margin-bottom: calc(60px + env(safe-area-inset-bottom)) !important;
     min-height: calc(100vh - 120px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
     box-sizing: border-box !important;
+    padding: 15px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
   }
 
   /* Специфичные исправления для основного контейнера */
   .home-container {
-    margin-top: calc(60px + env(safe-area-inset-top)) !important;
-    margin-bottom: calc(60px + env(safe-area-inset-bottom)) !important;
-    min-height: calc(100vh - 120px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
-    box-sizing: border-box !important;
+    margin: 0 !important;
     padding: 0 !important;
+    min-height: 100vh !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
   }
 
   /* Все модальные окна и оверлеи */
@@ -293,49 +279,47 @@
   }
 }
 
-/* Мобильная компоновка: чат под хедером и над нижней навигацией */
-@media (max-width: 767px) {
-  body.mobile-chat-open .mobile-messenger {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: var(--mobile-nav-height) !important;
-    padding-top: var(--mobile-header-height) !important;
-    width: 100vw !important;
-    /* Предотвращение наложения под хедер и нижнюю панель */
-    padding-top: calc(var(--mobile-header-height) + env(safe-area-inset-top)) !important;
-    padding-bottom: calc(var(--mobile-nav-height) + env(safe-area-inset-bottom)) !important;
-    box-sizing: border-box !important;
-    height: calc(100vh - var(--mobile-nav-height) - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
-    z-index: 900 !important;
-    box-sizing: border-box !important;
+  /* Мобильная компоновка: чат под хедером и над нижней навигацией */
+  @media (max-width: 767px) {
+    body.mobile-chat-open .mobile-messenger {
+      position: fixed !important;
+      top: calc(60px + env(safe-area-inset-top)) !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: calc(60px + env(safe-area-inset-bottom)) !important;
+      width: 100vw !important;
+      height: calc(100vh - 120px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+      z-index: 900 !important;
+      box-sizing: border-box !important;
+      
+      /* Дополнительные исправления для предотвращения наложения */
+      overflow: hidden !important;
+      display: flex !important;
+      flex-direction: column !important;
+      background: #0f172a !important;
+    }
+  
+      /* Исправления для области сообщений */
+    body.mobile-chat-open .mobile-messages-area {
+      flex: 1 !important;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      -webkit-overflow-scrolling: touch !important;
+      /* Отступы для предотвращения наложения */
+      padding-bottom: 12px !important;
+    }
     
-    /* Дополнительные исправления для предотвращения наложения */
-    overflow: hidden !important;
-    display: flex !important;
-    flex-direction: column !important;
-  }
-  
-  /* Исправления для области сообщений */
-  body.mobile-chat-open .mobile-messages-area {
-    flex: 1 !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    -webkit-overflow-scrolling: touch !important;
-    /* Отступы для предотвращения наложения */
-    padding-bottom: calc(12px + env(safe-area-inset-bottom)) !important;
-  }
-  
     /* Исправления для области ввода */
-  body.mobile-chat-open .mobile-message-input-area {
-    flex-shrink: 0 !important;
-    position: sticky !important;
-    bottom: 0 !important;
-    z-index: 10 !important;
-    /* Отступ для нижней панели */
-    padding-bottom: calc(12px + env(safe-area-inset-bottom)) !important;
-  }
+    body.mobile-chat-open .mobile-message-input-area {
+      flex-shrink: 0 !important;
+      position: sticky !important;
+      bottom: 0 !important;
+      z-index: 10 !important;
+      /* Отступ для нижней панели */
+      padding-bottom: 12px !important;
+      background: rgba(15, 23, 42, 0.98) !important;
+      border-top: 1px solid rgba(71, 85, 105, 0.3) !important;
+    }
 }
 @media (max-width: 767px) {
   .mobile-messenger {
@@ -2288,6 +2272,10 @@ body {
     grid-template-rows: auto 1fr auto;
     gap: 0;
     padding: 0;
+    min-height: 100vh;
+    width: 100vw;
+    max-width: 100vw;
+    overflow-x: hidden;
   }
 
   .sidebar, .right-sidebar {
@@ -2295,13 +2283,17 @@ body {
   }
 
   .header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 10000;
-    height: auto;
-    border-radius: 0;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 10000 !important;
+    height: 60px !important;
+    border-radius: 0 !important;
+    background: rgba(15, 23, 42, 0.98) !important;
+    backdrop-filter: blur(10px) !important;
+    border-bottom: 1px solid rgba(71, 85, 105, 0.3) !important;
+    padding-top: env(safe-area-inset-top) !important;
   }
 
   .header-content {
@@ -2309,6 +2301,9 @@ body {
     gap: 15px;
     align-items: stretch;
     padding: 15px;
+    height: 100%;
+    display: flex;
+    justify-content: center;
   }
   
   .header-search {
@@ -2331,13 +2326,90 @@ body {
   }
 
   .main-content {
-    margin-top: 120px;
-    margin-bottom: 80px;
-    padding: 15px;
+    margin-top: calc(60px + env(safe-area-inset-top)) !important;
+    margin-bottom: calc(60px + env(safe-area-inset-bottom)) !important;
+    padding: 15px !important;
+    min-height: calc(100vh - 120px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
   }
 
   .mobile-nav {
-    display: block;
+    display: block !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 10000 !important;
+    height: 60px !important;
+    background: rgba(15, 23, 42, 0.98) !important;
+    backdrop-filter: blur(10px) !important;
+    border-top: 1px solid rgba(71, 85, 105, 0.3) !important;
+    padding-bottom: env(safe-area-inset-bottom) !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+  }
+
+  /* Стили для мобильной навигации */
+  .mobile-nav-menu {
+    display: flex !important;
+    justify-content: space-around !important;
+    align-items: center !important;
+    height: 100% !important;
+    padding: 0 10px !important;
+  }
+
+  .mobile-nav-button {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    padding: 8px 12px !important;
+    background: transparent !important;
+    border: none !important;
+    color: rgba(148, 163, 184, 0.8) !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    border-radius: 8px !important;
+    min-width: 60px !important;
+  }
+
+  .mobile-nav-button:hover,
+  .mobile-nav-button.active {
+    color: #3b82f6 !important;
+    background: rgba(59, 130, 246, 0.1) !important;
+  }
+
+  .mobile-nav-icon {
+    width: 20px !important;
+    height: 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .mobile-nav-text {
+    font-size: 10px !important;
+    font-weight: 500 !important;
+    text-align: center !important;
+  }
+
+  .mobile-unread-badge {
+    position: absolute !important;
+    top: 4px !important;
+    right: 4px !important;
+    background: #ef4444 !important;
+    color: white !important;
+    border-radius: 50% !important;
+    width: 16px !important;
+    height: 16px !important;
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 
   .create-post {
@@ -2370,8 +2442,8 @@ body {
   }
 
   .chat-list {
-    margin-top: 120px;
-    margin-bottom: 80px;
+    margin-top: calc(60px + env(safe-area-inset-top)) !important;
+    margin-bottom: calc(60px + env(safe-area-inset-bottom)) !important;
   }
 
   .chat-item {
@@ -2379,16 +2451,16 @@ body {
   }
 
   .chat-messages {
-    margin-top: 120px;
-    margin-bottom: 80px;
+    margin-top: calc(60px + env(safe-area-inset-top)) !important;
+    margin-bottom: calc(60px + env(safe-area-inset-bottom)) !important;
   }
 
   .message-input-container {
-    position: fixed;
-    bottom: 80px;
-    left: 15px;
-    right: 15px;
-    z-index: 999;
+    position: fixed !important;
+    bottom: calc(60px + env(safe-area-inset-bottom)) !important;
+    left: 15px !important;
+    right: 15px !important;
+    z-index: 999 !important;
   }
 
   .message-input {
@@ -2397,8 +2469,8 @@ body {
   }
 
   .leaderboard {
-    margin-top: 120px;
-    margin-bottom: 80px;
+    margin-top: calc(60px + env(safe-area-inset-top)) !important;
+    margin-bottom: calc(60px + env(safe-area-inset-bottom)) !important;
   }
 
   .leaderboard-item {
@@ -2406,8 +2478,8 @@ body {
   }
 
   .wallet {
-    margin-top: 120px;
-    margin-bottom: 80px;
+    margin-top: calc(60px + env(safe-area-inset-top)) !important;
+    margin-bottom: calc(60px + env(safe-area-inset-bottom)) !important;
   }
 
   .wallet-section {
@@ -2415,8 +2487,8 @@ body {
   }
 
   .profile {
-    margin-top: 120px;
-    margin-bottom: 80px;
+    margin-top: calc(60px + env(safe-area-inset-top)) !important;
+    margin-bottom: calc(60px + env(safe-area-inset-bottom)) !important;
   }
 
   .profile-header {
@@ -2432,9 +2504,9 @@ body {
   }
 
   .modal-content {
-    margin: 20px;
-    max-width: calc(100vw - 40px);
-    max-height: calc(100vh - 40px);
+    margin: calc(60px + env(safe-area-inset-top)) 20px calc(60px + env(safe-area-inset-bottom)) 20px !important;
+    max-width: calc(100vw - 40px) !important;
+    max-height: calc(100vh - 120px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
   }
 
   .form-group {
@@ -2495,30 +2567,33 @@ body {
   }
 
   .main-content {
-    margin-top: 120px;
-    padding: 10px;
+    margin-top: calc(60px + env(safe-area-inset-top)) !important;
+    margin-bottom: calc(60px + env(safe-area-inset-bottom)) !important;
+    padding: 10px !important;
+    min-height: calc(100vh - 120px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
   }
 
   .main-content.messages-active {
-    margin-top: 120px;
+    margin-top: calc(60px + env(safe-area-inset-top)) !important;
   }
 
   .mobile-nav {
-    padding: 6px 0;
+    padding: 6px 0 !important;
+    height: 60px !important;
   }
 
   .mobile-nav-button {
-    padding: 6px 8px;
-    min-width: 50px;
+    padding: 6px 8px !important;
+    min-width: 50px !important;
   }
 
   .mobile-nav-icon {
-    width: 18px;
-    height: 18px;
+    width: 18px !important;
+    height: 18px !important;
   }
 
   .mobile-nav-text {
-    font-size: 9px;
+    font-size: 9px !important;
   }
 
   .create-post, .post {
@@ -2584,28 +2659,31 @@ body {
   }
 
   .main-content {
-    margin-top: 80px;
+    margin-top: calc(60px + env(safe-area-inset-top)) !important;
+    margin-bottom: calc(60px + env(safe-area-inset-bottom)) !important;
+    min-height: calc(100vh - 120px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
   }
 
   .main-content.messages-active {
-    margin-top: 80px;
+    margin-top: calc(60px + env(safe-area-inset-top)) !important;
   }
 
   .mobile-nav {
-    padding: 4px 0;
+    padding: 4px 0 !important;
+    height: 60px !important;
   }
 
   .mobile-nav-button {
-    padding: 4px 6px;
+    padding: 4px 6px !important;
   }
 
   .mobile-nav-icon {
-    width: 16px;
-    height: 16px;
+    width: 16px !important;
+    height: 16px !important;
   }
 
   .mobile-nav-text {
-    font-size: 8px;
+    font-size: 8px !important;
   }
 }
 
