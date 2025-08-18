@@ -8768,6 +8768,7 @@ body {
     align-items: center !important;
     justify-content: center !important;
     gap: 8px !important;
+    width: 100% !important;
   }
 
   /* Звездочка для премиум аккаунта */
@@ -8817,26 +8818,46 @@ body {
     width: 40px !important;
     height: 40px !important;
     border-radius: 50% !important;
-    background: #3b82f6 !important;
-    color: white !important;
-    border: none !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #e2e8f0 !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     cursor: pointer !important;
     transition: all 0.2s ease !important;
-    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
     z-index: 10 !important;
   }
 
   .profile-settings-btn-round:hover {
-    background: #2563eb !important;
+    background: rgba(255, 255, 255, 0.2) !important;
+    color: #f1f5f9 !important;
     transform: scale(1.05) !important;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
   }
 
   .profile-settings-btn-round:active {
     transform: scale(0.95) !important;
+  }
+
+  /* Контейнер для плашки "ваш профиль" */
+  .own-profile-badge-container {
+    text-align: center !important;
+    margin-bottom: 15px !important;
+  }
+
+  .own-profile-badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #e2e8f0 !important;
+    padding: 8px 16px !important;
+    border-radius: 20px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
   }
 
   .profile-stats {

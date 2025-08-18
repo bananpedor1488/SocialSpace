@@ -2899,11 +2899,6 @@ const HomePage = () => {
                                 </svg>
                               </span>
                             )}
-                            {isOwnProfile() && (
-                              <span className="own-profile-badge">
-                                <UserCheck size={16} /> Ваш профиль
-                              </span>
-                            )}
                           </h2>
                           {isOwnProfile() && (
                             <button 
@@ -2914,8 +2909,15 @@ const HomePage = () => {
                               <Settings size={18} />
                             </button>
                           )}
-
                         </div>
+                        
+                        {isOwnProfile() && (
+                          <div className="own-profile-badge-container">
+                            <span className="own-profile-badge">
+                              <UserCheck size={16} /> Ваш профиль
+                            </span>
+                          </div>
+                        )}
                         <p className="profile-handle">@{profile.username}</p>
                         {profile.bio && (
                           <p className="profile-bio">{profile.bio}</p>
