@@ -8866,30 +8866,125 @@ body {
     margin: 0 auto 20px !important;
     padding: 15px !important;
     display: flex !important;
+    flex-direction: row !important;
     justify-content: center !important;
     align-items: center !important;
     gap: 30px !important;
-    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow: visible !important;
   }
 
   .profile-stat {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
+    justify-content: center !important;
     text-align: center !important;
     gap: 4px !important;
+    flex-shrink: 0 !important;
+    min-width: 0 !important;
   }
 
   .stat-number {
     font-size: 18px !important;
     font-weight: 600 !important;
     color: #f1f5f9 !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
   .stat-label {
     font-size: 12px !important;
     color: #94a3b8 !important;
     font-weight: 500 !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    white-space: nowrap !important;
+  }
+
+  /* Принудительные стили для статистики профиля на всех экранах */
+  .profile-view .profile-stats,
+  .profile .profile-stats,
+  .profile-header .profile-stats {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 30px !important;
+    width: 100% !important;
+    max-width: 680px !important;
+    margin: 0 auto 20px !important;
+    padding: 15px !important;
+  }
+
+  .profile-view .profile-stat,
+  .profile .profile-stat,
+  .profile-header .profile-stat {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    gap: 4px !important;
+    flex-shrink: 0 !important;
+    min-width: 0 !important;
+  }
+
+  .profile-view .stat-number,
+  .profile .stat-number,
+  .profile-header .stat-number {
+    font-size: 18px !important;
+    font-weight: 600 !important;
+    color: #f1f5f9 !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .profile-view .stat-label,
+  .profile .stat-label,
+  .profile-header .stat-label {
+    font-size: 12px !important;
+    color: #94a3b8 !important;
+    font-weight: 500 !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    white-space: nowrap !important;
+  }
+
+  /* Дополнительные стили для очень маленьких экранов */
+  @media (max-width: 480px) {
+    .profile-stats {
+      gap: 20px !important;
+      padding: 10px !important;
+    }
+    
+    .stat-number {
+      font-size: 16px !important;
+    }
+    
+    .stat-label {
+      font-size: 11px !important;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .profile-stats {
+      gap: 15px !important;
+      padding: 8px !important;
+    }
+    
+    .stat-number {
+      font-size: 14px !important;
+    }
+    
+    .stat-label {
+      font-size: 10px !important;
+    }
   }
 
   .profile-actions {
