@@ -2625,7 +2625,8 @@ body {
   }
 
   .header-content {
-    padding: 10px;
+    padding: 10px !important;
+    gap: 8px !important;
   }
 
   .logo h1 {
@@ -2634,6 +2635,15 @@ body {
 
   .user-info {
     gap: 10px;
+  }
+
+  /* Исправление поиска на маленьких экранах */
+  .header-search {
+    max-width: calc(100vw - 180px) !important;
+    min-width: 150px !important;
+    width: auto !important;
+    flex: 1 !important;
+    margin: 0 5px !important;
   }
 
   .main-content {
@@ -2716,8 +2726,11 @@ body {
   }
 
   .header-search {
-    max-width: 200px;
-    min-width: 200px;
+    max-width: calc(100vw - 220px) !important;
+    min-width: 180px !important;
+    width: auto !important;
+    flex: 1 !important;
+    margin: 0 8px !important;
     order: 2;
   }
 
@@ -5280,6 +5293,15 @@ body {
 .leaderboard-list {
   max-height: 400px;
   overflow-y: auto;
+}
+
+/* Десктопная версия лидерборда на всю высоту */
+@media (min-width: 768px) {
+  .leaderboard-view .leaderboard-list {
+    height: calc(100vh - 200px) !important;
+    max-height: calc(100vh - 200px) !important;
+    overflow-y: auto !important;
+  }
 }
 
 .leaderboard-item {
@@ -8576,5 +8598,26 @@ body {
     height: 100% !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch !important;
+    padding-bottom: calc(100px + env(safe-area-inset-bottom)) !important;
+  }
+
+  /* Исправление поиска в хедере - не обрезается справа */
+  .header-search {
+    max-width: calc(100vw - 200px) !important;
+    min-width: 200px !important;
+    width: auto !important;
+    flex: 1 !important;
+    margin: 0 10px !important;
+  }
+
+  .header-search-input {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .header-content {
+    padding: 15px 10px !important;
+    gap: 10px !important;
   }
 }
