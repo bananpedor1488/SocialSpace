@@ -8865,8 +8865,31 @@ body {
     width: calc(100% - 24px) !important;
     margin: 0 auto 20px !important;
     padding: 15px !important;
+    display: flex !important;
     justify-content: center !important;
+    align-items: center !important;
     gap: 30px !important;
+    flex-direction: row !important;
+  }
+
+  .profile-stat {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    gap: 4px !important;
+  }
+
+  .stat-number {
+    font-size: 18px !important;
+    font-weight: 600 !important;
+    color: #f1f5f9 !important;
+  }
+
+  .stat-label {
+    font-size: 12px !important;
+    color: #94a3b8 !important;
+    font-weight: 500 !important;
   }
 
   .profile-actions {
