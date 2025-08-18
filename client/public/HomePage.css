@@ -8516,8 +8516,13 @@ body {
   /* Исправляем область ввода */
   .message-input-area {
     padding: 15px !important;
+    padding-bottom: calc(15px + env(safe-area-inset-bottom)) !important;
     min-height: 70px !important;
     border-top: 1px solid rgba(71, 85, 105, 0.3) !important;
+    position: sticky !important;
+    bottom: 0 !important;
+    background: rgba(15, 23, 42, 0.95) !important;
+    z-index: 10 !important;
   }
   
   .message-input {
@@ -8544,6 +8549,16 @@ body {
     padding: 15px !important;
     margin-bottom: 8px !important;
     border-radius: 12px !important;
+  }
+
+  /* Исправляем отступ снизу для списка чатов */
+  .chats-list {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
+    margin-bottom: 0 !important;
+  }
+
+  .chats-sidebar {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
   }
   
   .chat-info {
@@ -8685,6 +8700,33 @@ body {
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch !important;
     height: 100% !important;
+  }
+
+  /* Исправляем отступы для списка чатов на мобильных */
+  .chats-list {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
+    margin-bottom: 0 !important;
+  }
+
+  .chats-sidebar {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .messages-container .chats-sidebar {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
+  }
+
+  /* Исправляем контейнер сообщений */
+  .messages-container {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .chat-area {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .messages-area {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
   }
 
   /* Принудительные стили для лидерборда на мобильных */
