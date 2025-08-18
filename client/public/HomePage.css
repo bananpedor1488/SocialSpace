@@ -8523,18 +8523,9 @@ body {
     bottom: 0 !important;
     background: #1e293b !important;
     z-index: 10 !important;
-    margin-bottom: calc(60px + env(safe-area-inset-bottom)) !important;
   }
 
-  /* Исправляем заголовок списка чатов */
-  .chats-header {
-    flex-shrink: 0 !important;
-    background: #1e293b !important;
-    border-bottom: 1px solid rgba(71, 85, 105, 0.3) !important;
-    padding: 15px 20px !important;
-    z-index: 10 !important;
-    margin-top: calc(60px + env(safe-area-inset-top)) !important;
-  }
+
   
   .message-input {
     min-height: 44px !important;
@@ -8757,8 +8748,6 @@ body {
     transform: translateX(100%) !important;
     transition: transform 0.3s ease !important;
     z-index: 1000 !important;
-    padding-top: calc(60px + env(safe-area-inset-top)) !important;
-    padding-bottom: calc(60px + env(safe-area-inset-bottom)) !important;
     box-sizing: border-box !important;
   }
 
@@ -8779,20 +8768,16 @@ body {
 
   /* Исправляем chats-sidebar */
   .chats-sidebar {
-    position: fixed !important;
+    position: absolute !important;
     top: 0 !important;
     left: 0 !important;
     right: 0 !important;
     bottom: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
+    width: 100% !important;
+    height: 100% !important;
     transform: translateX(-100%) !important;
     transition: transform 0.3s ease !important;
-    z-index: 1001 !important;
-    background: #0f172a !important;
-    padding-top: calc(60px + env(safe-area-inset-top)) !important;
-    padding-bottom: calc(60px + env(safe-area-inset-bottom)) !important;
-    box-sizing: border-box !important;
+    z-index: 2 !important;
   }
 
   .chats-sidebar.show {
@@ -8801,16 +8786,10 @@ body {
 
   /* Исправляем messages-container */
   .messages-container {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
     overflow: hidden !important;
-    background: #0f172a !important;
-    z-index: 999 !important;
   }
 
   /* Исправляем messages-area */
@@ -8830,7 +8809,6 @@ body {
     border-bottom: 1px solid rgba(71, 85, 105, 0.3) !important;
     padding: 15px 20px !important;
     z-index: 10 !important;
-    margin-top: calc(60px + env(safe-area-inset-top)) !important;
   }
 
   /* Принудительные стили для лидерборда на мобильных */
