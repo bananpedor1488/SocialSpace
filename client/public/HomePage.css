@@ -1331,6 +1331,46 @@ body {
   border: 1px solid rgba(59, 130, 246, 0.3);
 }
 
+/* Стили для кнопки "Еще" в десктопной навигации */
+.nav-menu .more-btn,
+.nav-menu button[onclick*="more"],
+.nav-menu button[onclick*="settings"],
+.nav-menu button[onclick*="account"] {
+  background: transparent !important;
+  border: none !important;
+  color: rgba(203, 213, 225, 0.8) !important;
+  padding: 16px 20px !important;
+  border-radius: 16px !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  width: 100% !important;
+  transition: all 0.3s ease !important;
+  text-align: left !important;
+}
+
+.nav-menu .more-btn:hover,
+.nav-menu button[onclick*="more"]:hover,
+.nav-menu button[onclick*="settings"]:hover,
+.nav-menu button[onclick*="account"]:hover {
+  background: rgba(51, 65, 85, 0.5) !important;
+  color: #f1f5f9 !important;
+  transform: translateX(5px) !important;
+}
+
+.nav-menu .more-btn.active,
+.nav-menu button[onclick*="more"].active,
+.nav-menu button[onclick*="settings"].active,
+.nav-menu button[onclick*="account"].active {
+  background: rgba(59, 130, 246, 0.2) !important;
+  color: #60a5fa !important;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2) !important;
+  border: 1px solid rgba(59, 130, 246, 0.3) !important;
+}
+
 /* Основной контент */
 .main-content {
   grid-area: main;
@@ -7124,24 +7164,63 @@ body {
   opacity: 0.8;
 }
 
-.mobile-unread-badge {
-  position: absolute;
-  top: 2px;
-  right: 50%;
-  transform: translateX(50%);
-  background: #ef4444;
-  color: white;
-  font-size: 10px;
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 10px;
-  min-width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-}
+  .mobile-unread-badge {
+    position: absolute;
+    top: 2px;
+    right: 50%;
+    transform: translateX(50%);
+    background: #ef4444;
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 10px;
+    min-width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+
+  /* Стили для кнопки "Еще" в мобильной навигации */
+  .mobile-nav-menu .more-btn,
+  .mobile-nav-menu button[onclick*="more"],
+  .mobile-nav-menu button[onclick*="settings"],
+  .mobile-nav-menu button[onclick*="account"] {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    width: 100% !important;
+    padding: 8px 4px !important;
+    background: none !important;
+    border: none !important;
+    color: #94a3b8 !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    border-radius: 8px !important;
+    margin: 0 2px !important;
+  }
+
+  .mobile-nav-menu .more-btn:hover,
+  .mobile-nav-menu button[onclick*="more"]:hover,
+  .mobile-nav-menu button[onclick*="settings"]:hover,
+  .mobile-nav-menu button[onclick*="account"]:hover {
+    color: #e2e8f0 !important;
+    background: rgba(148, 163, 184, 0.1) !important;
+  }
+
+  .mobile-nav-menu .more-btn.active,
+  .mobile-nav-menu button[onclick*="more"].active,
+  .mobile-nav-menu button[onclick*="settings"].active,
+  .mobile-nav-menu button[onclick*="account"].active {
+    color: #3b82f6 !important;
+    background: rgba(59, 130, 246, 0.1) !important;
+  }
 
 /* Мобильные устройства (до 767px) */
 @media (max-width: 767px) {
@@ -8722,7 +8801,7 @@ body {
   /* Структура профиля: имя+звездочка -> плашка -> остальное */
   .profile-header {
     position: relative !important;
-    padding-top: 60px !important; /* Место для кнопки настроек */
+    padding-top: 20px !important; /* Убираем отступ для кнопки настроек */
   }
 
   .profile-name-section {
@@ -8754,78 +8833,7 @@ body {
     margin-bottom: 25px !important;
   }
 
-  /* Стили для кнопки настроек аккаунта в цветах оформления */
-  .profile-actions .settings-btn,
-  .profile-actions button[onclick*="settings"],
-  .profile-actions .account-settings-btn,
-  .profile-actions button[onclick*="account"],
-  .profile-actions .btn-settings {
-    background: #10b981 !important; /* Зеленый цвет как у других кнопок */
-    color: white !important;
-    border: none !important;
-    padding: 10px 16px !important;
-    border-radius: 8px !important;
-    font-weight: 500 !important;
-    font-size: 14px !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
-    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2) !important;
-    margin: 0 5px !important;
-    position: relative !important;
-    top: 0 !important;
-    right: 0 !important;
-  }
-
-  .profile-actions .settings-btn:hover,
-  .profile-actions button[onclick*="settings"]:hover,
-  .profile-actions .account-settings-btn:hover,
-  .profile-actions button[onclick*="account"]:hover,
-  .profile-actions .btn-settings:hover {
-    background: #059669 !important; /* Темно-зеленый при наведении */
-    transform: translateY(-1px) !important;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
-  }
-
-  .profile-actions .settings-btn:active,
-  .profile-actions button[onclick*="settings"]:active,
-  .profile-actions .account-settings-btn:active,
-  .profile-actions button[onclick*="account"]:active,
-  .profile-actions .btn-settings:active {
-    transform: translateY(0) !important;
-    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.2) !important;
-  }
-
-  /* Исправляем позиционирование кнопки настроек */
-  .profile-header .settings-btn,
-  .profile-header button[onclick*="settings"],
-  .profile-header .account-settings-btn,
-  .profile-header button[onclick*="account"],
-  .profile-header .btn-settings {
-    position: absolute !important;
-    top: 15px !important;
-    right: 15px !important;
-    background: #10b981 !important; /* Зеленый цвет как у других кнопок */
-    color: white !important;
-    border: none !important;
-    padding: 8px 12px !important;
-    border-radius: 6px !important;
-    font-size: 12px !important;
-    font-weight: 500 !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
-    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.2) !important;
-    z-index: 10 !important;
-  }
-
-  .profile-header .settings-btn:hover,
-  .profile-header button[onclick*="settings"]:hover,
-  .profile-header .account-settings-btn:hover,
-  .profile-header button[onclick*="account"]:hover,
-  .profile-header .btn-settings:hover {
-    background: #059669 !important; /* Темно-зеленый при наведении */
-    transform: translateY(-1px) !important;
-    box-shadow: 0 3px 10px rgba(16, 185, 129, 0.3) !important;
-  }
+  /* Убираем кнопки настроек из профиля - они будут в нижней панели */
 
   /* Возвращаем исходный размер плашек в кошельке */
   .wallet-section {
@@ -8846,5 +8854,96 @@ body {
     width: 100% !important;
     max-width: none !important;
     margin: 0 0 15px 0 !important;
+  }
+
+  /* Стили для страницы "Управление аккаунтом" */
+  .account-settings-page,
+  .settings-page,
+  .more-page {
+    margin: 0 !important;
+    padding: 15px !important;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
+    flex: 1 !important;
+    min-height: 0 !important;
+  }
+
+  .account-settings-container,
+  .settings-container,
+  .more-container {
+    max-width: 680px !important;
+    width: calc(100% - 24px) !important;
+    margin: 0 auto !important;
+  }
+
+  .account-settings-section,
+  .settings-section,
+  .more-section {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    padding: 20px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .account-settings-title,
+  .settings-title,
+  .more-title {
+    font-size: 20px !important;
+    font-weight: 600 !important;
+    color: #f1f5f9 !important;
+    margin-bottom: 15px !important;
+    text-align: center !important;
+  }
+
+  .account-settings-item,
+  .settings-item,
+  .more-item {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 15px 0 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  }
+
+  .account-settings-item:last-child,
+  .settings-item:last-child,
+  .more-item:last-child {
+    border-bottom: none !important;
+  }
+
+  .account-settings-label,
+  .settings-label,
+  .more-label {
+    font-size: 16px !important;
+    color: #e2e8f0 !important;
+    font-weight: 500 !important;
+  }
+
+  .account-settings-value,
+  .settings-value,
+  .more-value {
+    font-size: 14px !important;
+    color: #94a3b8 !important;
+  }
+
+  .account-settings-button,
+  .settings-button,
+  .more-button {
+    background: #3b82f6 !important;
+    color: white !important;
+    border: none !important;
+    padding: 10px 16px !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .account-settings-button:hover,
+  .settings-button:hover,
+  .more-button:hover {
+    background: #2563eb !important;
+    transform: translateY(-1px) !important;
   }
 }

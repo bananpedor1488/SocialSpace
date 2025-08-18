@@ -2305,6 +2305,7 @@ const HomePage = () => {
                 Кошелек
               </button></li>
               <li><button className={getNavItemClass('profile')} onClick={() => { setActiveTab('profile'); if(user) loadUserProfile(user._id || user.id); }}><User size={18} /> Профиль</button></li>
+              <li><button className={getNavItemClass('more')} onClick={() => setActiveTab('more')}><MoreVertical size={18} /> Еще</button></li>
             </ul>
           </nav>
 
@@ -2904,17 +2905,7 @@ const HomePage = () => {
                               </span>
                             )}
                           </h2>
-                          {isOwnProfile() && (
-                            <div style={{ display: 'flex', gap: '8px' }}>
-                              <button 
-                                className="profile-settings-btn"
-                                onClick={() => setShowProfileSettings(true)}
-                                title="Настройки профиля"
-                              >
-                                <Settings size={20} />
-                              </button>
-                            </div>
-                          )}
+
                         </div>
                         <p className="profile-handle">@{profile.username}</p>
                         {profile.bio && (
@@ -2961,17 +2952,7 @@ const HomePage = () => {
                           </div>
                         )}
                         
-                        {isOwnProfile() && (
-                          <div className="account-settings-section">
-                            <button 
-                              className="account-settings-btn-new"
-                              onClick={() => setShowAccountSettings(true)}
-                            >
-                              <Settings size={16} />
-                              <span>Настройки аккаунта</span>
-                            </button>
-                          </div>
-                        )}
+
 
                       </div>
                     </div>
@@ -3373,6 +3354,74 @@ const HomePage = () => {
                 )}
               </div>
             )}
+
+            {activeTab === 'more' && (
+              <div className="more-page">
+                <div className="more-container">
+                  <div className="more-section">
+                    <h2 className="more-title">
+                      <Settings size={24} /> 
+                      Управление аккаунтом
+                    </h2>
+                    
+                    <div className="more-item">
+                      <div className="more-label">Настройки профиля</div>
+                      <button 
+                        className="more-button"
+                        onClick={() => setShowProfileSettings(true)}
+                      >
+                        <Settings size={16} /> Настроить
+                      </button>
+                    </div>
+                    
+                    <div className="more-item">
+                      <div className="more-label">Настройки аккаунта</div>
+                      <button 
+                        className="more-button"
+                        onClick={() => setShowAccountSettings(true)}
+                      >
+                        <Settings size={16} /> Настроить
+                      </button>
+                    </div>
+                    
+                    <div className="more-item">
+                      <div className="more-label">Тема оформления</div>
+                      <div className="more-value">
+                        {isDarkTheme ? 'Темная' : 'Светлая'}
+                      </div>
+                    </div>
+                    
+                    <div className="more-item">
+                      <div className="more-label">Статус подключения</div>
+                      <div className="more-value">
+                        {isConnected ? 'Подключено' : 'Отключено'}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="more-section">
+                    <h3 className="more-title">
+                      <HelpCircle size={20} /> 
+                      Помощь и поддержка
+                    </h3>
+                    
+                    <div className="more-item">
+                      <div className="more-label">Список изменений</div>
+                      <div className="more-value">
+                        v1.0.0
+                      </div>
+                    </div>
+                    
+                    <div className="more-item">
+                      <div className="more-label">О приложении</div>
+                      <div className="more-value">
+                        SocialSpace
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </main>
 
           {/* Мобильная навигация */}
@@ -3427,6 +3476,16 @@ const HomePage = () => {
                 >
                   <User size={20} />
                   <span>Профиль</span>
+                </button>
+              </li>
+              <li>
+                <button 
+                  className={getNavItemClass('more')} 
+                  onClick={() => setActiveTab('more')}
+                  title="Еще"
+                >
+                  <MoreVertical size={20} />
+                  <span>Еще</span>
                 </button>
               </li>
             </ul>
