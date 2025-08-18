@@ -8553,6 +8553,11 @@ body {
     margin: 0 auto 16px !important; /* центрируем карточки */
   }
 
+  /* Отступ для плашки создания поста от верха */
+  .create-post {
+    margin-top: 20px !important;
+  }
+
   /* Уменьшаем плашку "постов пока нет" */
   .no-posts {
     max-width: 680px !important;
@@ -8646,5 +8651,60 @@ body {
   .header-content {
     padding: 15px 10px !important;
     gap: 10px !important;
+  }
+
+  /* Мобильные стили для профиля */
+  .profile-header {
+    padding: 20px 15px !important;
+    margin-bottom: 20px !important;
+    border-radius: 16px !important;
+  }
+
+  .profile-main-info {
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    gap: 20px !important;
+  }
+
+  .profile-avatar-section {
+    margin-right: 0 !important;
+    display: flex !important;
+    justify-content: center !important;
+  }
+
+  .profile-header-row {
+    justify-content: center !important;
+    gap: 15px !important;
+  }
+
+  .profile-display-name {
+    font-size: 24px !important;
+    text-align: center !important;
+    margin-bottom: 8px !important;
+  }
+
+  .profile-bio {
+    text-align: center !important;
+    margin: 0 auto 20px !important;
+    max-width: 100% !important;
+  }
+
+  .profile-stats {
+    padding: 15px !important;
+    justify-content: center !important;
+    gap: 30px !important;
+  }
+
+  .profile-actions {
+    justify-content: center !important;
+    gap: 15px !important;
+    flex-wrap: wrap !important;
+  }
+
+  .profile-posts-header {
+    justify-content: center !important;
+    text-align: center !important;
+    margin-bottom: 25px !important;
   }
 }
