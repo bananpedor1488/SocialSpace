@@ -8729,6 +8729,80 @@ body {
     padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
   }
 
+  /* Принудительные стили для chat-area на мобильных */
+  .chat-area {
+    flex: 1 !important;
+    height: 100vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background: rgba(15, 23, 42, 0.95) !important;
+    border-radius: 0 !important;
+    overflow: hidden !important;
+    transform: translateX(100%) !important;
+    transition: transform 0.3s ease !important;
+    position: relative !important;
+    z-index: 1 !important;
+  }
+
+  .chat-area.show {
+    transform: translateX(0) !important;
+  }
+
+  /* Исправляем контейнер сообщений */
+  .messages-container .chat-area {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  /* Исправляем chats-sidebar */
+  .chats-sidebar {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    transform: translateX(-100%) !important;
+    transition: transform 0.3s ease !important;
+    z-index: 2 !important;
+  }
+
+  .chats-sidebar.show {
+    transform: translateX(0) !important;
+  }
+
+  /* Исправляем messages-container */
+  .messages-container {
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+
+  /* Исправляем messages-area */
+  .messages-area {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    padding: 15px !important;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  /* Исправляем chat-header */
+  .chat-header {
+    flex-shrink: 0 !important;
+    background: rgba(15, 23, 42, 0.95) !important;
+    border-bottom: 1px solid rgba(71, 85, 105, 0.3) !important;
+    padding: 15px 20px !important;
+    z-index: 10 !important;
+  }
+
   /* Принудительные стили для лидерборда на мобильных */
   .main-content .leaderboard,
   .leaderboard-view {
