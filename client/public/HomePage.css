@@ -8809,6 +8809,36 @@ body {
     margin-bottom: 20px !important;
   }
 
+  /* Круглая кнопка настроек профиля */
+  .profile-settings-btn-round {
+    position: absolute !important;
+    top: 15px !important;
+    right: 15px !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important;
+    background: #3b82f6 !important;
+    color: white !important;
+    border: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3) !important;
+    z-index: 10 !important;
+  }
+
+  .profile-settings-btn-round:hover {
+    background: #2563eb !important;
+    transform: scale(1.05) !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4) !important;
+  }
+
+  .profile-settings-btn-round:active {
+    transform: scale(0.95) !important;
+  }
+
   .profile-stats {
     max-width: 680px !important;
     width: calc(100% - 24px) !important;

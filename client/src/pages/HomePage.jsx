@@ -2905,6 +2905,15 @@ const HomePage = () => {
                               </span>
                             )}
                           </h2>
+                          {isOwnProfile() && (
+                            <button 
+                              className="profile-settings-btn-round"
+                              onClick={() => setShowProfileSettings(true)}
+                              title="Настройки профиля"
+                            >
+                              <Settings size={18} />
+                            </button>
+                          )}
 
                         </div>
                         <p className="profile-handle">@{profile.username}</p>
@@ -3364,15 +3373,7 @@ const HomePage = () => {
                       Управление аккаунтом
                     </h2>
                     
-                    <div className="more-item">
-                      <div className="more-label">Настройки профиля</div>
-                      <button 
-                        className="more-button"
-                        onClick={() => setShowProfileSettings(true)}
-                      >
-                        <Settings size={16} /> Настроить
-                      </button>
-                    </div>
+
                     
                     <div className="more-item">
                       <div className="more-label">Настройки аккаунта</div>
