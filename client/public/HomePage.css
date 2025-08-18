@@ -8684,12 +8684,50 @@ body {
     font-size: 24px !important;
     text-align: center !important;
     margin-bottom: 8px !important;
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+  }
+
+  /* Звездочка для премиум аккаунта */
+  .profile-display-name .premium-star,
+  .profile-display-name .star-icon,
+  .profile-display-name .premium-icon {
+    color: #fbbf24 !important;
+    font-size: 20px !important;
+    margin-left: 5px !important;
   }
 
   .profile-bio {
     text-align: center !important;
     margin: 0 auto 20px !important;
     max-width: 100% !important;
+  }
+
+  /* Плашка "ваш профиль" под именем и звездочкой */
+  .profile-info-card,
+  .profile-details-card,
+  .profile-summary-card {
+    max-width: 680px !important;
+    width: calc(100% - 24px) !important;
+    margin: 0 auto 20px !important;
+    padding: 20px 15px !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  }
+
+  /* Структура профиля: имя+звездочка -> плашка -> остальное */
+  .profile-header {
+    position: relative !important;
+    padding-top: 60px !important; /* Место для кнопки настроек */
+  }
+
+  .profile-name-section {
+    text-align: center !important;
+    margin-bottom: 20px !important;
   }
 
   .profile-stats {
@@ -8722,7 +8760,7 @@ body {
   .profile-actions .account-settings-btn,
   .profile-actions button[onclick*="account"],
   .profile-actions .btn-settings {
-    background: #3b82f6 !important;
+    background: #10b981 !important; /* Зеленый цвет как у других кнопок */
     color: white !important;
     border: none !important;
     padding: 10px 16px !important;
@@ -8731,7 +8769,7 @@ body {
     font-size: 14px !important;
     cursor: pointer !important;
     transition: all 0.2s ease !important;
-    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2) !important;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2) !important;
     margin: 0 5px !important;
     position: relative !important;
     top: 0 !important;
@@ -8743,9 +8781,9 @@ body {
   .profile-actions .account-settings-btn:hover,
   .profile-actions button[onclick*="account"]:hover,
   .profile-actions .btn-settings:hover {
-    background: #2563eb !important;
+    background: #059669 !important; /* Темно-зеленый при наведении */
     transform: translateY(-1px) !important;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3) !important;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
   }
 
   .profile-actions .settings-btn:active,
@@ -8754,7 +8792,7 @@ body {
   .profile-actions button[onclick*="account"]:active,
   .profile-actions .btn-settings:active {
     transform: translateY(0) !important;
-    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.2) !important;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.2) !important;
   }
 
   /* Исправляем позиционирование кнопки настроек */
@@ -8766,7 +8804,7 @@ body {
     position: absolute !important;
     top: 15px !important;
     right: 15px !important;
-    background: #3b82f6 !important;
+    background: #10b981 !important; /* Зеленый цвет как у других кнопок */
     color: white !important;
     border: none !important;
     padding: 8px 12px !important;
@@ -8775,7 +8813,7 @@ body {
     font-weight: 500 !important;
     cursor: pointer !important;
     transition: all 0.2s ease !important;
-    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.2) !important;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.2) !important;
     z-index: 10 !important;
   }
 
@@ -8784,9 +8822,9 @@ body {
   .profile-header .account-settings-btn:hover,
   .profile-header button[onclick*="account"]:hover,
   .profile-header .btn-settings:hover {
-    background: #2563eb !important;
+    background: #059669 !important; /* Темно-зеленый при наведении */
     transform: translateY(-1px) !important;
-    box-shadow: 0 3px 10px rgba(59, 130, 246, 0.3) !important;
+    box-shadow: 0 3px 10px rgba(16, 185, 129, 0.3) !important;
   }
 
   /* Возвращаем исходный размер плашек в кошельке */
