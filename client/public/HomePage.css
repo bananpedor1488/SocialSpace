@@ -2527,6 +2527,9 @@ body {
     padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
     flex: 1 !important;
     min-height: 0 !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
   }
 
   .leaderboard-item {
@@ -7217,17 +7220,33 @@ body {
   }
 
   .leaderboard {
-    margin-top: 120px;
-    margin-bottom: 80px;
+    margin: 0 !important;
+    padding: 15px !important;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
+    flex: 1 !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
   }
 
   .leaderboard-item {
     padding: 15px;
   }
 
+  .leaderboard-list {
+    flex: 1 !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
   .wallet {
-    margin-top: 120px;
-    margin-bottom: 80px;
+    margin: 0 !important;
+    padding: 15px !important;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
+    flex: 1 !important;
+    min-height: 0 !important;
   }
 
   .wallet-section {
@@ -7235,8 +7254,11 @@ body {
   }
 
   .profile {
-    margin-top: 120px;
-    margin-bottom: 80px;
+    margin: 0 !important;
+    padding: 15px !important;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
+    flex: 1 !important;
+    min-height: 0 !important;
   }
 
   .profile-header {
@@ -7252,9 +7274,11 @@ body {
   }
 
   .modal-content {
-    margin: 20px;
-    max-width: calc(100vw - 40px);
-    max-height: calc(100vh - 40px);
+    margin: 20px !important;
+    max-width: calc(100vw - 40px) !important;
+    max-height: calc(100vh - 40px) !important;
+    position: relative !important;
+    z-index: 10001 !important;
   }
 
   .form-group {
@@ -8488,7 +8512,8 @@ body {
 
   /* Список топ игроков на всю высоту контейнера */
   .leaderboard-list {
-    height: calc(100vh - 200px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+    flex: 1 !important;
+    min-height: 0 !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch !important;
   }
@@ -8501,11 +8526,6 @@ body {
 
   .leaderboard-header {
     flex-shrink: 0 !important;
-  }
-
-  .leaderboard-list {
-    flex: 1 !important;
-    min-height: 0 !important;
   }
 
   /* Страница рейтинга на всю высоту */
@@ -8525,7 +8545,6 @@ body {
   .leaderboard-view .leaderboard-list {
     flex: 1 !important;
     min-height: 0 !important;
-    height: auto !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch !important;
   }
