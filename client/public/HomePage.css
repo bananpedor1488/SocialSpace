@@ -27,7 +27,7 @@
     position: relative !important;
   }
 
-  /* ФИКСИРОВАННЫЙ КОНТЕЙНЕР КОНТЕНТА - НЕ ЗАХОДИТ ПОД ХЕДЕР */
+  /* ФИКСИРОВАННЫЙ КОНТЕЙНЕР КОНТЕНТА - НЕ ЗАХОДИТ ПОД ХЕДЕР И НАВИГАЦИЮ */
   .home-container {
     position: fixed !important;
     top: calc(60px + env(safe-area-inset-top)) !important;
@@ -44,6 +44,8 @@
     flex-direction: column !important;
     margin: 0 !important;
     padding: 0 !important;
+    /* Дополнительный отступ снизу для предотвращения наложения под навигацию */
+    padding-bottom: calc(20px + env(safe-area-inset-bottom)) !important;
   }
 
   /* Хедер - фиксированная позиция */
@@ -88,6 +90,7 @@
   .page-content {
     margin: 0 !important;
     padding: 15px !important;
+    padding-bottom: calc(35px + env(safe-area-inset-bottom)) !important;
     width: 100% !important;
     max-width: 100% !important;
     overflow-x: hidden !important;
@@ -330,6 +333,7 @@
       -webkit-overflow-scrolling: touch !important;
       /* Отступы для предотвращения наложения */
       padding: 15px !important;
+      padding-bottom: calc(20px + env(safe-area-inset-bottom)) !important;
       margin: 0 !important;
     }
     
@@ -341,6 +345,7 @@
       z-index: 10 !important;
       /* Отступ для нижней панели */
       padding: 15px !important;
+      padding-bottom: calc(15px + env(safe-area-inset-bottom)) !important;
       background: rgba(15, 23, 42, 0.98) !important;
       border-top: 1px solid rgba(71, 85, 105, 0.3) !important;
       margin: 0 !important;
@@ -854,7 +859,7 @@
     bottom: 0;
     margin-bottom: 0 !important; /* убираем микрозазор над навигацией */
     z-index: 100001; /* поверх мобильной навигации */
-    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px)) !important;
   }
 
   .mobile-message-input-wrapper {
@@ -1006,6 +1011,7 @@
   .dark-theme .mobile-message-input-area { 
     background: rgba(30, 41, 59, 0.9); 
     border-color: rgba(71, 85, 105, 0.3); 
+    padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px)) !important;
   }
 
   .dark-theme .mobile-message-input-wrapper { 
@@ -2482,6 +2488,7 @@ body {
   .chat-list {
     margin: 0 !important;
     padding: 15px !important;
+    padding-bottom: calc(35px + env(safe-area-inset-bottom)) !important;
     flex: 1 !important;
     min-height: 0 !important;
   }
@@ -2493,18 +2500,20 @@ body {
   .chat-messages {
     margin: 0 !important;
     padding: 15px !important;
+    padding-bottom: calc(35px + env(safe-area-inset-bottom)) !important;
     flex: 1 !important;
     min-height: 0 !important;
   }
 
   .message-input-container {
     position: sticky !important;
-    bottom: 0 !important;
+    bottom: calc(20px + env(safe-area-inset-bottom)) !important;
     left: 15px !important;
     right: 15px !important;
     z-index: 999 !important;
     background: rgba(15, 23, 42, 0.98) !important;
     padding: 10px 0 !important;
+    margin-bottom: calc(10px + env(safe-area-inset-bottom)) !important;
   }
 
   .message-input {
@@ -2515,6 +2524,7 @@ body {
   .leaderboard {
     margin: 0 !important;
     padding: 15px !important;
+    padding-bottom: calc(35px + env(safe-area-inset-bottom)) !important;
     flex: 1 !important;
     min-height: 0 !important;
   }
@@ -2526,6 +2536,7 @@ body {
   .wallet {
     margin: 0 !important;
     padding: 15px !important;
+    padding-bottom: calc(35px + env(safe-area-inset-bottom)) !important;
     flex: 1 !important;
     min-height: 0 !important;
   }
@@ -2537,6 +2548,7 @@ body {
   .profile {
     margin: 0 !important;
     padding: 15px !important;
+    padding-bottom: calc(35px + env(safe-area-inset-bottom)) !important;
     flex: 1 !important;
     min-height: 0 !important;
   }
@@ -2621,6 +2633,7 @@ body {
   .main-content {
     margin: 0 !important;
     padding: 10px !important;
+    padding-bottom: calc(30px + env(safe-area-inset-bottom)) !important;
     flex: 1 !important;
     min-height: 0 !important;
   }
@@ -2712,6 +2725,8 @@ body {
 
   .main-content {
     margin: 0 !important;
+    padding: 10px !important;
+    padding-bottom: calc(25px + env(safe-area-inset-bottom)) !important;
     flex: 1 !important;
     min-height: 0 !important;
   }
@@ -3172,15 +3187,16 @@ body {
 }
 
 /* Область ввода сообщения */
-.message-input-area {
-  padding: 16px 20px;
-  border-top: 1px solid rgba(71, 85, 105, 0.3);
-  background: rgba(30, 41, 59, 0.9);
-  display: flex;
-  gap: 12px;
-  align-items: flex-end;
-  flex-shrink: 0;
-}
+  .message-input-area {
+    padding: 16px 20px;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom)) !important;
+    border-top: 1px solid rgba(71, 85, 105, 0.3);
+    background: rgba(30, 41, 59, 0.9);
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    flex-shrink: 0;
+  }
 
 .message-input {
   flex: 1;
