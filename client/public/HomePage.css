@@ -8716,35 +8716,97 @@ body {
     margin-bottom: 25px !important;
   }
 
-  /* Стили для кнопки настроек аккаунта */
+  /* Стили для кнопки настроек аккаунта в цветах оформления */
   .profile-actions .settings-btn,
   .profile-actions button[onclick*="settings"],
-  .profile-actions .account-settings-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  .profile-actions .account-settings-btn,
+  .profile-actions button[onclick*="account"],
+  .profile-actions .btn-settings {
+    background: #3b82f6 !important;
     color: white !important;
     border: none !important;
-    padding: 12px 20px !important;
-    border-radius: 12px !important;
-    font-weight: 600 !important;
+    padding: 10px 16px !important;
+    border-radius: 8px !important;
+    font-weight: 500 !important;
     font-size: 14px !important;
     cursor: pointer !important;
-    transition: all 0.3s ease !important;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3) !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2) !important;
     margin: 0 5px !important;
+    position: relative !important;
+    top: 0 !important;
+    right: 0 !important;
   }
 
   .profile-actions .settings-btn:hover,
   .profile-actions button[onclick*="settings"]:hover,
-  .profile-actions .account-settings-btn:hover {
-    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%) !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4) !important;
+  .profile-actions .account-settings-btn:hover,
+  .profile-actions button[onclick*="account"]:hover,
+  .profile-actions .btn-settings:hover {
+    background: #2563eb !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3) !important;
   }
 
   .profile-actions .settings-btn:active,
   .profile-actions button[onclick*="settings"]:active,
-  .profile-actions .account-settings-btn:active {
+  .profile-actions .account-settings-btn:active,
+  .profile-actions button[onclick*="account"]:active,
+  .profile-actions .btn-settings:active {
     transform: translateY(0) !important;
-    box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3) !important;
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.2) !important;
+  }
+
+  /* Исправляем позиционирование кнопки настроек */
+  .profile-header .settings-btn,
+  .profile-header button[onclick*="settings"],
+  .profile-header .account-settings-btn,
+  .profile-header button[onclick*="account"],
+  .profile-header .btn-settings {
+    position: absolute !important;
+    top: 15px !important;
+    right: 15px !important;
+    background: #3b82f6 !important;
+    color: white !important;
+    border: none !important;
+    padding: 8px 12px !important;
+    border-radius: 6px !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.2) !important;
+    z-index: 10 !important;
+  }
+
+  .profile-header .settings-btn:hover,
+  .profile-header button[onclick*="settings"]:hover,
+  .profile-header .account-settings-btn:hover,
+  .profile-header button[onclick*="account"]:hover,
+  .profile-header .btn-settings:hover {
+    background: #2563eb !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 3px 10px rgba(59, 130, 246, 0.3) !important;
+  }
+
+  /* Возвращаем исходный размер плашек в кошельке */
+  .wallet-section {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 0 20px 0 !important;
+  }
+
+  .wallet-card {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 0 15px 0 !important;
+  }
+
+  .wallet-balance-card,
+  .wallet-transaction-card,
+  .wallet-history-card {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 0 15px 0 !important;
   }
 }
