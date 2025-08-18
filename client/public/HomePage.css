@@ -45,7 +45,7 @@
     margin: 0 !important;
     padding: 0 !important;
     /* Дополнительный отступ снизу для предотвращения наложения под навигацию */
-    padding-bottom: calc(20px + env(safe-area-inset-bottom)) !important;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
   }
 
   /* Хедер - фиксированная позиция */
@@ -90,7 +90,7 @@
   .page-content {
     margin: 0 !important;
     padding: 15px !important;
-    padding-bottom: calc(35px + env(safe-area-inset-bottom)) !important;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
     width: 100% !important;
     max-width: 100% !important;
     overflow-x: hidden !important;
@@ -325,27 +325,27 @@
       padding: 0 !important;
   }
   
-  /* Исправления для области сообщений */
-  body.mobile-chat-open .mobile-messages-area {
-    flex: 1 !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    -webkit-overflow-scrolling: touch !important;
-    /* Отступы для предотвращения наложения */
+      /* Исправления для области сообщений */
+    body.mobile-chat-open .mobile-messages-area {
+      flex: 1 !important;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      -webkit-overflow-scrolling: touch !important;
+      /* Отступы для предотвращения наложения */
+      padding: 15px !important;
+      padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
+      margin: 0 !important;
+    }
+  
+        /* Исправления для области ввода */
+    body.mobile-chat-open .mobile-message-input-area {
+      flex-shrink: 0 !important;
+      position: sticky !important;
+      bottom: 0 !important;
+      z-index: 10 !important;
+      /* Отступ для нижней панели */
       padding: 15px !important;
       padding-bottom: calc(20px + env(safe-area-inset-bottom)) !important;
-      margin: 0 !important;
-  }
-  
-    /* Исправления для области ввода */
-  body.mobile-chat-open .mobile-message-input-area {
-    flex-shrink: 0 !important;
-    position: sticky !important;
-    bottom: 0 !important;
-    z-index: 10 !important;
-    /* Отступ для нижней панели */
-      padding: 15px !important;
-      padding-bottom: calc(15px + env(safe-area-inset-bottom)) !important;
       background: rgba(15, 23, 42, 0.98) !important;
       border-top: 1px solid rgba(71, 85, 105, 0.3) !important;
       margin: 0 !important;
@@ -2488,7 +2488,7 @@ body {
   .chat-list {
     margin: 0 !important;
     padding: 15px !important;
-    padding-bottom: calc(35px + env(safe-area-inset-bottom)) !important;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
     flex: 1 !important;
     min-height: 0 !important;
   }
@@ -2500,7 +2500,7 @@ body {
   .chat-messages {
     margin: 0 !important;
     padding: 15px !important;
-    padding-bottom: calc(35px + env(safe-area-inset-bottom)) !important;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
     flex: 1 !important;
     min-height: 0 !important;
   }
@@ -2524,7 +2524,7 @@ body {
   .leaderboard {
     margin: 0 !important;
     padding: 15px !important;
-    padding-bottom: calc(35px + env(safe-area-inset-bottom)) !important;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
     flex: 1 !important;
     min-height: 0 !important;
   }
@@ -2536,7 +2536,7 @@ body {
   .wallet {
     margin: 0 !important;
     padding: 15px !important;
-    padding-bottom: calc(35px + env(safe-area-inset-bottom)) !important;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
     flex: 1 !important;
     min-height: 0 !important;
   }
@@ -2548,7 +2548,7 @@ body {
   .profile {
     margin: 0 !important;
     padding: 15px !important;
-    padding-bottom: calc(35px + env(safe-area-inset-bottom)) !important;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
     flex: 1 !important;
     min-height: 0 !important;
   }
@@ -2633,7 +2633,7 @@ body {
   .main-content {
     margin: 0 !important;
     padding: 10px !important;
-    padding-bottom: calc(30px + env(safe-area-inset-bottom)) !important;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
     flex: 1 !important;
     min-height: 0 !important;
   }
@@ -2726,7 +2726,7 @@ body {
   .main-content {
     margin: 0 !important;
     padding: 10px !important;
-    padding-bottom: calc(25px + env(safe-area-inset-bottom)) !important;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
     flex: 1 !important;
     min-height: 0 !important;
   }
