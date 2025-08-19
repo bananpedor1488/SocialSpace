@@ -1978,11 +1978,13 @@ body {
   align-items: flex-start;
   gap: 25px;
   flex-wrap: wrap;
+  position: relative;
 }
 
 .profile-info {
   flex: 1;
   min-width: 300px;
+  margin-left: 30px;
 }
 
 .profile-username {
@@ -9758,8 +9760,8 @@ body {
 
 .profile-settings-btn-round {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 15px;
+  right: 15px;
   width: 45px;
   height: 45px;
   border-radius: 50%;
@@ -9789,6 +9791,7 @@ body {
 
 .own-profile-badge-container {
   position: static;
+  margin-top: 10px;
   margin-bottom: 15px;
 }
 
@@ -10215,9 +10218,17 @@ body {
 
   .profile-settings-btn-round {
     position: absolute !important;
-    top: 0 !important;
-    right: 0 !important;
+    top: 15px !important;
+    right: 15px !important;
     margin-top: 0 !important;
     align-self: auto !important;
+  }
+
+  .own-profile-badge-container {
+    margin-top: 10px !important;
+  }
+
+  .profile-info {
+    margin-top: 15px !important;
   }
 }

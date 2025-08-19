@@ -2991,6 +2991,13 @@ const HomePage = () => {
                             </h2>
                           </div>
                           <p className="profile-handle">@{profile.username}</p>
+                          {isOwnProfile() && (
+                            <div className="own-profile-badge-container">
+                              <span className="own-profile-badge">
+                                <UserCheck size={16} /> Ваш профиль
+                              </span>
+                            </div>
+                          )}
                         </div>
                         {isOwnProfile() && (
                           <button 
@@ -3004,14 +3011,6 @@ const HomePage = () => {
                       </div>
                       
                       <div className="profile-details">
-                        {isOwnProfile() && (
-                          <div className="own-profile-badge-container">
-                            <span className="own-profile-badge">
-                              <UserCheck size={16} /> Ваш профиль
-                            </span>
-                          </div>
-                        )}
-                        
                         {profile.bio && (
                           <p className="profile-bio">{profile.bio}</p>
                         )}
