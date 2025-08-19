@@ -2977,30 +2977,33 @@ const HomePage = () => {
                           alt={profile.displayName || profile.username}
                           size="xlarge"
                         />
-                      </div>
-                      <div className="profile-info">
-                        <div className="profile-header-row">
-                          <h2 className="profile-display-name">
-                            {profile.displayName || profile.username}
-                            {profile.premium && (
-                              <span className="premium-badge">
-                                <svg viewBox="0 0 24 24" fill="currentColor">
-                                  <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
-                                </svg>
-                              </span>
+                        <div className="profile-info">
+                          <div className="profile-header-row">
+                            <h2 className="profile-display-name">
+                              {profile.displayName || profile.username}
+                              {profile.premium && (
+                                <span className="premium-badge">
+                                  <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
+                                  </svg>
+                                </span>
+                              )}
+                            </h2>
+                            {isOwnProfile() && (
+                              <button 
+                                className="profile-settings-btn-round"
+                                onClick={() => setShowProfileSettings(true)}
+                                title="Настройки профиля"
+                              >
+                                <Settings size={18} />
+                              </button>
                             )}
-                          </h2>
-                          {isOwnProfile() && (
-                            <button 
-                              className="profile-settings-btn-round"
-                              onClick={() => setShowProfileSettings(true)}
-                              title="Настройки профиля"
-                            >
-                              <Settings size={18} />
-                            </button>
-                          )}
+                          </div>
+                          <p className="profile-handle">@{profile.username}</p>
                         </div>
-                        
+                      </div>
+                      
+                      <div className="profile-details">
                         {isOwnProfile() && (
                           <div className="own-profile-badge-container">
                             <span className="own-profile-badge">
@@ -3008,7 +3011,7 @@ const HomePage = () => {
                             </span>
                           </div>
                         )}
-                        <p className="profile-handle">@{profile.username}</p>
+                        
                         {profile.bio && (
                           <p className="profile-bio">{profile.bio}</p>
                         )}
@@ -3052,9 +3055,6 @@ const HomePage = () => {
                             </button>
                           </div>
                         )}
-                        
-
-
                       </div>
                     </div>
                   </div>
