@@ -9737,7 +9737,7 @@ body {
   flex-direction: column;
   gap: 5px;
   margin-bottom: 0;
-  margin-left: -10px;
+  margin-left: -20px;
 }
 
 .profile-display-name {
@@ -9758,8 +9758,8 @@ body {
 
 .profile-settings-btn-round {
   position: absolute;
-  top: 15px;
-  right: 15px;
+  top: 0;
+  right: 0;
   width: 45px;
   height: 45px;
   border-radius: 50%;
