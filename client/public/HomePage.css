@@ -9611,13 +9611,13 @@ body {
   gap: 30px;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 10px 20px;
 }
 
 .profile-header {
   background: rgba(30, 41, 59, 0.9);
   border-radius: 20px;
-  padding: 30px;
+  padding: 25px;
   border: 1px solid rgba(71, 85, 105, 0.4);
   height: fit-content;
   position: sticky;
@@ -9625,21 +9625,28 @@ body {
 }
 
 .profile-main-info {
-  text-align: center;
+  position: relative;
   margin-bottom: 25px;
 }
 
 .profile-avatar-section {
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: 20px;
   margin-bottom: 20px;
+}
+
+.profile-info {
+  flex: 1;
+  text-align: left;
 }
 
 .profile-header-row {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 15px;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 
 .profile-display-name {
@@ -9647,6 +9654,9 @@ body {
   font-size: 24px;
   font-weight: 600;
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .profile-settings-btn-round {
@@ -9681,19 +9691,20 @@ body {
 }
 
 .own-profile-badge-container {
-  text-align: center;
-  margin-bottom: 20px;
+  position: absolute;
+  top: 0;
+  right: 50px;
 }
 
 .own-profile-badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   background: rgba(59, 130, 246, 0.1);
   color: #3b82f6;
-  padding: 10px 20px;
-  border-radius: 25px;
-  font-size: 14px;
+  padding: 6px 12px;
+  border-radius: 15px;
+  font-size: 12px;
   font-weight: 600;
   border: 1px solid rgba(59, 130, 246, 0.3);
   transition: all 0.3s ease;
@@ -9711,7 +9722,7 @@ body {
   font-size: 15px;
   line-height: 1.6;
   margin: 15px 0;
-  text-align: center;
+  text-align: left;
 }
 
 .profile-stats {
