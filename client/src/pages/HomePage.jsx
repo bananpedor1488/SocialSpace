@@ -3060,28 +3060,30 @@ const HomePage = () => {
                   </div>
                 </div>
 
-                <div className="profile-posts-header">
-                  <h3>
-                    <Pencil size={18} /> 
-                    Посты {isOwnProfile() ? '(ваши)' : ''}
-                  </h3>
-                  {profilePosts.length > 0 && (
-                    <span className="posts-count">{profilePosts.length} постов</span>
+                <div className="profile-posts">
+                  <div className="profile-posts-header">
+                    <h3>
+                      <Pencil size={18} /> 
+                      Посты {isOwnProfile() ? '(ваши)' : ''}
+                    </h3>
+                    {profilePosts.length > 0 && (
+                      <span className="posts-count">{profilePosts.length} постов</span>
+                    )}
+                  </div>
+
+                  {profilePosts.length > 0 ? (
+                    <div className="posts-feed">
+                      {renderPosts(profilePosts)}
+                    </div>
+                  ) : (
+                    <div className="no-posts">
+                      {isOwnProfile() ? 
+                        'У вас пока нет постов. Создайте свой первый пост!' : 
+                        `У @${profile.username} пока нет постов`
+                      }
+                    </div>
                   )}
                 </div>
-
-                {profilePosts.length > 0 ? (
-                  <div className="posts-feed">
-                    {renderPosts(profilePosts)}
-                  </div>
-                ) : (
-                  <div className="no-posts">
-                    {isOwnProfile() ? 
-                      'У вас пока нет постов. Создайте свой первый пост!' : 
-                      `У @${profile.username} пока нет постов`
-                    }
-                  </div>
-                )}
               </div>
             )}
 
