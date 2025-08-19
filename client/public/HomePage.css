@@ -1215,21 +1215,21 @@ body {
 
 /* Стили для вкладки "Еще" на ПК */
 .more-page {
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 30px;
 }
 
 .more-container {
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  gap: 40px;
 }
 
 .more-section {
   background: rgba(30, 41, 59, 0.9);
   border-radius: 20px;
-  padding: 30px;
+  padding: 40px;
   border: 1px solid rgba(71, 85, 105, 0.4);
   transition: all 0.3s ease;
 }
@@ -1242,24 +1242,24 @@ body {
 
 .more-title {
   color: #f1f5f9;
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 600;
-  margin: 0 0 25px 0;
+  margin: 0 0 30px 0;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 15px;
 }
 
 .more-title h3 {
-  font-size: 20px;
-  margin: 0 0 20px 0;
+  font-size: 24px;
+  margin: 0 0 25px 0;
 }
 
 .more-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 0;
+  padding: 20px 0;
   border-bottom: 1px solid rgba(71, 85, 105, 0.3);
 }
 
@@ -1269,26 +1269,26 @@ body {
 
 .more-label {
   color: #e2e8f0;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 500;
 }
 
 .more-value {
   color: rgba(148, 163, 184, 0.8);
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .more-button {
   background: rgba(51, 65, 85, 0.7);
   border: 1px solid rgba(71, 85, 105, 0.5);
   color: #e2e8f0;
-  padding: 8px 16px;
+  padding: 12px 20px;
   border-radius: 12px;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 14px;
+  gap: 8px;
+  font-size: 16px;
   font-weight: 500;
   transition: all 0.3s ease;
 }
@@ -1338,6 +1338,32 @@ body {
   font-style: italic;
   margin-top: 30px !important;
   text-align: center;
+}
+
+/* Стили для кнопки закрытия модального окна */
+.modal-close {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.modal-close:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
+  transform: scale(1.05);
+}
+
+.modal-close:active {
+  transform: scale(0.95);
 }
 
 /* Показываем обычное поле поиска на десктопе */
@@ -9579,10 +9605,54 @@ body {
 }
 
 /* Стили для профиля на ПК */
+.profile-view {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.profile-header {
+  background: rgba(30, 41, 59, 0.9);
+  border-radius: 20px;
+  padding: 30px;
+  border: 1px solid rgba(71, 85, 105, 0.4);
+  height: fit-content;
+  position: sticky;
+  top: 20px;
+}
+
+.profile-main-info {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.profile-avatar-section {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.profile-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.profile-display-name {
+  color: #f1f5f9;
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+}
+
 .profile-settings-btn-round {
   position: absolute;
-  top: 20px;
-  right: 20px;
+  top: 0;
+  right: 0;
   width: 45px;
   height: 45px;
   border-radius: 50%;
@@ -9634,6 +9704,113 @@ body {
   border-color: rgba(59, 130, 246, 0.4);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+.profile-bio {
+  color: rgba(148, 163, 184, 0.9);
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 15px 0;
+  text-align: center;
+}
+
+.profile-stats {
+  display: flex;
+  justify-content: space-around;
+  gap: 20px;
+  margin: 25px 0;
+}
+
+.profile-stat {
+  text-align: center;
+  flex: 1;
+}
+
+.stat-number {
+  display: block;
+  color: #f1f5f9;
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.stat-label {
+  color: rgba(148, 163, 184, 0.8);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.profile-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+.follow-btn {
+  background: rgba(51, 65, 85, 0.7);
+  border: 1px solid rgba(71, 85, 105, 0.5);
+  color: #e2e8f0;
+  padding: 12px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.follow-btn:hover {
+  background: rgba(71, 85, 105, 0.8);
+  color: #f1f5f9;
+  transform: translateY(-1px);
+  border-color: rgba(100, 116, 139, 0.7);
+}
+
+.follow-btn.following {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+.follow-btn.following:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.profile-posts {
+  background: rgba(30, 41, 59, 0.9);
+  border-radius: 20px;
+  padding: 30px;
+  border: 1px solid rgba(71, 85, 105, 0.4);
+}
+
+.profile-posts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+}
+
+.profile-posts-header h3 {
+  color: #f1f5f9;
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.posts-count {
+  color: rgba(148, 163, 184, 0.8);
+  font-size: 14px;
+  font-weight: 500;
 }
 
   /* Принудительные стили для статистики профиля на всех экранах */
