@@ -1213,6 +1213,8 @@ body {
   display: none !important;
 }
 
+
+
 /* Показываем обычное поле поиска на десктопе */
 .header-search.desktop-only {
   display: block !important;
@@ -2646,6 +2648,8 @@ body {
   .mobile-search-overlay {
     display: block !important;
   }
+
+
 
   /* Скрываем обычные результаты поиска на мобильных устройствах */
   .header-search-results {

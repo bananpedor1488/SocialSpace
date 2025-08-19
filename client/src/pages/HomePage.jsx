@@ -2305,6 +2305,8 @@ const HomePage = () => {
                 )}
               </div>
               
+
+              
               <div className="user-info desktop-only">
                 <Points />
               </div>
