@@ -2989,18 +2989,18 @@ const HomePage = () => {
                                 </span>
                               )}
                             </h2>
-                            {isOwnProfile() && (
-                              <button 
-                                className="profile-settings-btn-round"
-                                onClick={() => setShowProfileSettings(true)}
-                                title="Настройки профиля"
-                              >
-                                <Settings size={18} />
-                              </button>
-                            )}
                           </div>
                           <p className="profile-handle">@{profile.username}</p>
                         </div>
+                        {isOwnProfile() && (
+                          <button 
+                            className="profile-settings-btn-round"
+                            onClick={() => setShowProfileSettings(true)}
+                            title="Настройки профиля"
+                          >
+                            <Settings size={18} />
+                          </button>
+                        )}
                       </div>
                       
                       <div className="profile-details">
