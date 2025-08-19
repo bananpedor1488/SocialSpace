@@ -1203,6 +1203,11 @@ body {
   display: none !important;
 }
 
+/* Скрываем мобильные результаты поиска на десктопе */
+.mobile-search-results {
+  display: none !important;
+}
+
 .user-info {
   display: flex;
   align-items: center;
@@ -2407,6 +2412,7 @@ body {
   
   /* Кнопка поиска для мобильных устройств */
   .mobile-search-toggle {
+    position: relative;
     display: flex !important;
     align-items: center;
     justify-content: center;
@@ -2417,8 +2423,9 @@ body {
     border-radius: 50%;
     color: #e2e8f0;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     flex-shrink: 0;
+    overflow: hidden;
   }
 
   .mobile-search-toggle:hover {
@@ -2429,56 +2436,64 @@ body {
   .mobile-search-toggle:active {
     transform: scale(0.95);
   }
-  
-  /* Анимированное поле поиска */
-  .header-search {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 0;
-    max-width: calc(100vw - 120px);
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 10002;
-  }
 
-  .header-search.expanded {
-    width: 100%;
-    opacity: 1;
-    visibility: visible;
-  }
-
-  .header-search-input {
-    width: 100%;
+  /* Анимация превращения кнопки в поле поиска */
+  .mobile-search-toggle.expanded {
+    width: 200px;
+    border-radius: 25px;
     background: rgba(15, 23, 42, 0.98);
     border: 2px solid rgba(59, 130, 246, 0.6);
-    border-radius: 25px;
-    padding: 12px 20px;
-    color: #e2e8f0;
-    font-size: 16px;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
   }
 
-  .header-search-input::placeholder {
+  /* Иконка поиска */
+  .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 1;
+    z-index: 2;
+  }
+
+  .mobile-search-toggle.expanded .search-icon {
+    opacity: 0;
+    transform: translateY(-50%) scale(0.8);
+  }
+
+  /* Поле ввода */
+  .mobile-search-input {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #e2e8f0;
+    font-size: 16px;
+    padding: 0 40px 0 40px;
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .mobile-search-toggle.expanded .mobile-search-input {
+    opacity: 1;
+  }
+
+  .mobile-search-input::placeholder {
     color: rgba(148, 163, 184, 0.7);
   }
 
-  .header-search-input:focus {
-    outline: none;
-    border-color: rgba(59, 130, 246, 0.8);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-  }
-
   /* Результаты поиска для мобильных устройств */
-  .header-search-results {
+  .mobile-search-results {
     position: absolute;
     top: 100%;
-    left: 0;
     right: 0;
+    width: 280px;
     background: rgba(15, 23, 42, 0.98);
     backdrop-filter: blur(20px);
     border: 1px solid rgba(71, 85, 105, 0.4);
@@ -2502,7 +2517,7 @@ body {
     }
   }
 
-  .header-search-result {
+  .mobile-search-result {
     padding: 12px 16px;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -2512,15 +2527,15 @@ body {
     gap: 12px;
   }
 
-  .header-search-result:last-child {
+  .mobile-search-result:last-child {
     border-bottom: none;
   }
 
-  .header-search-result:hover {
+  .mobile-search-result:hover {
     background: rgba(51, 65, 85, 0.6);
   }
 
-  .header-search-result:active {
+  .mobile-search-result:active {
     background: rgba(51, 65, 85, 0.8);
     transform: scale(0.98);
   }
@@ -2537,7 +2552,7 @@ body {
     min-width: 0;
   }
 
-  .header-search-username {
+  .mobile-search-username {
     color: #f1f5f9;
     font-weight: 600;
     font-size: 14px;
@@ -2546,7 +2561,7 @@ body {
     text-overflow: ellipsis;
   }
 
-  .header-search-name {
+  .mobile-search-name {
     color: rgba(148, 163, 184, 0.8);
     font-size: 12px;
     white-space: nowrap;
@@ -2569,8 +2584,13 @@ body {
   }
 
   /* Скрываем обычное поле поиска на мобильных устройствах */
-  .header-search:not(.expanded) {
+  .header-search {
     display: none !important;
+  }
+
+  /* Показываем мобильные результаты поиска */
+  .mobile-search-results {
+    display: block !important;
   }
   
   .logo {

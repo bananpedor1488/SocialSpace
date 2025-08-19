@@ -1662,7 +1662,7 @@ const HomePage = () => {
     if (!isSearchExpanded) {
       // Фокусируемся на поле ввода при открытии
       setTimeout(() => {
-        const searchInput = document.querySelector('.header-search-input');
+        const searchInput = document.querySelector('.mobile-search-input');
         if (searchInput) {
           searchInput.focus();
         }
@@ -2279,31 +2279,32 @@ const HomePage = () => {
             <div className="header-content">
               <div className="logo"><h1><Flame size={24} /> SocialSpace</h1></div>
               
+              <div className="user-info desktop-only">
+                <Points />
+              </div>
+              
               {/* Кнопка поиска для мобильных устройств */}
               <button 
-                className="mobile-search-toggle"
+                className={`mobile-search-toggle ${isSearchExpanded ? 'expanded' : ''}`}
                 onClick={toggleSearch}
                 aria-label="Поиск"
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg className="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <circle cx="11" cy="11" r="8"/>
                   <path d="m21 21-4.35-4.35"/>
                 </svg>
-              </button>
-              
-              <div className={`header-search ${isSearchExpanded ? 'expanded' : ''}`}>
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={handleSearch}
                   onBlur={handleSearchBlur}
                   placeholder="Поиск пользователей..."
-                  className="header-search-input"
+                  className="mobile-search-input"
                 />
                 {searchResults.length > 0 && (
-                  <div className="header-search-results">
+                  <div className="mobile-search-results">
                     {searchResults.map(searchUser => (
-                      <div key={searchUser._id} className="header-search-result" onClick={() => handleSearchClick(searchUser)}>
+                      <div key={searchUser._id} className="mobile-search-result" onClick={() => handleSearchClick(searchUser)}>
                         <Avatar 
                           src={searchUser.avatar || null}
                           alt={searchUser.displayName || searchUser.username}
@@ -2311,9 +2312,9 @@ const HomePage = () => {
                           className="search-result-avatar"
                         />
                         <div className="search-result-info">
-                          <span className="header-search-username">@{searchUser.username}</span>
+                          <span className="mobile-search-username">@{searchUser.username}</span>
                           {searchUser.displayName && (
-                            <span className="header-search-name">
+                            <span className="mobile-search-name">
                               {searchUser.displayName}
                               {searchUser.premium && (
                                 <span className="premium-badge">
@@ -2329,10 +2330,7 @@ const HomePage = () => {
                     ))}
                   </div>
                 )}
-              </div>
-              <div className="user-info desktop-only">
-                <Points />
-              </div>
+              </button>
             </div>
           </header>
 
