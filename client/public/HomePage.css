@@ -1984,7 +1984,7 @@ body {
 .profile-info {
   flex: 1;
   min-width: 300px;
-  margin-left: 30px;
+  margin-left: 0;
 }
 
 .profile-username {
