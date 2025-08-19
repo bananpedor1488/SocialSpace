@@ -10114,17 +10114,17 @@ body {
     transform: translateY(-1px) !important;
   }
 
-/* Мобильная версия профиля - отдельные стили для телефонов */
-@media (max-width: 767px) {
-  .profile-view {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 20px !important;
-    max-width: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    grid-template-columns: none !important;
-  }
+  /* Мобильная версия профиля - отдельные стили для телефонов */
+  @media (max-width: 767px) {
+    .profile-view {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 20px !important;
+      max-width: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      grid-template-columns: none !important;
+    }
 
   .profile-header {
     background: rgba(30, 41, 59, 0.9) !important;
@@ -10191,5 +10191,6 @@ body {
     border-radius: 20px !important;
     padding: 25px !important;
     border: 1px solid rgba(71, 85, 105, 0.4) !important;
+    margin-bottom: 15px !important;
   }
 }
