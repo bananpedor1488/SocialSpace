@@ -99,6 +99,8 @@ const HomePage = () => {
   const [typingUsers, setTypingUsers] = useState({});
   // Состояние для анимации поиска на мобильных устройствах
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+  // Состояние для лицензионного соглашения
+  const [showLicense, setShowLicense] = useState(false);
   // НОВЫЕ СОСТОЯНИЯ ДЛЯ ЧАТОВ
   const [chats, setChats] = useState([]);
   const [activeChat, setActiveChat] = useState(null);
@@ -3463,8 +3465,6 @@ const HomePage = () => {
                       Управление аккаунтом
                     </h2>
                     
-
-                    
                     <div className="more-item">
                       <div className="more-label">Настройки аккаунта</div>
                       <button 
@@ -3508,6 +3508,16 @@ const HomePage = () => {
                       <div className="more-value">
                         SocialSpace
                       </div>
+                    </div>
+                    
+                    <div className="more-item">
+                      <div className="more-label">Лицензионное соглашение</div>
+                      <button 
+                        className="more-button"
+                        onClick={() => setShowLicense(true)}
+                      >
+                        <FileText size={16} /> Читать
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -3811,6 +3821,43 @@ const HomePage = () => {
             isDarkTheme={isDarkTheme}
             onToggleTheme={toggleTheme}
           />
+        )}
+
+        {/* Модальное окно лицензионного соглашения */}
+        {showLicense && (
+          <div className="modal-overlay" onClick={() => setShowLicense(false)}>
+            <div className="modal-content license-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>Лицензионное соглашение</h2>
+                <button className="modal-close" onClick={() => setShowLicense(false)}>
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="modal-body license-content">
+                <h3>Условия использования SocialSpace</h3>
+                
+                <h4>1. Общие положения</h4>
+                <p>Настоящее Лицензионное соглашение регулирует использование приложения SocialSpace. Используя приложение, вы соглашаетесь с условиями данного соглашения.</p>
+                
+                <h4>2. Права и обязанности пользователя</h4>
+                <p>Пользователь имеет право использовать приложение в личных целях. Запрещается использование приложения для незаконной деятельности, распространения вредоносного контента или нарушения прав других пользователей.</p>
+                
+                <h4>3. Конфиденциальность</h4>
+                <p>Мы обязуемся защищать вашу личную информацию в соответствии с нашей Политикой конфиденциальности. Ваши данные не будут переданы третьим лицам без вашего согласия.</p>
+                
+                <h4>4. Ограничение ответственности</h4>
+                <p>Приложение предоставляется "как есть" без каких-либо гарантий. Мы не несем ответственности за любые убытки, связанные с использованием приложения.</p>
+                
+                <h4>5. Изменения в соглашении</h4>
+                <p>Мы оставляем за собой право изменять данное соглашение. Пользователи будут уведомлены об изменениях через приложение.</p>
+                
+                <h4>6. Контактная информация</h4>
+                <p>По всем вопросам, связанным с данным соглашением, обращайтесь к нам через приложение или по электронной почте.</p>
+                
+                <p className="license-date">Дата последнего обновления: {new Date().toLocaleDateString('ru-RU')}</p>
+              </div>
+            </div>
+          </div>
         )}
         
         <PointsModals />
