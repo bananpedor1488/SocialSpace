@@ -2425,10 +2425,13 @@ body {
   /* Порядок элементов в мобильной версии */
   .logo {
     order: 1;
+    flex-shrink: 0;
   }
 
   .mobile-search-toggle {
     order: 3;
+    flex-shrink: 0;
+    margin-left: auto;
   }
 
   .header-search.desktop-only {
