@@ -2279,6 +2279,46 @@ const HomePage = () => {
             <div className="header-content">
               <div className="logo"><h1><Flame size={24} /> SocialSpace</h1></div>
               
+              {/* Обычное поле поиска для десктопа */}
+              <div className="header-search desktop-only">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={handleSearch}
+                  placeholder="Поиск пользователей..."
+                  className="header-search-input"
+                />
+                {searchResults.length > 0 && (
+                  <div className="header-search-results">
+                    {searchResults.map(searchUser => (
+                      <div key={searchUser._id} className="header-search-result" onClick={() => handleSearchClick(searchUser)}>
+                        <Avatar 
+                          src={searchUser.avatar || null}
+                          alt={searchUser.displayName || searchUser.username}
+                          size="small"
+                          className="search-result-avatar"
+                        />
+                        <div className="search-result-info">
+                          <span className="header-search-username">@{searchUser.username}</span>
+                          {searchUser.displayName && (
+                            <span className="header-search-name">
+                              {searchUser.displayName}
+                              {searchUser.premium && (
+                                <span className="premium-badge">
+                                  <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
+                                  </svg>
+                                </span>
+                              )}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              
               <div className="user-info desktop-only">
                 <Points />
               </div>

@@ -1208,6 +1208,11 @@ body {
   display: none !important;
 }
 
+/* Показываем обычное поле поиска на десктопе */
+.header-search.desktop-only {
+  display: block !important;
+}
+
 .user-info {
   display: flex;
   align-items: center;
@@ -2584,13 +2589,18 @@ body {
   }
 
   /* Скрываем обычное поле поиска на мобильных устройствах */
-  .header-search {
+  .header-search.desktop-only {
     display: none !important;
   }
 
   /* Показываем мобильные результаты поиска */
   .mobile-search-results {
     display: block !important;
+  }
+
+  /* Скрываем обычные результаты поиска на мобильных устройствах */
+  .header-search-results {
+    display: none !important;
   }
   
   .logo {
