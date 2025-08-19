@@ -2421,6 +2421,23 @@ body {
     justify-content: space-between;
     position: relative;
   }
+
+  /* Порядок элементов в мобильной версии */
+  .logo {
+    order: 1;
+  }
+
+  .mobile-search-toggle {
+    order: 3;
+  }
+
+  .header-search.desktop-only {
+    order: 2;
+  }
+
+  .user-info.desktop-only {
+    order: 4;
+  }
   
   /* Кнопка поиска для мобильных устройств */
   .mobile-search-toggle {
