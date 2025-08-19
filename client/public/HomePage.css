@@ -1208,6 +1208,11 @@ body {
   display: none !important;
 }
 
+/* Скрываем мобильный оверлей поиска на десктопе */
+.mobile-search-overlay {
+  display: none !important;
+}
+
 /* Показываем обычное поле поиска на десктопе */
 .header-search.desktop-only {
   display: block !important;
@@ -2417,7 +2422,6 @@ body {
   
   /* Кнопка поиска для мобильных устройств */
   .mobile-search-toggle {
-    position: relative;
     display: flex !important;
     align-items: center;
     justify-content: center;
@@ -2428,9 +2432,8 @@ body {
     border-radius: 50%;
     color: #e2e8f0;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s ease;
     flex-shrink: 0;
-    overflow: hidden;
   }
 
   .mobile-search-toggle:hover {
@@ -2442,73 +2445,114 @@ body {
     transform: scale(0.95);
   }
 
-  /* Анимация превращения кнопки в поле поиска */
-  .mobile-search-toggle.expanded {
-    width: 200px;
-    border-radius: 25px;
-    background: rgba(15, 23, 42, 0.98);
-    border: 2px solid rgba(59, 130, 246, 0.6);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(10px);
-  }
-
-  /* Иконка поиска */
-  .search-icon {
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    opacity: 1;
-    z-index: 2;
-  }
-
-  .mobile-search-toggle.expanded .search-icon {
-    opacity: 0;
-    transform: translateY(-50%) scale(0.8);
-  }
-
-  /* Поле ввода */
-  .mobile-search-input {
-    position: absolute;
-    left: 0;
+  /* Мобильный оверлей поиска */
+  .mobile-search-overlay {
+    position: fixed;
     top: 0;
-    width: 100%;
-    height: 100%;
-    background: transparent;
-    border: none;
-    outline: none;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 10001;
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* Контейнер мобильного поиска */
+  .mobile-search-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: rgba(15, 23, 42, 0.98);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+    padding: calc(env(safe-area-inset-top) + 15px) 15px 15px 15px;
+    animation: slideDown 0.3s ease-out;
+    z-index: 10002;
+  }
+
+  @keyframes slideDown {
+    from {
+      transform: translateY(-100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  /* Заголовок мобильного поиска */
+  .mobile-search-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  /* Кнопка закрытия */
+  .mobile-search-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: rgba(51, 65, 85, 0.7);
+    border: 1px solid rgba(71, 85, 105, 0.5);
+    border-radius: 50%;
+    color: #e2e8f0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+  }
+
+  .mobile-search-close:hover {
+    background: rgba(51, 65, 85, 0.9);
+    border-color: rgba(239, 68, 68, 0.6);
+  }
+
+  .mobile-search-close:active {
+    transform: scale(0.95);
+  }
+
+  /* Поле ввода мобильного поиска */
+  .mobile-search-input {
+    flex: 1;
+    background: rgba(51, 65, 85, 0.7);
+    border: 1px solid rgba(71, 85, 105, 0.5);
+    border-radius: 25px;
+    padding: 12px 20px;
     color: #e2e8f0;
     font-size: 16px;
-    padding: 0 40px 0 40px;
-    opacity: 0;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .mobile-search-toggle.expanded .mobile-search-input {
-    opacity: 1;
+    transition: all 0.3s ease;
   }
 
   .mobile-search-input::placeholder {
     color: rgba(148, 163, 184, 0.7);
   }
 
+  .mobile-search-input:focus {
+    outline: none;
+    border-color: rgba(59, 130, 246, 0.6);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    background: rgba(51, 65, 85, 0.9);
+  }
+
   /* Результаты поиска для мобильных устройств */
   .mobile-search-results {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    width: 280px;
+    margin-top: 15px;
     background: rgba(15, 23, 42, 0.98);
-    backdrop-filter: blur(20px);
     border: 1px solid rgba(71, 85, 105, 0.4);
     border-radius: 16px;
-    margin-top: 8px;
-    max-height: 250px;
+    max-height: 300px;
     overflow-y: auto;
-    z-index: 50000;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    animation: slideDown 0.3s ease-out;
   }
 
   @keyframes slideDown {
@@ -2595,6 +2639,11 @@ body {
 
   /* Показываем мобильные результаты поиска */
   .mobile-search-results {
+    display: block !important;
+  }
+
+  /* Показываем мобильный оверлей поиска */
+  .mobile-search-overlay {
     display: block !important;
   }
 

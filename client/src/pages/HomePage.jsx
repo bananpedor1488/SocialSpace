@@ -1660,27 +1660,13 @@ const HomePage = () => {
   const toggleSearch = () => {
     setIsSearchExpanded(!isSearchExpanded);
     if (!isSearchExpanded) {
-      // Фокусируемся на поле ввода при открытии
-      setTimeout(() => {
-        const searchInput = document.querySelector('.mobile-search-input');
-        if (searchInput) {
-          searchInput.focus();
-        }
-      }, 300);
+      // Очищаем поиск при открытии
+      setSearchQuery('');
+      setSearchResults([]);
     } else {
       // Очищаем поиск при закрытии
       setSearchQuery('');
       setSearchResults([]);
-    }
-  };
-
-  // Функция для закрытия поиска при клике вне поля
-  const handleSearchBlur = () => {
-    if (window.innerWidth <= 767) {
-      setTimeout(() => {
-        setIsSearchExpanded(false);
-        setSearchResults([]);
-      }, 200);
     }
   };
 
@@ -2325,22 +2311,38 @@ const HomePage = () => {
               
               {/* Кнопка поиска для мобильных устройств */}
               <button 
-                className={`mobile-search-toggle ${isSearchExpanded ? 'expanded' : ''}`}
+                className="mobile-search-toggle"
                 onClick={toggleSearch}
                 aria-label="Поиск"
               >
-                <svg className="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <circle cx="11" cy="11" r="8"/>
                   <path d="m21 21-4.35-4.35"/>
                 </svg>
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={handleSearch}
-                  onBlur={handleSearchBlur}
-                  placeholder="Поиск пользователей..."
-                  className="mobile-search-input"
-                />
+              </button>
+            </div>
+          </header>
+
+          {/* Мобильное поле поиска - выпадает сверху вниз */}
+          {isSearchExpanded && (
+            <div className="mobile-search-overlay">
+              <div className="mobile-search-container">
+                <div className="mobile-search-header">
+                  <button className="mobile-search-close" onClick={toggleSearch}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <line x1="18" y1="6" x2="6" y2="18"/>
+                      <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                  </button>
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={handleSearch}
+                    placeholder="Поиск пользователей..."
+                    className="mobile-search-input"
+                    autoFocus
+                  />
+                </div>
                 {searchResults.length > 0 && (
                   <div className="mobile-search-results">
                     {searchResults.map(searchUser => (
@@ -2370,9 +2372,9 @@ const HomePage = () => {
                     ))}
                   </div>
                 )}
-              </button>
+              </div>
             </div>
-          </header>
+          )}
 
           <nav className="sidebar">
             <ul className="nav-menu">
