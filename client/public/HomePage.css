@@ -2428,10 +2428,20 @@ body {
     flex-shrink: 0;
   }
 
+  .logo h1 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+  }
+
   .mobile-search-toggle {
     order: 3;
     flex-shrink: 0;
     margin-left: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .header-search.desktop-only {
@@ -2532,6 +2542,7 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     flex-shrink: 0;
+    margin-left: auto;
   }
 
   .mobile-search-close:hover {
