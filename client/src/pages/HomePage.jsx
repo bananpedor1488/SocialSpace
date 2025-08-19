@@ -97,6 +97,8 @@ const HomePage = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState('Подключение...');
   const [typingUsers, setTypingUsers] = useState({});
+  // Состояние для анимации поиска на мобильных устройствах
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   // НОВЫЕ СОСТОЯНИЯ ДЛЯ ЧАТОВ
   const [chats, setChats] = useState([]);
   const [activeChat, setActiveChat] = useState(null);
@@ -1648,6 +1650,38 @@ const HomePage = () => {
     loadUserProfile(searchUser._id);
     setSearchQuery('');
     setSearchResults([]);
+    // Скрываем поиск на мобильных устройствах после выбора пользователя
+    if (window.innerWidth <= 767) {
+      setIsSearchExpanded(false);
+    }
+  };
+
+  // Функция для переключения состояния поиска на мобильных устройствах
+  const toggleSearch = () => {
+    setIsSearchExpanded(!isSearchExpanded);
+    if (!isSearchExpanded) {
+      // Фокусируемся на поле ввода при открытии
+      setTimeout(() => {
+        const searchInput = document.querySelector('.header-search-input');
+        if (searchInput) {
+          searchInput.focus();
+        }
+      }, 300);
+    } else {
+      // Очищаем поиск при закрытии
+      setSearchQuery('');
+      setSearchResults([]);
+    }
+  };
+
+  // Функция для закрытия поиска при клике вне поля
+  const handleSearchBlur = () => {
+    if (window.innerWidth <= 767) {
+      setTimeout(() => {
+        setIsSearchExpanded(false);
+        setSearchResults([]);
+      }, 200);
+    }
   };
 
   const loadUserProfile = async (userId) => {
@@ -2244,11 +2278,25 @@ const HomePage = () => {
           <header className="header">
             <div className="header-content">
               <div className="logo"><h1><Flame size={24} /> SocialSpace</h1></div>
-              <div className="header-search">
+              
+              {/* Кнопка поиска для мобильных устройств */}
+              <button 
+                className="mobile-search-toggle"
+                onClick={toggleSearch}
+                aria-label="Поиск"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="11" cy="11" r="8"/>
+                  <path d="m21 21-4.35-4.35"/>
+                </svg>
+              </button>
+              
+              <div className={`header-search ${isSearchExpanded ? 'expanded' : ''}`}>
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={handleSearch}
+                  onBlur={handleSearchBlur}
                   placeholder="Поиск пользователей..."
                   className="header-search-input"
                 />

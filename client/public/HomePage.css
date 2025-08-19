@@ -1198,6 +1198,11 @@ body {
   font-size: 14px;
 }
 
+/* Скрываем кнопку поиска на десктопе */
+.mobile-search-toggle {
+  display: none !important;
+}
+
 .user-info {
   display: flex;
   align-items: center;
@@ -2390,24 +2395,188 @@ body {
   }
 
   .header-content {
-    flex-direction: column;
+    flex-direction: row;
     gap: 15px;
-    align-items: stretch;
+    align-items: center;
     padding: 15px;
     height: 100%;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
+    position: relative;
   }
   
+  /* Кнопка поиска для мобильных устройств */
+  .mobile-search-toggle {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: rgba(51, 65, 85, 0.7);
+    border: 1px solid rgba(71, 85, 105, 0.5);
+    border-radius: 50%;
+    color: #e2e8f0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+  }
+
+  .mobile-search-toggle:hover {
+    background: rgba(51, 65, 85, 0.9);
+    border-color: rgba(59, 130, 246, 0.6);
+  }
+
+  .mobile-search-toggle:active {
+    transform: scale(0.95);
+  }
+  
+  /* Анимированное поле поиска */
   .header-search {
-    max-width: 100%;
-    min-width: 100%;
-    order: 2;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 0;
+    max-width: calc(100vw - 120px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 10002;
+  }
+
+  .header-search.expanded {
+    width: 100%;
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .header-search-input {
+    width: 100%;
+    background: rgba(15, 23, 42, 0.98);
+    border: 2px solid rgba(59, 130, 246, 0.6);
+    border-radius: 25px;
+    padding: 12px 20px;
+    color: #e2e8f0;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .header-search-input::placeholder {
+    color: rgba(148, 163, 184, 0.7);
+  }
+
+  .header-search-input:focus {
+    outline: none;
+    border-color: rgba(59, 130, 246, 0.8);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  }
+
+  /* Результаты поиска для мобильных устройств */
+  .header-search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: rgba(15, 23, 42, 0.98);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(71, 85, 105, 0.4);
+    border-radius: 16px;
+    margin-top: 8px;
+    max-height: 250px;
+    overflow-y: auto;
+    z-index: 50000;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    animation: slideDown 0.3s ease-out;
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .header-search-result {
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .header-search-result:last-child {
+    border-bottom: none;
+  }
+
+  .header-search-result:hover {
+    background: rgba(51, 65, 85, 0.6);
+  }
+
+  .header-search-result:active {
+    background: rgba(51, 65, 85, 0.8);
+    transform: scale(0.98);
+  }
+
+  .search-result-avatar {
+    flex-shrink: 0;
+  }
+
+  .search-result-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .header-search-username {
+    color: #f1f5f9;
+    font-weight: 600;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .header-search-name {
+    color: rgba(148, 163, 184, 0.8);
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .premium-badge {
+    color: #fbbf24;
+    display: flex;
+    align-items: center;
+  }
+
+  .premium-badge svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* Скрываем обычное поле поиска на мобильных устройствах */
+  .header-search:not(.expanded) {
+    display: none !important;
   }
   
   .logo {
     order: 1;
     text-align: center;
+    flex-shrink: 0;
   }
   
   .user-info {
@@ -2416,6 +2585,7 @@ body {
     justify-content: space-between;
     align-items: center;
     gap: 10px;
+    flex-shrink: 0;
   }
 
   .main-content {
