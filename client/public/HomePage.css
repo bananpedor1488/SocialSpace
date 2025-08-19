@@ -9607,9 +9607,9 @@ body {
 /* Стили для профиля на ПК */
 .profile-view {
   display: grid;
-  grid-template-columns: 300px 1fr;
+  grid-template-columns: 400px 1fr;
   gap: 30px;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 20px;
 }
@@ -10024,4 +10024,4 @@ body {
     background: #2563eb !important;
     transform: translateY(-1px) !important;
   }
-}
+/* Ошибка: лишняя закрывающая фигурная скобка. Просто удалите её. */
