@@ -7,7 +7,7 @@ import {
   Home, MessageCircle, User, LogOut, Plus,
   Heart, MessageSquare, Repeat, Pencil, Trash2, Users, UserCheck, Send, X, ChevronDown, ChevronLeft,
   Moon, Sun, Wifi, WifiOff, Flame, Clock, Phone, Settings, Trophy, DollarSign,
-  Check, Play, HelpCircle, History, Crown, Gift, ArrowLeft, MoreVertical
+  Check, Play, HelpCircle, History, Crown, Gift, ArrowLeft, MoreVertical, FileText
 } from 'lucide-react';
 
 import CallInterface from '../components/CallInterface';
