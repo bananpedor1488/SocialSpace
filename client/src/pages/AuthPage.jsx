@@ -123,7 +123,7 @@ const AuthPage = () => {
           throw new Error('Не удалось сохранить токены в localStorage');
         }
 
-        // Дополнительная проверка что токены сохранились
+        // Дополнительная  что токены сохранились
         setTimeout(() => {
           const verified = verifyTokensSaved();
           console.log('Tokens verified after save:', verified);

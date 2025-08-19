@@ -108,7 +108,7 @@ function AppRouter() {
         color: 'white',
         fontSize: '18px'
       }}>
-        Проверка авторизации...
+         Проверка авторизации...
       </div>
     );
   }
