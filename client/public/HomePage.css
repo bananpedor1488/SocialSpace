@@ -3167,6 +3167,84 @@ body {
     padding: 15px 10px;
   }
 
+  /* Мобильная версия профиля - отдельные стили */
+  .profile-view {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 20px !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    grid-template-columns: none !important;
+  }
+
+  .profile-header {
+    background: rgba(30, 41, 59, 0.9) !important;
+    border-radius: 20px !important;
+    padding: 25px !important;
+    border: 1px solid rgba(71, 85, 105, 0.4) !important;
+    position: static !important;
+    height: auto !important;
+    top: auto !important;
+  }
+
+  .profile-main-info {
+    text-align: center !important;
+    position: static !important;
+  }
+
+  .profile-avatar-section {
+    position: relative !important;
+    display: block !important;
+    text-align: center !important;
+    gap: 0 !important;
+    margin-bottom: 20px !important;
+  }
+
+  .profile-info {
+    flex: none !important;
+    text-align: center !important;
+  }
+
+  .profile-header-row {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 15px !important;
+    margin-bottom: 15px !important;
+  }
+
+  .profile-display-name {
+    text-align: center !important;
+    justify-content: center !important;
+  }
+
+  .own-profile-badge-container {
+    position: static !important;
+    top: auto !important;
+    right: auto !important;
+    text-align: center !important;
+    margin-bottom: 20px !important;
+  }
+
+  .own-profile-badge {
+    padding: 10px 20px !important;
+    border-radius: 25px !important;
+    font-size: 14px !important;
+    gap: 8px !important;
+  }
+
+  .profile-bio {
+    text-align: center !important;
+  }
+
+  .profile-posts {
+    background: rgba(30, 41, 59, 0.9) !important;
+    border-radius: 20px !important;
+    padding: 25px !important;
+    border: 1px solid rgba(71, 85, 105, 0.4) !important;
+  }
+
   .profile-username {
     font-size: 1.2rem;
   }
@@ -10035,4 +10113,83 @@ body {
     background: #2563eb !important;
     transform: translateY(-1px) !important;
   }
-/* Ошибка: лишняя закрывающая фигурная скобка. Просто удалите её. */
+
+/* Мобильная версия профиля - отдельные стили для телефонов */
+@media (max-width: 767px) {
+  .profile-view {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 20px !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    grid-template-columns: none !important;
+  }
+
+  .profile-header {
+    background: rgba(30, 41, 59, 0.9) !important;
+    border-radius: 20px !important;
+    padding: 25px !important;
+    border: 1px solid rgba(71, 85, 105, 0.4) !important;
+    position: static !important;
+    height: auto !important;
+    top: auto !important;
+  }
+
+  .profile-main-info {
+    text-align: center !important;
+    position: static !important;
+  }
+
+  .profile-avatar-section {
+    position: relative !important;
+    display: block !important;
+    text-align: center !important;
+    gap: 0 !important;
+    margin-bottom: 20px !important;
+  }
+
+  .profile-info {
+    flex: none !important;
+    text-align: center !important;
+  }
+
+  .profile-header-row {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 15px !important;
+    margin-bottom: 15px !important;
+  }
+
+  .profile-display-name {
+    text-align: center !important;
+    justify-content: center !important;
+  }
+
+  .own-profile-badge-container {
+    position: static !important;
+    top: auto !important;
+    right: auto !important;
+    text-align: center !important;
+    margin-bottom: 20px !important;
+  }
+
+  .own-profile-badge {
+    padding: 10px 20px !important;
+    border-radius: 25px !important;
+    font-size: 14px !important;
+    gap: 8px !important;
+  }
+
+  .profile-bio {
+    text-align: center !important;
+  }
+
+  .profile-posts {
+    background: rgba(30, 41, 59, 0.9) !important;
+    border-radius: 20px !important;
+    padding: 25px !important;
+    border: 1px solid rgba(71, 85, 105, 0.4) !important;
+  }
+}
