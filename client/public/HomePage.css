@@ -9767,7 +9767,7 @@ body {
   flex-direction: column;
   gap: 5px;
   margin-bottom: 0;
-  margin-left: -20px;
+  margin-left: 0;
 }
 
 .profile-display-name {
