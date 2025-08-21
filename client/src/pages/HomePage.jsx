@@ -2999,16 +2999,16 @@ const HomePage = () => {
                             )}
                           </div>
                         </div>
-                        {isOwnProfile() && (
-                          <button 
-                            className="profile-settings-btn-round"
-                            onClick={() => setShowProfileSettings(true)}
-                            title="Настройки профиля"
-                          >
-                            <Settings size={18} />
-                          </button>
-                        )}
                       </div>
+                      {isOwnProfile() && (
+                        <button 
+                          className="profile-settings-btn-round"
+                          onClick={() => setShowProfileSettings(true)}
+                          title="Настройки профиля"
+                        >
+                          <Settings size={18} />
+                        </button>
+                      )}
                       
                       <div className="profile-details">
                         {profile.bio && (
