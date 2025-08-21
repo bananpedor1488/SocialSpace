@@ -9750,7 +9750,7 @@ body {
   position: relative;
   display: flex;
   align-items: flex-start;
-  gap: 0;
+  gap: 15px;
   margin-bottom: 20px;
 }
 
@@ -9781,6 +9781,8 @@ body {
   align-items: center;
   gap: 8px;
   margin-bottom: 0;
+  margin-left: -15px;
+  transform: translateX(-10px);
 }
 
 .profile-details {
