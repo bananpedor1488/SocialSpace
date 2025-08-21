@@ -4,6 +4,7 @@ import AuthPage from './pages/AuthPage';
 import HomePage from './pages/HomePage';
 import { PointsProvider } from './context/PointsContext';
 import axios from 'axios';
+import './App.css';
 
 // Настройка axios interceptors для автоматической отправки токенов
 const setupAxiosInterceptors = () => {
@@ -99,16 +100,42 @@ function AppRouter() {
 
   if (isLoading) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        color: 'white',
-        fontSize: '18px'
-      }}>
-         Проверка авторизации...
+      <div className="glass-background">
+        {/* Анимированные фонари */}
+        <div className="lantern"></div>
+        <div className="lantern"></div>
+        <div className="lantern"></div>
+        <div className="lantern"></div>
+        <div className="lantern"></div>
+        <div className="lantern"></div>
+        
+        {/* Световые следы */}
+        <div className="light-trail"></div>
+        <div className="light-trail"></div>
+        <div className="light-trail"></div>
+        
+        {/* Частицы */}
+        <div className="particle"></div>
+        <div className="particle"></div>
+        <div className="particle"></div>
+        <div className="particle"></div>
+        
+        {/* Жидкое стекло */}
+        <div className="glass-effect"></div>
+        
+        {/* Текст загрузки */}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          height: '100vh',
+          position: 'relative',
+          zIndex: 10
+        }}>
+          <div className="loading-text">
+            Проверка авторизации...
+          </div>
+        </div>
       </div>
     );
   }

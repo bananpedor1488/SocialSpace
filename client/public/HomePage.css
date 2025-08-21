@@ -5451,6 +5451,13 @@ body {
   margin-bottom: 12px;
 }
 
+/* Уменьшаем отступ между аватаркой и именем на ПК */
+@media (min-width: 768px) {
+  .post-header {
+    gap: 6px;
+  }
+}
+
 .post-avatar {
   cursor: pointer;
   flex-shrink: 0;
@@ -5491,6 +5498,13 @@ body {
   align-items: center;
   gap: 12px;
   flex: 1;
+}
+
+/* Уменьшаем отступ между аватаркой и именем в рекомендациях на ПК */
+@media (min-width: 768px) {
+  .suggestion-info {
+    gap: 6px;
+  }
 }
 
 .suggestion-display-name {
@@ -5559,6 +5573,13 @@ body {
   align-items: center;
 }
 
+/* Уменьшаем отступ между аватаркой и именем в комментариях на ПК */
+@media (min-width: 768px) {
+  .comment-info {
+    gap: 6px;
+  }
+}
+
 .comment-username {
   color: rgba(255, 255, 255, 0.9);
   font-weight: 500;
@@ -5585,6 +5606,13 @@ body {
   padding: 8px 12px;
   cursor: pointer;
   transition: background-color 0.2s;
+}
+
+/* Уменьшаем отступ между аватаркой и именем в поиске на ПК */
+@media (min-width: 768px) {
+  .header-search-result {
+    gap: 6px;
+  }
 }
 
 .search-result-info {
