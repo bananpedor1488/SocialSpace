@@ -2015,7 +2015,7 @@ body {
 .profile-handle {
   color: rgba(148, 163, 184, 0.9);
   font-size: 16px;
-  margin-bottom: 20px;
+  margin-bottom: 0;
 }
 
 .profile-stats {
@@ -9759,13 +9759,13 @@ body {
   text-align: left;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0;
 }
 
 .profile-header-row {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 0;
   margin-bottom: 0;
   margin-left: 0;
 }
@@ -9778,6 +9778,7 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-bottom: 0;
 }
 
 .profile-details {
@@ -9788,8 +9789,8 @@ body {
 
 .profile-settings-btn-round {
   position: absolute;
-  top: 15px;
-  right: 15px;
+  top: 0;
+  right: 0;
   width: 45px;
   height: 45px;
   border-radius: 50%;
