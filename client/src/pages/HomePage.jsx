@@ -2972,24 +2972,24 @@ const HomePage = () => {
                   <div className="profile-content">
                     <div className="profile-main-info">
                       <div className="profile-avatar-section">
-                        <Avatar 
-                          src={profile.avatar || null} 
-                          alt={profile.displayName || profile.username}
-                          size="xlarge"
-                        />
+                        <div className="avatar-name-container">
+                          <Avatar 
+                            src={profile.avatar || null} 
+                            alt={profile.displayName || profile.username}
+                            size="xlarge"
+                          />
+                          <h2 className="profile-display-name">
+                            {profile.displayName || profile.username}
+                            {profile.premium && (
+                              <span className="premium-badge">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                  <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
+                                </svg>
+                              </span>
+                            )}
+                          </h2>
+                        </div>
                         <div className="profile-info">
-                          <div className="profile-header-row">
-                            <h2 className="profile-display-name">
-                              {profile.displayName || profile.username}
-                              {profile.premium && (
-                                <span className="premium-badge">
-                                  <svg viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
-                                  </svg>
-                                </span>
-                              )}
-                            </h2>
-                          </div>
                           <p className="profile-handle">@{profile.username}</p>
                           {isOwnProfile() && (
                             <div className="own-profile-badge-container">

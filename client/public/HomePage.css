@@ -9754,6 +9754,12 @@ body {
   margin-bottom: 20px;
 }
 
+.avatar-name-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .profile-info {
   flex: none;
   width: auto;
@@ -9780,9 +9786,6 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 0;
-  margin-left: -15px;
-  transform: translateX(-10px);
 }
 
 .profile-details {
