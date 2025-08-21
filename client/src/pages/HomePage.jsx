@@ -2978,26 +2978,26 @@ const HomePage = () => {
                             alt={profile.displayName || profile.username}
                             size="xlarge"
                           />
-                          <h2 className="profile-display-name">
-                            {profile.displayName || profile.username}
-                            {profile.premium && (
-                              <span className="premium-badge">
-                                <svg viewBox="0 0 24 24" fill="currentColor">
-                                  <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
-                                </svg>
-                              </span>
+                          <div className="name-info-container">
+                            <h2 className="profile-display-name">
+                              {profile.displayName || profile.username}
+                              {profile.premium && (
+                                <span className="premium-badge">
+                                  <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
+                                  </svg>
+                                </span>
+                              )}
+                            </h2>
+                            <p className="profile-handle">@{profile.username}</p>
+                            {isOwnProfile() && (
+                              <div className="own-profile-badge-container">
+                                <span className="own-profile-badge">
+                                  <UserCheck size={16} /> Ваш профиль
+                                </span>
+                              </div>
                             )}
-                          </h2>
-                        </div>
-                        <div className="profile-info">
-                          <p className="profile-handle">@{profile.username}</p>
-                          {isOwnProfile() && (
-                            <div className="own-profile-badge-container">
-                              <span className="own-profile-badge">
-                                <UserCheck size={16} /> Ваш профиль
-                              </span>
-                            </div>
-                          )}
+                          </div>
                         </div>
                         {isOwnProfile() && (
                           <button 

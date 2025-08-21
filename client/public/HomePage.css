@@ -9756,8 +9756,14 @@ body {
 
 .avatar-name-container {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
+}
+
+.name-info-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
 .profile-info {
