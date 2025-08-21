@@ -9750,16 +9750,18 @@ body {
   position: relative;
   display: flex;
   align-items: flex-start;
-  gap: 25px;
+  gap: 0;
   margin-bottom: 20px;
 }
 
 .profile-info {
-  flex: 1;
+  flex: none;
+  width: auto;
   text-align: left;
   display: flex;
   flex-direction: column;
   gap: 0;
+  margin-left: -10px;
 }
 
 .profile-header-row {
