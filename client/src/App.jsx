@@ -4,7 +4,6 @@ import AuthPage from './pages/AuthPage';
 import HomePage from './pages/HomePage';
 import { PointsProvider } from './context/PointsContext';
 import axios from 'axios';
-import './App.css';
 
 // Настройка axios interceptors для автоматической отправки токенов
 const setupAxiosInterceptors = () => {
@@ -100,41 +99,29 @@ function AppRouter() {
 
   if (isLoading) {
     return (
-      <div className="glass-background">
-        {/* Анимированные фонари */}
-        <div className="lantern"></div>
-        <div className="lantern"></div>
-        <div className="lantern"></div>
-        <div className="lantern"></div>
-        <div className="lantern"></div>
-        <div className="lantern"></div>
-        
-        {/* Световые следы */}
-        <div className="light-trail"></div>
-        <div className="light-trail"></div>
-        <div className="light-trail"></div>
-        
-        {/* Частицы */}
-        <div className="particle"></div>
-        <div className="particle"></div>
-        <div className="particle"></div>
-        <div className="particle"></div>
-        
-        {/* Жидкое стекло */}
-        <div className="glass-effect"></div>
-        
-        {/* Текст загрузки */}
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center', 
-          height: '100vh',
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        background: '#000',
+        color: 'white',
+        fontSize: '18px',
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        <div style={{
+          background: 'rgba(255, 255, 255, 0.1)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          borderRadius: '16px',
+          padding: '30px 40px',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
           position: 'relative',
-          zIndex: 10
+          zIndex: 2
         }}>
-          <div className="loading-text">
-            Проверка авторизации...
-          </div>
+          Проверка авторизации...
         </div>
       </div>
     );
