@@ -3012,7 +3012,10 @@ const HomePage = () => {
                       
                       <div className="profile-details">
                         {profile.bio && (
-                          <p className="profile-bio">{profile.bio}</p>
+                          <>
+                            <span className="profile-bio-label">Описание</span>
+                            <p className="profile-bio">{profile.bio}</p>
+                          </>
                         )}
                         
                         <div className="profile-stats">
