@@ -9743,6 +9743,38 @@ body {
   padding: 10px 10px;
 }
 
+.profile-view .profile-details {
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+}
+
+.profile-view .profile-bio {
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+}
+
+.profile-view .profile-stats {
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+}
+
+.profile-view .profile-bio-label {
+  margin-bottom: 15px;
+}
+
+.profile-view .profile-info {
+  width: 100%;
+  max-width: none;
+}
+
+.profile-view .profile-main-info {
+  width: 100%;
+  max-width: none;
+}
+
 .profile-header {
   background: rgba(30, 41, 59, 0.9);
   border-radius: 20px;
@@ -9781,12 +9813,12 @@ body {
 
 .profile-info {
   flex: none;
-  width: auto;
+  width: 100%;
   text-align: left;
   display: flex;
   flex-direction: column;
   gap: 0;
-  margin-left: -10px;
+  margin-left: 0;
 }
 
 .profile-header-row {
@@ -9900,7 +9932,7 @@ body {
   color: #f1f5f9;
   font-size: 18px;
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
   display: block;
   text-align: left;
 }
