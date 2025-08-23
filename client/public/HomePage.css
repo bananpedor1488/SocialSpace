@@ -9683,7 +9683,7 @@ body {
   .profile-stats {
     max-width: none !important;
     width: 100% !important;
-    margin: 15px 0 !important;
+    margin: 10px 0 !important;
     padding: 0 !important;
     display: flex !important;
     flex-direction: row !important;
@@ -9762,7 +9762,7 @@ body {
 }
 
 .profile-view .profile-bio-label {
-  margin-bottom: 15px;
+  margin-bottom: 5px;
 }
 
 .profile-view .profile-info {
@@ -9842,7 +9842,7 @@ body {
 .profile-details {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -9908,10 +9908,10 @@ body {
 .profile-bio {
   color: rgba(148, 163, 184, 0.9);
   font-size: 16px;
-  line-height: 1.6;
-  margin: 15px 0;
+  line-height: 1.5;
+  margin: 10px 0;
   text-align: left;
-  padding: 20px;
+  padding: 15px;
   background: rgba(30, 41, 59, 0.8);
   border-radius: 15px;
   border: 1px solid rgba(71, 85, 105, 0.3);
@@ -9932,7 +9932,7 @@ body {
   color: #f1f5f9;
   font-size: 18px;
   font-weight: 600;
-  margin-bottom: 12px;
+  margin-bottom: 5px;
   display: block;
   text-align: left;
 }
@@ -9941,7 +9941,7 @@ body {
   display: flex;
   justify-content: space-between;
   gap: 15px;
-  margin: 15px 0;
+  margin: 10px 0;
   width: 100%;
   box-sizing: border-box;
 }
@@ -10070,7 +10070,7 @@ body {
     align-items: center !important;
     gap: 15px !important;
     width: 100% !important;
-    margin: 15px 0 !important;
+    margin: 10px 0 !important;
     padding: 0 !important;
   }
 
@@ -10358,13 +10358,13 @@ body {
     text-align: center !important;
     width: 100% !important;
     box-sizing: border-box !important;
-    padding: 20px !important;
+    padding: 15px !important;
     border-radius: 15px !important;
   }
 
   .profile-bio-label {
     text-align: center !important;
-    margin-bottom: 8px !important;
+    margin-bottom: 5px !important;
   }
 
   .profile-posts {
