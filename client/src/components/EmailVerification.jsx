@@ -103,7 +103,12 @@ const EmailVerification = ({ userId, email, onVerificationSuccess, onBack, isFro
         userId
       });
       
-      showMessage('Новый код отправлен на ваш email', 'success');
+             showMessage(
+         isFromLogin 
+           ? 'Код подтверждения отправлен на ваш email' 
+           : 'Новый код отправлен на ваш email', 
+         'success'
+       );
       setCountdown(60); // 60 секунд до следующей отправки
       
     } catch (error) {
@@ -186,12 +191,12 @@ const EmailVerification = ({ userId, email, onVerificationSuccess, onBack, isFro
           <h2 className="verification-title">
             {isFromLogin ? 'Подтвердите email для входа' : 'Подтверждение email'}
           </h2>
-          <p className="verification-subtitle">
-            {isFromLogin 
-              ? `Для входа в аккаунт необходимо подтвердить email. Код отправлен на <strong>${email}</strong>`
-              : `Мы отправили код подтверждения на <strong>${email}</strong>`
-            }
-          </p>
+                     <p className="verification-subtitle">
+             {isFromLogin 
+               ? `Для входа в аккаунт необходимо подтвердить email. Нажмите "Отправить код повторно" для получения кода на ${email}`
+               : `Мы отправили код подтверждения на ${email}`
+             }
+           </p>
           {isFromLogin && (
             <p className="verification-note">
               После подтверждения email вы сможете войти в аккаунт
@@ -255,17 +260,17 @@ const EmailVerification = ({ userId, email, onVerificationSuccess, onBack, isFro
         </form>
 
         <div className="verification-actions">
-          <button
-            type="button"
-            onClick={handleResendCode}
-            disabled={countdown > 0 || isLoading}
-            className="resend-btn"
-          >
-            {countdown > 0 
-              ? `Отправить снова через ${countdown}с` 
-              : 'Отправить код повторно'
-            }
-          </button>
+                     <button
+             type="button"
+             onClick={handleResendCode}
+             disabled={countdown > 0 || isLoading}
+             className="resend-btn"
+           >
+             {countdown > 0 
+               ? `Отправить снова через ${countdown}с` 
+               : isFromLogin ? 'Отправить код' : 'Отправить код повторно'
+             }
+           </button>
           
           <button
             type="button"
