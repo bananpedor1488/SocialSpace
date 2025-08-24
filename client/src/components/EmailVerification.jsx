@@ -2,12 +2,15 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './EmailVerification.css';
 
-const EmailVerification = ({ userId, email, onVerificationSuccess, onBack }) => {
+const EmailVerification = ({ userId, email, onVerificationSuccess, onBack, isFromLogin = false }) => {
   const [code, setCode] = useState(['', '', '', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
   const [countdown, setCountdown] = useState(0);
+  const [showEmailChange, setShowEmailChange] = useState(false);
+  const [newEmail, setNewEmail] = useState('');
+  const [isChangingEmail, setIsChangingEmail] = useState(false);
 
   const showMessage = (text, type = 'error') => {
     setMessage(text);
@@ -110,6 +113,46 @@ const EmailVerification = ({ userId, email, onVerificationSuccess, onBack }) => 
     }
   };
 
+  // Изменение email
+  const handleChangeEmail = async () => {
+    if (!newEmail || !isValidEmail(newEmail)) {
+      showMessage('Введите корректный email адрес');
+      return;
+    }
+
+    setIsChangingEmail(true);
+    try {
+      const response = await axios.post('https://server-pqqy.onrender.com/api/auth/change-email', {
+        userId,
+        newEmail
+      });
+
+      showMessage('Email изменен. Новый код отправлен на указанный адрес', 'success');
+      // Обновляем email в родительском компоненте через callback
+      if (response.data.email) {
+        // Можно добавить callback для обновления email в родительском компоненте
+      }
+      setShowEmailChange(false);
+      setNewEmail('');
+      setCountdown(60);
+      
+    } catch (error) {
+      console.error('Change email error:', error);
+      let errorMessage = 'Ошибка изменения email';
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
+      showMessage(errorMessage);
+    } finally {
+      setIsChangingEmail(false);
+    }
+  };
+
+  // Валидация email
+  const isValidEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
   // Обратный отсчет для повторной отправки
   useEffect(() => {
     if (countdown > 0) {
@@ -127,10 +170,17 @@ const EmailVerification = ({ userId, email, onVerificationSuccess, onBack }) => 
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 7.89a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
           </div>
-          <h2 className="verification-title">Подтверждение email</h2>
+          <h2 className="verification-title">
+            {isFromLogin ? 'Подтвердите email для входа' : 'Подтверждение email'}
+          </h2>
           <p className="verification-subtitle">
             Мы отправили код подтверждения на <strong>{email}</strong>
           </p>
+          {isFromLogin && (
+            <p className="verification-note">
+              Для входа в аккаунт необходимо подтвердить email адрес
+            </p>
+          )}
         </div>
 
         {message && (
@@ -203,13 +253,62 @@ const EmailVerification = ({ userId, email, onVerificationSuccess, onBack }) => 
           
           <button
             type="button"
-            onClick={onBack}
+            onClick={() => setShowEmailChange(!showEmailChange)}
             disabled={isLoading}
-            className="back-btn"
+            className="change-email-btn"
           >
-            Назад к регистрации
+            Изменить email
           </button>
+          
+          {!isFromLogin && (
+            <button
+              type="button"
+              onClick={onBack}
+              disabled={isLoading}
+              className="back-btn"
+            >
+              Назад к регистрации
+            </button>
+          )}
         </div>
+
+        {/* Форма изменения email */}
+        {showEmailChange && (
+          <div className="email-change-form">
+            <h3>Изменить email</h3>
+            <div className="input-group">
+              <input
+                type="email"
+                value={newEmail}
+                onChange={(e) => setNewEmail(e.target.value)}
+                placeholder="Новый email адрес"
+                className="email-input"
+                disabled={isChangingEmail}
+              />
+            </div>
+            <div className="email-change-actions">
+              <button
+                type="button"
+                onClick={handleChangeEmail}
+                disabled={!newEmail || !isValidEmail(newEmail) || isChangingEmail}
+                className="change-btn"
+              >
+                {isChangingEmail ? 'Изменение...' : 'Изменить email'}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowEmailChange(false);
+                  setNewEmail('');
+                }}
+                disabled={isChangingEmail}
+                className="cancel-btn"
+              >
+                Отмена
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -11,7 +11,7 @@ const AuthPage = () => {
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
   const [showVerification, setShowVerification] = useState(false);
-  const [verificationData, setVerificationData] = useState({ userId: '', email: '' });
+  const [verificationData, setVerificationData] = useState({ userId: '', email: '', isFromLogin: false });
   const navigate = useNavigate();
 
   const showMessage = (text, type = 'error') => {
@@ -116,7 +116,8 @@ const AuthPage = () => {
       if (!isLogin && response.data.requiresVerification) {
         setVerificationData({
           userId: response.data.userId,
-          email: response.data.email
+          email: response.data.email,
+          isFromLogin: false
         });
         setShowVerification(true);
         setIsLoading(false);
@@ -127,7 +128,8 @@ const AuthPage = () => {
       if (isLogin && response.data.requiresVerification) {
         setVerificationData({
           userId: response.data.userId,
-          email: data.identifier
+          email: data.identifier,
+          isFromLogin: true
         });
         setShowVerification(true);
         setIsLoading(false);
@@ -216,7 +218,7 @@ const AuthPage = () => {
   // Возврат к форме регистрации
   const handleBackToRegistration = () => {
     setShowVerification(false);
-    setVerificationData({ userId: '', email: '' });
+    setVerificationData({ userId: '', email: '', isFromLogin: false });
   };
 
   // Если показываем верификацию
@@ -227,6 +229,7 @@ const AuthPage = () => {
         email={verificationData.email}
         onVerificationSuccess={handleVerificationSuccess}
         onBack={handleBackToRegistration}
+        isFromLogin={verificationData.isFromLogin}
       />
     );
   }
