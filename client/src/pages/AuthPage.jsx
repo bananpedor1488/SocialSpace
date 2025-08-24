@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import EmailVerification from '../components/EmailVerification';
 import './AuthPage.css';
 
 const AuthPage = () => {
@@ -9,6 +10,8 @@ const AuthPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
+  const [showVerification, setShowVerification] = useState(false);
+  const [verificationData, setVerificationData] = useState({ userId: '', email: '' });
   const navigate = useNavigate();
 
   const showMessage = (text, type = 'error') => {
@@ -24,6 +27,7 @@ const AuthPage = () => {
     setData({ username: '', identifier: '', password: '' });
     setMessage('');
     setIsLogin(!isLogin);
+    setShowVerification(false);
   };
 
   const handleChange = (e) => {
@@ -108,7 +112,29 @@ const AuthPage = () => {
 
       console.log('Ответ сервера:', response.data);
 
-      // Сохраняем JWT токены в localStorage
+      // Обработка регистрации с верификацией
+      if (!isLogin && response.data.requiresVerification) {
+        setVerificationData({
+          userId: response.data.userId,
+          email: response.data.email
+        });
+        setShowVerification(true);
+        setIsLoading(false);
+        return;
+      }
+
+      // Обработка входа с проверкой верификации
+      if (isLogin && response.data.requiresVerification) {
+        setVerificationData({
+          userId: response.data.userId,
+          email: data.identifier
+        });
+        setShowVerification(true);
+        setIsLoading(false);
+        return;
+      }
+
+      // Обычная обработка успешной авторизации
       const { accessToken, refreshToken, user } = response.data;
       
       if (accessToken && refreshToken && user) {
@@ -123,7 +149,7 @@ const AuthPage = () => {
           throw new Error('Не удалось сохранить токены в localStorage');
         }
 
-        // Дополнительная  что токены сохранились
+        // Дополнительная проверка что токены сохранились
         setTimeout(() => {
           const verified = verifyTokensSaved();
           console.log('Tokens verified after save:', verified);
@@ -176,6 +202,34 @@ const AuthPage = () => {
       setIsLoading(false);
     }
   };
+
+  // Обработка успешной верификации
+  const handleVerificationSuccess = (user) => {
+    showMessage(`Добро пожаловать: ${user.username}`, 'success');
+    
+    setTimeout(() => {
+      console.log('Navigating to /home after verification...');
+      navigate('/home', { replace: true });
+    }, 1500);
+  };
+
+  // Возврат к форме регистрации
+  const handleBackToRegistration = () => {
+    setShowVerification(false);
+    setVerificationData({ userId: '', email: '' });
+  };
+
+  // Если показываем верификацию
+  if (showVerification) {
+    return (
+      <EmailVerification
+        userId={verificationData.userId}
+        email={verificationData.email}
+        onVerificationSuccess={handleVerificationSuccess}
+        onBack={handleBackToRegistration}
+      />
+    );
+  }
 
   return (
     <div className="auth-container">
