@@ -163,7 +163,15 @@ const EmailVerification = ({ userId, email, onVerificationSuccess, onBack, isFro
 
   return (
     <div className="email-verification-container">
-      <div className="verification-box">
+      {/* Частицы на фоне */}
+      <div className="particles">
+        {Array.from({ length: 50 }, (_, i) => (
+          <div key={i} className={`particle particle-${i % 5}`}></div>
+        ))}
+      </div>
+      
+      <div className="verification-wrapper">
+        <div className="verification-box">
         <div className="verification-header">
           <div className="header-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -309,6 +317,7 @@ const EmailVerification = ({ userId, email, onVerificationSuccess, onBack, isFro
             </div>
           </div>
         )}
+        </div>
       </div>
     </div>
   );
