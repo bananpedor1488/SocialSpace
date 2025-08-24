@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import AuthPage from './pages/AuthPage';
 import HomePage from './pages/HomePage';
+import EmailVerificationPage from './pages/EmailVerificationPage';
 import { PointsProvider } from './context/PointsContext';
 import axios from 'axios';
 
@@ -121,6 +122,7 @@ function AppRouter() {
           <HomePage />
         </PointsProvider>
       } />
+      <Route path="/verify-email" element={<EmailVerificationPage />} />
     </Routes>
   );
 }

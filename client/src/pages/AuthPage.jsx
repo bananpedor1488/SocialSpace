@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import EmailVerification from '../components/EmailVerification';
 import './AuthPage.css';
 
 const AuthPage = () => {
@@ -10,8 +9,6 @@ const AuthPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
-  const [showVerification, setShowVerification] = useState(false);
-  const [verificationData, setVerificationData] = useState({ userId: '', email: '', isFromLogin: false });
   const navigate = useNavigate();
 
   const showMessage = (text, type = 'error') => {
@@ -27,7 +24,6 @@ const AuthPage = () => {
     setData({ username: '', identifier: '', password: '' });
     setMessage('');
     setIsLogin(!isLogin);
-    setShowVerification(false);
   };
 
   const handleChange = (e) => {
@@ -114,12 +110,13 @@ const AuthPage = () => {
 
       // Обработка регистрации с верификацией
       if (!isLogin && response.data.requiresVerification) {
-        setVerificationData({
+        // Сохраняем данные пользователя для верификации
+        localStorage.setItem('tempVerificationData', JSON.stringify({
           userId: response.data.userId,
           email: response.data.email,
           isFromLogin: false
-        });
-        setShowVerification(true);
+        }));
+        navigate('/verify-email', { state: { isFromLogin: false } });
         setIsLoading(false);
         return;
       }
@@ -127,12 +124,13 @@ const AuthPage = () => {
       // Обработка входа с проверкой верификации
       if (isLogin && response.data.requiresVerification) {
         console.log('User needs email verification for login');
-        setVerificationData({
+        // Сохраняем данные пользователя для верификации
+        localStorage.setItem('tempVerificationData', JSON.stringify({
           userId: response.data.userId,
           email: response.data.email, // Используем email из ответа сервера
           isFromLogin: true
-        });
-        setShowVerification(true);
+        }));
+        navigate('/verify-email', { state: { isFromLogin: true } });
         setIsLoading(false);
         return;
       }
@@ -189,12 +187,13 @@ const AuthPage = () => {
       // Проверяем, не является ли это случаем неподтвержденного email
       if (err.response?.status === 403 && err.response?.data?.requiresVerification) {
         console.log('User needs email verification for login');
-        setVerificationData({
+        // Сохраняем данные пользователя для верификации
+        localStorage.setItem('tempVerificationData', JSON.stringify({
           userId: err.response.data.userId,
           email: err.response.data.email, // Используем email из ответа сервера
           isFromLogin: true
-        });
-        setShowVerification(true);
+        }));
+        navigate('/verify-email', { state: { isFromLogin: true } });
         setIsLoading(false);
         return;
       }
@@ -221,45 +220,9 @@ const AuthPage = () => {
     }
   };
 
-  // Обработка успешной верификации
-  const handleVerificationSuccess = (user) => {
-    const isFromLogin = verificationData.isFromLogin;
-    
-    if (isFromLogin) {
-      showMessage(`Email подтвержден! Добро пожаловать: ${user.username}`, 'success');
-    } else {
-      showMessage(`Добро пожаловать: ${user.username}`, 'success');
-    }
-    
-    setTimeout(() => {
-      console.log('Navigating to /home after verification...');
-      navigate('/home', { replace: true });
-    }, 1500);
-  };
 
-  // Возврат к форме авторизации
-  const handleBackToRegistration = () => {
-    setShowVerification(false);
-    setVerificationData({ userId: '', email: '', isFromLogin: false });
-    
-    // Если это был логин, показываем сообщение
-    if (verificationData.isFromLogin) {
-      showMessage('Вернитесь к форме входа и попробуйте снова', 'error');
-    }
-  };
 
-  // Если показываем верификацию
-  if (showVerification) {
-    return (
-      <EmailVerification
-        userId={verificationData.userId}
-        email={verificationData.email}
-        onVerificationSuccess={handleVerificationSuccess}
-        onBack={handleBackToRegistration}
-        isFromLogin={verificationData.isFromLogin}
-      />
-    );
-  }
+
 
   return (
     <div className="auth-container">
