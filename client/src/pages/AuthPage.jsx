@@ -110,6 +110,7 @@ const AuthPage = () => {
 
       // Обработка регистрации с верификацией
       if (!isLogin && response.data.requiresVerification) {
+        console.log('Registration requires email verification');
         // Сохраняем данные пользователя для верификации
         localStorage.setItem('tempVerificationData', JSON.stringify({
           userId: response.data.userId,
@@ -138,6 +139,7 @@ const AuthPage = () => {
       // Обычная обработка успешной авторизации
       const { accessToken, refreshToken, user } = response.data;
       
+      // Проверяем, есть ли токены для сохранения
       if (accessToken && refreshToken && user) {
         // Сохраняем токены с проверкой
         const tokensSaved = (
@@ -178,7 +180,10 @@ const AuthPage = () => {
           // window.location.reload();
         }, 1000);
       } else {
-        throw new Error('Не получены токены от сервера');
+        // Если нет токенов, но это не ошибка верификации, то это ошибка
+        if (!response.data.requiresVerification) {
+          throw new Error('Не получены токены от сервера');
+        }
       }
 
     } catch (err) {

@@ -12,7 +12,22 @@ const EmailVerificationPage = () => {
   useEffect(() => {
     const checkAuthAndVerification = async () => {
       try {
-        // Проверяем аутентификацию
+        // Проверяем, есть ли временные данные верификации в localStorage (для регистрации)
+        const tempVerificationData = localStorage.getItem('tempVerificationData');
+        if (tempVerificationData) {
+          const tempData = JSON.parse(tempVerificationData);
+          setVerificationData({
+            userId: tempData.userId,
+            email: tempData.email,
+            isFromLogin: tempData.isFromLogin
+          });
+          // Очищаем временные данные
+          localStorage.removeItem('tempVerificationData');
+          setLoading(false);
+          return;
+        }
+
+        // Проверяем аутентификацию (для входа)
         const accessToken = localStorage.getItem('accessToken');
         if (!accessToken) {
           navigate('/');
@@ -30,25 +45,12 @@ const EmailVerificationPage = () => {
           return;
         }
 
-        // Проверяем, есть ли временные данные верификации в localStorage
-        const tempVerificationData = localStorage.getItem('tempVerificationData');
-        if (tempVerificationData) {
-          const tempData = JSON.parse(tempVerificationData);
-          setVerificationData({
-            userId: tempData.userId,
-            email: tempData.email,
-            isFromLogin: tempData.isFromLogin
-          });
-          // Очищаем временные данные
-          localStorage.removeItem('tempVerificationData');
-        } else {
-          // Устанавливаем данные для верификации из данных пользователя
-          setVerificationData({
-            userId: userData._id,
-            email: userData.email,
-            isFromLogin: location.state?.isFromLogin || false
-          });
-        }
+        // Устанавливаем данные для верификации из данных пользователя
+        setVerificationData({
+          userId: userData._id,
+          email: userData.email,
+          isFromLogin: location.state?.isFromLogin || false
+        });
 
       } catch (error) {
         console.error('Auth check failed:', error);
@@ -68,6 +70,12 @@ const EmailVerificationPage = () => {
   const handleVerificationSuccess = (verifiedUser) => {
     // Обновляем данные пользователя в localStorage
     localStorage.setItem('user', JSON.stringify(verifiedUser));
+    
+    // Если есть токены, сохраняем их
+    if (verifiedUser.accessToken && verifiedUser.refreshToken) {
+      localStorage.setItem('accessToken', verifiedUser.accessToken);
+      localStorage.setItem('refreshToken', verifiedUser.refreshToken);
+    }
     
     // Перенаправляем на домашнюю страницу
     navigate('/home');

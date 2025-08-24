@@ -113,12 +113,19 @@ const EmailVerification = ({ userId, email, onVerificationSuccess, onBack, isFro
       localStorage.setItem('refreshToken', refreshToken);
       localStorage.setItem('user', JSON.stringify(user));
 
-             // Показываем анимацию успеха
-       setShowSuccessAnimation(true);
-       
-       setTimeout(() => {
-         onVerificationSuccess(user);
-       }, 2500);
+      // Добавляем токены к объекту пользователя для передачи в callback
+      const userWithTokens = {
+        ...user,
+        accessToken,
+        refreshToken
+      };
+
+      // Показываем анимацию успеха
+      setShowSuccessAnimation(true);
+      
+      setTimeout(() => {
+        onVerificationSuccess(userWithTokens);
+      }, 2500);
 
     } catch (error) {
       console.error('Verification error:', error);
