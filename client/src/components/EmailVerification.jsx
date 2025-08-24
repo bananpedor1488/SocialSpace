@@ -23,9 +23,28 @@ const EmailVerification = ({ userId, email, onVerificationSuccess, onBack, isFro
 
   // Обработка ввода кода
   const handleCodeChange = (index, value) => {
-    if (value.length > 1) return; // Только один символ
-    
     const newCode = [...code];
+    
+    // Если вставлен длинный код (например, из буфера обмена)
+    if (value.length > 1) {
+      // Берем только первые 6 символов
+      const codeToInsert = value.slice(0, 6);
+      
+      // Распределяем код по полям
+      for (let i = 0; i < 6; i++) {
+        newCode[i] = codeToInsert[i] || '';
+      }
+      
+      setCode(newCode);
+      
+      // Фокусируемся на последнем заполненном поле или первом пустом
+      const lastFilledIndex = Math.min(codeToInsert.length - 1, 5);
+      const nextInput = document.querySelector(`input[data-index="${lastFilledIndex}"]`);
+      if (nextInput) nextInput.focus();
+      return;
+    }
+    
+    // Обычный ввод одного символа
     newCode[index] = value;
     setCode(newCode);
 
@@ -41,6 +60,31 @@ const EmailVerification = ({ userId, email, onVerificationSuccess, onBack, isFro
     if (e.key === 'Backspace' && !code[index] && index > 0) {
       const prevInput = document.querySelector(`input[data-index="${index - 1}"]`);
       if (prevInput) prevInput.focus();
+    }
+  };
+
+  // Обработка вставки
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData('text');
+    
+    // Убираем все нецифровые символы
+    const cleanCode = pastedData.replace(/\D/g, '').slice(0, 6);
+    
+    if (cleanCode.length > 0) {
+      const newCode = [...code];
+      
+      // Распределяем код по полям
+      for (let i = 0; i < 6; i++) {
+        newCode[i] = cleanCode[i] || '';
+      }
+      
+      setCode(newCode);
+      
+      // Фокусируемся на последнем заполненном поле или первом пустом
+      const lastFilledIndex = Math.min(cleanCode.length - 1, 5);
+      const nextInput = document.querySelector(`input[data-index="${lastFilledIndex}"]`);
+      if (nextInput) nextInput.focus();
     }
   };
 
@@ -216,19 +260,20 @@ const EmailVerification = ({ userId, email, onVerificationSuccess, onBack, isFro
           <div className="code-input-group">
             <label className="code-label">Введите код подтверждения:</label>
             <div className="code-inputs">
-              {code.map((digit, index) => (
-                <input
-                  key={index}
-                  type="text"
-                  data-index={index}
-                  value={digit}
-                  onChange={(e) => handleCodeChange(index, e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(index, e)}
-                  className="code-input"
-                  maxLength={1}
-                  autoFocus={index === 0}
-                />
-              ))}
+                             {code.map((digit, index) => (
+                 <input
+                   key={index}
+                   type="text"
+                   data-index={index}
+                   value={digit}
+                   onChange={(e) => handleCodeChange(index, e.target.value)}
+                   onKeyDown={(e) => handleKeyDown(index, e)}
+                   onPaste={handlePaste}
+                   className="code-input"
+                   maxLength={1}
+                   autoFocus={index === 0}
+                 />
+               ))}
             </div>
           </div>
 
