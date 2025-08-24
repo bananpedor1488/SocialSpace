@@ -126,6 +126,7 @@ const AuthPage = () => {
 
       // Обработка входа с проверкой верификации
       if (isLogin && response.data.requiresVerification) {
+        console.log('User needs email verification for login');
         setVerificationData({
           userId: response.data.userId,
           email: data.identifier,
@@ -185,6 +186,19 @@ const AuthPage = () => {
     } catch (err) {
       console.error('Ошибка авторизации:', err);
       
+      // Проверяем, не является ли это случаем неподтвержденного email
+      if (err.response?.status === 403 && err.response?.data?.requiresVerification) {
+        console.log('User needs email verification for login');
+        setVerificationData({
+          userId: err.response.data.userId,
+          email: data.identifier,
+          isFromLogin: true
+        });
+        setShowVerification(true);
+        setIsLoading(false);
+        return;
+      }
+      
       let errorMessage = 'Произошла ошибка';
       
       if (err.response?.data?.message) {
@@ -193,6 +207,8 @@ const AuthPage = () => {
         errorMessage = isLogin ? 'Неверный email или пароль' : 'Пользователь с таким email уже существует';
       } else if (err.response?.status === 401) {
         errorMessage = 'Неверные данные для входа';
+      } else if (err.response?.status === 403) {
+        errorMessage = 'Email не подтвержден. Проверьте почту и подтвердите регистрацию';
       } else if (err.response?.status >= 500) {
         errorMessage = 'Ошибка сервера. Попробуйте позже';
       } else if (!err.response) {
@@ -207,7 +223,13 @@ const AuthPage = () => {
 
   // Обработка успешной верификации
   const handleVerificationSuccess = (user) => {
-    showMessage(`Добро пожаловать: ${user.username}`, 'success');
+    const isFromLogin = verificationData.isFromLogin;
+    
+    if (isFromLogin) {
+      showMessage(`Email подтвержден! Добро пожаловать: ${user.username}`, 'success');
+    } else {
+      showMessage(`Добро пожаловать: ${user.username}`, 'success');
+    }
     
     setTimeout(() => {
       console.log('Navigating to /home after verification...');
@@ -215,10 +237,15 @@ const AuthPage = () => {
     }, 1500);
   };
 
-  // Возврат к форме регистрации
+  // Возврат к форме авторизации
   const handleBackToRegistration = () => {
     setShowVerification(false);
     setVerificationData({ userId: '', email: '', isFromLogin: false });
+    
+    // Если это был логин, показываем сообщение
+    if (verificationData.isFromLogin) {
+      showMessage('Вернитесь к форме входа и попробуйте снова', 'error');
+    }
   };
 
   // Если показываем верификацию

@@ -68,7 +68,12 @@ const EmailVerification = ({ userId, email, onVerificationSuccess, onBack, isFro
       localStorage.setItem('refreshToken', refreshToken);
       localStorage.setItem('user', JSON.stringify(user));
 
-      showMessage('Email подтвержден успешно!', 'success');
+      showMessage(
+        isFromLogin 
+          ? 'Email подтвержден! Теперь вы можете войти в аккаунт' 
+          : 'Email подтвержден успешно!', 
+        'success'
+      );
       
       setTimeout(() => {
         onVerificationSuccess(user);
@@ -182,11 +187,14 @@ const EmailVerification = ({ userId, email, onVerificationSuccess, onBack, isFro
             {isFromLogin ? 'Подтвердите email для входа' : 'Подтверждение email'}
           </h2>
           <p className="verification-subtitle">
-            Мы отправили код подтверждения на <strong>{email}</strong>
+            {isFromLogin 
+              ? `Для входа в аккаунт необходимо подтвердить email. Код отправлен на <strong>${email}</strong>`
+              : `Мы отправили код подтверждения на <strong>${email}</strong>`
+            }
           </p>
           {isFromLogin && (
             <p className="verification-note">
-              Для входа в аккаунт необходимо подтвердить email адрес
+              После подтверждения email вы сможете войти в аккаунт
             </p>
           )}
         </div>
@@ -276,6 +284,17 @@ const EmailVerification = ({ userId, email, onVerificationSuccess, onBack, isFro
               className="back-btn"
             >
               Назад к регистрации
+            </button>
+          )}
+          
+          {isFromLogin && (
+            <button
+              type="button"
+              onClick={onBack}
+              disabled={isLoading}
+              className="back-btn"
+            >
+              Назад к входу
             </button>
           )}
         </div>
