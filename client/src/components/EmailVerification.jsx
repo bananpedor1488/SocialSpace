@@ -103,12 +103,7 @@ const EmailVerification = ({ userId, email, onVerificationSuccess, onBack, isFro
         userId
       });
       
-             showMessage(
-         isFromLogin 
-           ? 'Код подтверждения отправлен на ваш email' 
-           : 'Новый код отправлен на ваш email', 
-         'success'
-       );
+             showMessage('Новый код отправлен на ваш email', 'success');
       setCountdown(60); // 60 секунд до следующей отправки
       
     } catch (error) {
@@ -193,7 +188,7 @@ const EmailVerification = ({ userId, email, onVerificationSuccess, onBack, isFro
           </h2>
                      <p className="verification-subtitle">
              {isFromLogin 
-               ? `Для входа в аккаунт необходимо подтвердить email. Нажмите "Отправить код повторно" для получения кода на ${email}`
+               ? `Для входа в аккаунт необходимо подтвердить email. Код отправлен на ${email}`
                : `Мы отправили код подтверждения на ${email}`
              }
            </p>
@@ -268,7 +263,7 @@ const EmailVerification = ({ userId, email, onVerificationSuccess, onBack, isFro
            >
              {countdown > 0 
                ? `Отправить снова через ${countdown}с` 
-               : isFromLogin ? 'Отправить код' : 'Отправить код повторно'
+               : 'Отправить код повторно'
              }
            </button>
           
