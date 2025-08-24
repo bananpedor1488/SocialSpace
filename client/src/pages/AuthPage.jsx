@@ -129,7 +129,7 @@ const AuthPage = () => {
         console.log('User needs email verification for login');
         setVerificationData({
           userId: response.data.userId,
-          email: data.identifier,
+          email: response.data.email, // Используем email из ответа сервера
           isFromLogin: true
         });
         setShowVerification(true);
@@ -191,7 +191,7 @@ const AuthPage = () => {
         console.log('User needs email verification for login');
         setVerificationData({
           userId: err.response.data.userId,
-          email: data.identifier,
+          email: err.response.data.email, // Используем email из ответа сервера
           isFromLogin: true
         });
         setShowVerification(true);
