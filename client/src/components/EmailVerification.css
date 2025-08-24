@@ -723,3 +723,188 @@ body {
     height: 24px;
   }
 }
+
+/* Анимация успешного подтверждения */
+.success-animation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.success-animation {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 20px;
+  padding: 3rem 2rem;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  animation: slideInUp 0.5s ease-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.success-animation::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  animation: shimmer 2s infinite;
+}
+
+.success-icon {
+  margin-bottom: 1.5rem;
+  animation: iconBounce 0.6s ease-out 0.3s both;
+}
+
+.success-icon svg {
+  width: 80px;
+  height: 80px;
+  color: #fff;
+  stroke-width: 3;
+  animation: checkmark 0.8s ease-out 0.5s both;
+}
+
+.success-text h3 {
+  color: #fff;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  animation: textSlideIn 0.6s ease-out 0.7s both;
+}
+
+.success-text p {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+  animation: textSlideIn 0.6s ease-out 0.9s both;
+}
+
+.success-progress {
+  margin-top: 2rem;
+  width: 200px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  overflow: hidden;
+  animation: progressAppear 0.5s ease-out 1.1s both;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #4ade80, #22c55e);
+  border-radius: 2px;
+  animation: progressFill 2s ease-out 1.2s;
+}
+
+/* Анимации */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes iconBounce {
+  0% {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(0deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes checkmark {
+  0% {
+    stroke-dasharray: 0 100;
+    stroke-dashoffset: 100;
+  }
+  100% {
+    stroke-dasharray: 100 100;
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes textSlideIn {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes progressAppear {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+@keyframes progressFill {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+  }
+  100% {
+    transform: translateX(100%) translateY(100%) rotate(45deg);
+  }
+}
+
+/* Адаптивность для анимации */
+@media (max-width: 768px) {
+  .success-animation {
+    padding: 2rem 1.5rem;
+    margin: 1rem;
+  }
+
+  .success-icon svg {
+    width: 60px;
+    height: 60px;
+  }
+
+  .success-text h3 {
+    font-size: 1.5rem;
+  }
+
+  .success-text p {
+    font-size: 0.9rem;
+  }
+
+  .success-progress {
+    width: 150px;
+  }
+}

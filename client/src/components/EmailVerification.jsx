@@ -11,6 +11,7 @@ const EmailVerification = ({ userId, email, onVerificationSuccess, onBack, isFro
   const [showEmailChange, setShowEmailChange] = useState(false);
   const [newEmail, setNewEmail] = useState('');
   const [isChangingEmail, setIsChangingEmail] = useState(false);
+  const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
 
   const showMessage = (text, type = 'error') => {
     setMessage(text);
@@ -112,16 +113,12 @@ const EmailVerification = ({ userId, email, onVerificationSuccess, onBack, isFro
       localStorage.setItem('refreshToken', refreshToken);
       localStorage.setItem('user', JSON.stringify(user));
 
-      showMessage(
-        isFromLogin 
-          ? 'Email подтвержден! Теперь вы можете войти в аккаунт' 
-          : 'Email подтвержден успешно!', 
-        'success'
-      );
-      
-      setTimeout(() => {
-        onVerificationSuccess(user);
-      }, 1500);
+             // Показываем анимацию успеха
+       setShowSuccessAnimation(true);
+       
+       setTimeout(() => {
+         onVerificationSuccess(user);
+       }, 2500);
 
     } catch (error) {
       console.error('Verification error:', error);
@@ -218,6 +215,26 @@ const EmailVerification = ({ userId, email, onVerificationSuccess, onBack, isFro
           <div key={i} className={`particle particle-${i % 5}`}></div>
         ))}
       </div>
+      
+      {/* Анимация успешного подтверждения */}
+      {showSuccessAnimation && (
+        <div className="success-animation-overlay">
+          <div className="success-animation">
+            <div className="success-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <div className="success-text">
+              <h3>Email подтвержден!</h3>
+              <p>{isFromLogin ? 'Теперь вы можете войти в аккаунт' : 'Добро пожаловать!'}</p>
+            </div>
+            <div className="success-progress">
+              <div className="progress-bar"></div>
+            </div>
+          </div>
+        </div>
+      )}
       
       <div className="verification-wrapper">
         <div className="verification-box">
