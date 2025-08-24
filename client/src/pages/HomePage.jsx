@@ -17,6 +17,7 @@ import AccountSettings from '../components/AccountSettings';
 import Avatar from '../components/Avatar';
 import Points from '../components/Points';
 import PointsModals from '../components/PointsModals';
+import EmailVerification from '../components/EmailVerification';
 import { usePoints } from '../context/PointsContext';
 
 import useOnlineStatus from '../hooks/useOnlineStatus';
@@ -43,6 +44,8 @@ const HomePage = () => {
   const [postText, setPostText] = useState('');
   const [showProfileSettings, setShowProfileSettings] = useState(false);
   const [showAccountSettings, setShowAccountSettings] = useState(false);
+  const [showEmailVerification, setShowEmailVerification] = useState(false);
+  const [verificationData, setVerificationData] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [posts, setPosts] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
@@ -183,6 +186,23 @@ const HomePage = () => {
 
   const navigate = useNavigate();
   const socketRef = useRef(null);
+
+  // Обработка успешной верификации email
+  const handleVerificationSuccess = (verifiedUser) => {
+    setUser(verifiedUser);
+    setShowEmailVerification(false);
+    setVerificationData(null);
+    localStorage.setItem('user', JSON.stringify(verifiedUser));
+  };
+
+  // Обработка возврата из верификации
+  const handleVerificationBack = () => {
+    setShowEmailVerification(false);
+    setVerificationData(null);
+    // Выходим из аккаунта, так как email не верифицирован
+    clearTokens();
+    navigate('/');
+  };
   
   // Хук для онлайн статуса
   const { onlineUsers, fetchOnlineStatus, getUserStatus } = useOnlineStatus(socketRef.current);
@@ -911,12 +931,35 @@ const HomePage = () => {
           const parsedUser = JSON.parse(savedUser);
           setUser(parsedUser);
           
-
+          // Проверяем верификацию email из сохраненных данных
+          if (!parsedUser.emailVerified) {
+            console.log('User email not verified from localStorage, redirecting to verification');
+            setVerificationData({
+              userId: parsedUser._id,
+              email: parsedUser.email,
+              isFromLogin: false
+            });
+            setShowEmailVerification(true);
+            return;
+          }
         }
 
         const res = await axios.get('https://server-pqqy.onrender.com/api/me');
-        setUser(res.data.user);
-        localStorage.setItem('user', JSON.stringify(res.data.user));
+        const userData = res.data.user;
+        setUser(userData);
+        localStorage.setItem('user', JSON.stringify(userData));
+        
+        // Проверяем верификацию email
+        if (!userData.emailVerified) {
+          console.log('User email not verified, redirecting to verification');
+          setVerificationData({
+            userId: userData._id,
+            email: userData.email,
+            isFromLogin: false
+          });
+          setShowEmailVerification(true);
+          return;
+        }
         
         // Очищаем любые "зависшие" звонки при загрузке
         try {
@@ -3867,6 +3910,17 @@ const HomePage = () => {
               </div>
             </div>
           </div>
+        )}
+
+        {/* Верификация email */}
+        {showEmailVerification && verificationData && (
+          <EmailVerification
+            userId={verificationData.userId}
+            email={verificationData.email}
+            onVerificationSuccess={handleVerificationSuccess}
+            onBack={handleVerificationBack}
+            isFromLogin={verificationData.isFromLogin}
+          />
         )}
         
         <PointsModals />

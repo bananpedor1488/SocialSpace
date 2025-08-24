@@ -225,13 +225,10 @@ const EmailVerification = ({ userId, email, onVerificationSuccess, onBack, isFro
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <div className="success-text">
-              <h3>Email подтвержден!</h3>
-              <p>{isFromLogin ? 'Теперь вы можете войти в аккаунт' : 'Добро пожаловать!'}</p>
-            </div>
-            <div className="success-progress">
-              <div className="progress-bar"></div>
-            </div>
+                           <div className="success-text">
+                 <h3>Email подтвержден!</h3>
+                 <p>{isFromLogin ? 'Теперь вы можете войти в аккаунт' : 'Добро пожаловать!'}</p>
+               </div>
           </div>
         </div>
       )}
