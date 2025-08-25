@@ -60,7 +60,7 @@ const AccountSettings = ({ isOpen, onClose, user, onLogout, isDarkTheme, onToggl
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`
         }
       });
-      setSessions(sessions.filter(session => session.id !== sessionId));
+      setSessions(sessions.filter(session => session.sessionId !== sessionId));
       showMessage('Сессия успешно завершена', 'success');
     } catch (error) {
       console.error('Ошибка при завершении сессии:', error);
