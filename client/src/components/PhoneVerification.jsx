@@ -24,7 +24,7 @@ const PhoneVerification = ({ onClose }) => {
         return;
       }
       
-      const response = await fetch('/api/phone-verification/status', {
+      const response = await fetch('https://server-pqqy.onrender.com/api/phone-verification/status', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
