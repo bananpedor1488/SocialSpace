@@ -119,8 +119,52 @@ const PhoneVerification = () => {
     setTimeout(() => setMessage(''), 3000);
   };
 
-  const openTelegramBot = () => {
-    window.open('https://t.me/SocialSpaceWEB_bot', '_blank');
+  const openTelegramBot = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      // Инициация автоматической верификации
+      const response = await fetch('/api/phone-verification/start-auto-verification', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setMessage('Автоматическая верификация инициирована! Откройте бота в Telegram.');
+        setMessageType('success');
+        
+        // Открываем бота в новой вкладке
+        window.open('https://t.me/SocialSpaceWEB_bot', '_blank');
+        
+        // Начинаем проверку статуса каждые 5 секунд
+        const checkInterval = setInterval(async () => {
+          await checkVerificationStatus();
+          if (verificationStatus?.phoneVerified) {
+            clearInterval(checkInterval);
+            setMessage('🎉 Номер телефона успешно верифицирован!');
+            setMessageType('success');
+          }
+        }, 5000);
+        
+        // Останавливаем проверку через 2 минуты
+        setTimeout(() => {
+          clearInterval(checkInterval);
+        }, 120000);
+        
+      } else {
+        setMessage(data.message);
+        setMessageType('error');
+      }
+    } catch (error) {
+      console.error('Error starting auto-verification:', error);
+      setMessage('Ошибка при инициации автоматической верификации');
+      setMessageType('error');
+    }
   };
 
   if (isLoading) {
@@ -136,10 +180,10 @@ const PhoneVerification = () => {
 
   return (
     <div className="phone-verification">
-      <div className="phone-verification-header">
-        <Phone size={24} />
-        <h2>Верификация номера телефона</h2>
-      </div>
+             <div className="phone-verification-header">
+         <Phone size={24} />
+         <h2>Автоматическая верификация номера телефона</h2>
+       </div>
 
       {message && (
         <div className={`message ${messageType}`}>
@@ -194,60 +238,44 @@ const PhoneVerification = () => {
                 ))}
               </div>
 
-              <div className="bot-actions">
-                <button 
-                  className="btn btn-primary"
-                  onClick={openTelegramBot}
-                >
-                  <ExternalLink size={16} />
-                  Открыть Telegram бота
-                </button>
-                
-                                 <button 
+                             <div className="bot-actions">
+                 <button 
+                   className="btn btn-primary"
+                   onClick={openTelegramBot}
+                 >
+                   <ExternalLink size={16} />
+                   Перейти в бота (автоматическая верификация)
+                 </button>
+                 
+                 <button 
                    className="btn btn-secondary"
                    onClick={() => copyToClipboard('https://t.me/SocialSpaceWEB_bot')}
                  >
-                  <Copy size={16} />
-                  Скопировать ссылку
-                </button>
-              </div>
+                   <Copy size={16} />
+                   Скопировать ссылку
+                 </button>
+               </div>
             </div>
           )}
 
-          <div className="verification-form">
-            <h3>Введите код верификации</h3>
-            <p>После отправки контакта боту, введите полученный код:</p>
-            
-            <form onSubmit={handleVerifyCode}>
-              <div className="input-group">
-                <input
-                  type="text"
-                  value={verificationCode}
-                  onChange={(e) => setVerificationCode(e.target.value)}
-                  placeholder="Введите код (например: 123456789)"
-                  maxLength="20"
-                  disabled={isVerifying}
-                />
-                <button 
-                  type="submit" 
-                  className="btn btn-primary"
-                  disabled={isVerifying || !verificationCode.trim()}
-                >
-                  {isVerifying ? 'Проверяем...' : 'Подтвердить'}
-                </button>
-              </div>
-            </form>
-
-            <div className="verification-tips">
-              <h4>💡 Советы:</h4>
-              <ul>
-                <li>Код действителен 10 минут</li>
-                <li>Код состоит только из цифр</li>
-                <li>Не передавайте код третьим лицам</li>
-                <li>Если код не приходит, попробуйте еще раз</li>
-              </ul>
-            </div>
-          </div>
+                     <div className="verification-info">
+             <h3>🚀 Автоматическая верификация</h3>
+             <p>
+               После нажатия кнопки "Перейти в бота" и отправки контакта в Telegram, 
+               ваш номер телефона будет автоматически верифицирован на сайте.
+             </p>
+             
+             <div className="verification-tips">
+               <h4>💡 Как это работает:</h4>
+               <ul>
+                 <li>Нажмите кнопку "Перейти в бота"</li>
+                 <li>Отправьте команду /start в Telegram</li>
+                 <li>Нажмите кнопку "📱 Отправить номер телефона"</li>
+                 <li>Верификация произойдет автоматически!</li>
+                 <li>Вернитесь на сайт - статус обновится</li>
+               </ul>
+             </div>
+           </div>
         </div>
       )}
     </div>
