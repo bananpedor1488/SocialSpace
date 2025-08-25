@@ -14,14 +14,15 @@
 }
 
 .phone-verification {
-  background: white;
+  background: #1e293b;
   border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   max-width: 600px;
   width: 90%;
   max-height: 90vh;
   overflow-y: auto;
   animation: slideIn 0.3s ease-out;
+  border: 1px solid #374151;
 }
 
 @keyframes slideIn {
@@ -101,7 +102,8 @@ body:has(link[href*="HomePage1.css"]) .phone-verification,
   align-items: center;
   justify-content: space-between;
   padding: 24px 24px 0 24px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #374151;
+  background: #1e293b;
 }
 
 .phone-verification-header::before {
@@ -136,7 +138,7 @@ body:has(link[href*="HomePage1.css"]) .phone-verification,
   margin: 0;
   font-size: 20px;
   font-weight: 600;
-  color: #1f2937;
+  color: #e2e8f0;
 }
 
 .header-content svg {
@@ -149,15 +151,15 @@ body:has(link[href*="HomePage1.css"]) .phone-verification,
   border: none;
   font-size: 24px;
   cursor: pointer;
-  color: #6b7280;
+  color: #9ca3af;
   padding: 8px;
   border-radius: 8px;
   transition: all 0.2s;
 }
 
 .close-btn:hover {
-  background: #f3f4f6;
-  color: #374151;
+  background: #374151;
+  color: #e2e8f0;
 }
 
 @keyframes shimmer {
@@ -167,6 +169,8 @@ body:has(link[href*="HomePage1.css"]) .phone-verification,
 
 .phone-verification-content {
   padding: 24px;
+  background: #1e293b;
+  color: #e2e8f0;
 }
 
 .phone-verification-loading {
@@ -214,15 +218,15 @@ body:has(link[href*="HomePage1.css"]) .phone-verification,
 }
 
 .message.success {
-  background: #d1fae5;
-  color: #065f46;
-  border: 1px solid #a7f3d0;
+  background: #064e3b;
+  color: #d1fae5;
+  border: 1px solid #059669;
 }
 
 .message.error {
-  background: #fee2e2;
-  color: #991b1b;
-  border: 1px solid #fca5a5;
+  background: #7f1d1d;
+  color: #fecaca;
+  border: 1px solid #dc2626;
 }
 
 /* Успешная верификация */
@@ -289,7 +293,7 @@ body:has(link[href*="HomePage1.css"]) .phone-verification,
 .phone-number {
   font-size: 18px;
   font-weight: 600;
-  color: #374151;
+  color: #e2e8f0;
   margin-bottom: 8px;
   animation: fadeInUp 0.5s ease-out 0.3s both;
 }
@@ -635,13 +639,13 @@ body:has(link[href*="HomePage1.css"]) .phone-verification,
 }
 
 .btn-secondary {
-  background: #f3f4f6;
-  color: #374151;
-  border: 1px solid #d1d5db;
+  background: #374151;
+  color: #e2e8f0;
+  border: 1px solid #4b5563;
 }
 
 .btn-secondary:hover {
-  background: #e5e7eb;
+  background: #4b5563;
   transform: translateY(-1px);
 }
 
@@ -661,15 +665,15 @@ body:has(link[href*="HomePage1.css"]) .phone-verification,
 }
 
 .verification-tips {
-  background: #fef3c7;
-  border: 1px solid #fde68a;
+  background: #451a03;
+  border: 1px solid #92400e;
   border-radius: 12px;
   padding: 16px;
 }
 
 .verification-tips h4 {
   margin: 0 0 12px 0;
-  color: #92400e;
+  color: #fbbf24;
   font-size: 16px;
 }
 
@@ -680,7 +684,7 @@ body:has(link[href*="HomePage1.css"]) .phone-verification,
 
 .verification-tips li {
   margin-bottom: 6px;
-  color: #78350f;
+  color: #fde68a;
   font-size: 14px;
 }
 
