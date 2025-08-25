@@ -3518,12 +3518,25 @@ const HomePage = () => {
                     
                     <div className="more-item">
                       <div className="more-label">
-                        <Clock size={18} />
-                        Время в сети
+                        <Calendar size={18} />
+                        Время регистрации
                       </div>
                       <div className="more-value">
-                        {user?.lastSeen ? new Date(user.lastSeen).toLocaleDateString('ru-RU') : 'Неизвестно'}
+                        {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('ru-RU') : 'Неизвестно'}
                       </div>
+                    </div>
+                    
+                    <div className="more-item">
+                      <div className="more-label">
+                        <LogOut size={18} />
+                        Выйти из аккаунта
+                      </div>
+                      <button 
+                        className="more-button logout-button"
+                        onClick={handleLogout}
+                      >
+                        <LogOut size={16} /> Выйти
+                      </button>
                     </div>
                   </div>
                   
@@ -3580,45 +3593,7 @@ const HomePage = () => {
                     </div>
                   </div>
                   
-                  <div className="more-section">
-                    <h2 className="more-title">
-                      <Shield size={24} /> 
-                      Безопасность
-                    </h2>
-                    
-                    <div className="more-item">
-                      <div className="more-label">
-                        <Lock size={18} />
-                        Статус аккаунта
-                      </div>
-                      <div className="more-value">
-                        {user?.emailVerified ? 'Подтвержден' : 'Не подтвержден'}
-                      </div>
-                    </div>
-                    
-                    <div className="more-item">
-                      <div className="more-label">
-                        <Calendar size={18} />
-                        Дата регистрации
-                      </div>
-                      <div className="more-value">
-                        {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('ru-RU') : 'Неизвестно'}
-                      </div>
-                    </div>
-                    
-                    <div className="more-item">
-                      <div className="more-label">
-                        <LogOut size={18} />
-                        Выйти из аккаунта
-                      </div>
-                      <button 
-                        className="more-button logout-button"
-                        onClick={handleLogout}
-                      >
-                        <LogOut size={16} /> Выйти
-                      </button>
-                    </div>
-                  </div>
+
                 </div>
               </div>
             )}
