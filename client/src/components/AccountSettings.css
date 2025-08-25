@@ -538,6 +538,17 @@ body:has(link[href*="HomePage1.css"]) .account-settings-modal,
   transform: scale(1.05);
 }
 
+.no-sessions {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--hint-color);
+}
+
+.no-sessions p {
+  margin: 0;
+  font-size: 16px;
+}
+
 /* Внешний вид */
 .appearance-items {
   padding: 24px;

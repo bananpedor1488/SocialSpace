@@ -33,36 +33,7 @@ const AccountSettings = ({ isOpen, onClose, user, onLogout, isDarkTheme, onToggl
       setSessions(response.data.sessions || []);
     } catch (error) {
       console.error('Ошибка при получении сессий:', error);
-      // Если API не реализован, создаем моковые данные
-      setSessions([
-        {
-          id: 'current',
-          device: 'Chrome на Windows',
-          location: 'Москва, Россия',
-          ip: '192.168.1.1',
-          lastActivity: new Date().toISOString(),
-          isCurrent: true,
-          deviceType: 'desktop'
-        },
-        {
-          id: 'mobile-1',
-          device: 'Safari на iPhone',
-          location: 'Санкт-Петербург, Россия',
-          ip: '192.168.1.2',
-          lastActivity: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-          isCurrent: false,
-          deviceType: 'mobile'
-        },
-        {
-          id: 'tablet-1',
-          device: 'Chrome на iPad',
-          location: 'Екатеринбург, Россия',
-          ip: '192.168.1.3',
-          lastActivity: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-          isCurrent: false,
-          deviceType: 'tablet'
-        }
-      ]);
+      setSessions([]);
     } finally {
       setSessionsLoading(false);
     }
@@ -325,42 +296,48 @@ const AccountSettings = ({ isOpen, onClose, user, onLogout, isDarkTheme, onToggl
                 </div>
               ) : (
                 <div className="sessions-list">
-                  {sessions.map((session) => (
-                    <div key={session.id} className={`session-item ${session.isCurrent ? 'current' : ''}`}>
-                      <div className="session-icon">
-                        {getDeviceIcon(session.deviceType)}
-                      </div>
-                      <div className="session-info">
-                        <div className="session-header">
-                          <h4>{session.device}</h4>
-                          {session.isCurrent && <span className="current-badge">Текущая</span>}
-                        </div>
-                        <div className="session-details">
-                          <span className="session-location">
-                            <MapPin size={14} />
-                            {session.location}
-                          </span>
-                          <span className="session-ip">
-                            <Globe size={14} />
-                            {session.ip}
-                          </span>
-                          <span className="session-time">
-                            <Clock size={14} />
-                            {formatDate(session.lastActivity)}
-                          </span>
-                        </div>
-                      </div>
-                      {!session.isCurrent && (
-                        <button 
-                          className="terminate-btn"
-                          onClick={() => handleTerminateSession(session.id)}
-                          title="Завершить сессию"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      )}
+                  {sessions.length === 0 ? (
+                    <div className="no-sessions">
+                      <p>Сессии не найдены</p>
                     </div>
-                  ))}
+                  ) : (
+                    sessions.map((session) => (
+                      <div key={session.sessionId} className={`session-item ${session.isCurrent ? 'current' : ''}`}>
+                        <div className="session-icon">
+                          {getDeviceIcon(session.deviceType)}
+                        </div>
+                        <div className="session-info">
+                          <div className="session-header">
+                            <h4>{session.device}</h4>
+                            {session.isCurrent && <span className="current-badge">Текущая</span>}
+                          </div>
+                          <div className="session-details">
+                            <span className="session-location">
+                              <MapPin size={14} />
+                              {session.location || 'Неизвестно'}
+                            </span>
+                            <span className="session-ip">
+                              <Globe size={14} />
+                              {session.ip}
+                            </span>
+                            <span className="session-time">
+                              <Clock size={14} />
+                              {formatDate(session.lastActivity)}
+                            </span>
+                          </div>
+                        </div>
+                        {!session.isCurrent && (
+                          <button 
+                            className="terminate-btn"
+                            onClick={() => handleTerminateSession(session.sessionId)}
+                            title="Завершить сессию"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        )}
+                      </div>
+                    ))
+                  )}
                 </div>
               )}
             </div>
