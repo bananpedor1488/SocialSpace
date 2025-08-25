@@ -18,6 +18,7 @@ import AccountSettings from '../components/AccountSettings';
 import Avatar from '../components/Avatar';
 import Points from '../components/Points';
 import PointsModals from '../components/PointsModals';
+import PhoneVerification from '../components/PhoneVerification';
 import { usePoints } from '../context/PointsContext';
 
 import useOnlineStatus from '../hooks/useOnlineStatus';
@@ -102,6 +103,7 @@ const HomePage = () => {
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   // Состояние для лицензионного соглашения
   const [showLicense, setShowLicense] = useState(false);
+  const [showPhoneVerification, setShowPhoneVerification] = useState(false);
   // НОВЫЕ СОСТОЯНИЯ ДЛЯ ЧАТОВ
   const [chats, setChats] = useState([]);
   const [activeChat, setActiveChat] = useState(null);
@@ -3528,6 +3530,27 @@ const HomePage = () => {
                     
                     <div className="more-item">
                       <div className="more-label">
+                        <Phone size={18} />
+                        Верификация телефона
+                      </div>
+                      <div className="more-value">
+                        {user?.phoneVerified ? (
+                          <span style={{ color: '#28a745', fontWeight: '600' }}>
+                            ✅ Верифицирован
+                          </span>
+                        ) : (
+                          <button 
+                            className="more-button"
+                            onClick={() => setShowPhoneVerification(true)}
+                          >
+                            <Phone size={16} /> Верифицировать
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="more-item">
+                      <div className="more-label">
                         <LogOut size={18} />
                         Выйти из аккаунта
                       </div>
@@ -3895,6 +3918,23 @@ const HomePage = () => {
             isDarkTheme={isDarkTheme}
             onToggleTheme={toggleTheme}
           />
+        )}
+
+        {/* Верификация телефона */}
+        {showPhoneVerification && (
+          <div className="modal-overlay" onClick={() => setShowPhoneVerification(false)}>
+            <div className="modal-content phone-verification-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3>Верификация номера телефона</h3>
+                <button onClick={() => setShowPhoneVerification(false)} className="modal-close">
+                  <X size={16} />
+                </button>
+              </div>
+              <div className="modal-body">
+                <PhoneVerification />
+              </div>
+            </div>
+          </div>
         )}
 
         {/* Лицензионное соглашение */}

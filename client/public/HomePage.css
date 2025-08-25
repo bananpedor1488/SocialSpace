@@ -10518,3 +10518,24 @@ body {
     margin-top: 15px !important;
   }
 }
+
+/* Стили для модального окна верификации телефона */
+.phone-verification-modal .modal-content {
+  max-width: 800px !important;
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+  padding: 0 !important;
+}
+
+.phone-verification-modal .modal-body {
+  padding: 0 !important;
+  max-height: calc(90vh - 60px) !important;
+  overflow-y: auto !important;
+}
+
+@media (max-width: 768px) {
+  .phone-verification-modal .modal-content {
+    max-width: 95vw !important;
+    margin: 10px !important;
+  }
+}
