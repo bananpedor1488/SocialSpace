@@ -1,22 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import { Phone, CheckCircle, AlertCircle, Copy, ExternalLink } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Phone, CheckCircle, AlertCircle, Copy, ExternalLink, Clock, CheckSquare } from 'lucide-react';
 import API_CONFIG from '../config/api';
 import './PhoneVerification.css';
 
 const PhoneVerification = ({ onClose }) => {
   const [verificationStatus, setVerificationStatus] = useState(null);
   const [instructions, setInstructions] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
+  const [verificationStep, setVerificationStep] = useState('initial'); // initial, started, completed
+  const [requestId, setRequestId] = useState(null);
+  const [checkCount, setCheckCount] = useState(0);
+  const [isChecking, setIsChecking] = useState(false);
+  const checkIntervalRef = useRef(null);
+  const timeoutRef = useRef(null);
 
   useEffect(() => {
     checkVerificationStatus();
+    return () => {
+      if (checkIntervalRef.current) {
+        clearInterval(checkIntervalRef.current);
+      }
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
   }, []);
 
   const checkVerificationStatus = async () => {
     try {
-      setIsLoading(true);
+      setIsChecking(true);
       const token = localStorage.getItem('accessToken');
       
       console.log('🔍 Checking verification status...');
@@ -64,8 +78,19 @@ const PhoneVerification = ({ onClose }) => {
       if (data.success) {
         setVerificationStatus(data);
         
-        // Если номер не верифицирован, получаем инструкции
-        if (!data.phoneVerified) {
+        // Если номер верифицирован, останавливаем проверку
+        if (data.phoneVerified) {
+          setVerificationStep('completed');
+          if (checkIntervalRef.current) {
+            clearInterval(checkIntervalRef.current);
+          }
+          if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+          }
+          setMessage('🎉 Номер телефона успешно верифицирован!');
+          setMessageType('success');
+        } else if (verificationStep === 'initial') {
+          // Если номер не верифицирован и мы еще не начали процесс, получаем инструкции
           await getInstructions();
         }
       } else {
@@ -77,7 +102,7 @@ const PhoneVerification = ({ onClose }) => {
       setMessage('Ошибка при проверке статуса верификации: ' + error.message);
       setMessageType('error');
     } finally {
-      setIsLoading(false);
+      setIsChecking(false);
     }
   };
 
@@ -136,6 +161,7 @@ const PhoneVerification = ({ onClose }) => {
 
   const openTelegramBot = async () => {
     try {
+      setIsLoading(true);
       const token = localStorage.getItem('accessToken');
       
       console.log('🚀 Opening Telegram bot...');
@@ -176,25 +202,27 @@ const PhoneVerification = ({ onClose }) => {
       const data = await response.json();
       
       if (data.success) {
+        setVerificationStep('started');
+        setRequestId(data.chatId);
         setMessage('Автоматическая верификация инициирована! Откройте бота в Telegram.');
         setMessageType('success');
         
         // Открываем бота в новой вкладке
         window.open('https://t.me/SocialSpaceWEB_bot', '_blank');
         
-        // Начинаем проверку статуса каждые 5 секунд
-        const checkInterval = setInterval(async () => {
+        // Начинаем проверку статуса каждые 3 секунды
+        checkIntervalRef.current = setInterval(async () => {
+          setCheckCount(prev => prev + 1);
           await checkVerificationStatus();
-          if (verificationStatus?.phoneVerified) {
-            clearInterval(checkInterval);
-            setMessage('🎉 Номер телефона успешно верифицирован!');
-            setMessageType('success');
-          }
-        }, 5000);
+        }, 3000);
         
         // Останавливаем проверку через 2 минуты
-        setTimeout(() => {
-          clearInterval(checkInterval);
+        timeoutRef.current = setTimeout(() => {
+          if (checkIntervalRef.current) {
+            clearInterval(checkIntervalRef.current);
+          }
+          setMessage('Время ожидания истекло. Попробуйте еще раз.');
+          setMessageType('error');
         }, 120000);
         
       } else {
@@ -205,32 +233,167 @@ const PhoneVerification = ({ onClose }) => {
       console.error('Error starting auto-verification:', error);
       setMessage('Ошибка при инициации автоматической верификации: ' + error.message);
       setMessageType('error');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="phone-verification-overlay">
-        <div className="phone-verification">
-          <div className="phone-verification-header">
-            <div className="header-content">
-              <Phone size={24} />
-              <h2>Автоматическая верификация номера телефона</h2>
+  const renderContent = () => {
+    if (verificationStatus?.phoneVerified) {
+      return (
+        <div className="verification-success">
+          <div className="success-animation">
+            <div className="success-icon">
+              <CheckCircle size={64} />
             </div>
-            <button className="close-btn" onClick={onClose}>
-              ✕
-            </button>
+            <div className="success-ripple"></div>
           </div>
-          <div className="phone-verification-content">
-            <div className="phone-verification-loading">
-              <div className="loading-spinner"></div>
-              <p>Проверяем статус верификации...</p>
+          <h3>Номер телефона верифицирован!</h3>
+          <p className="phone-number">+{verificationStatus.phoneNumber}</p>
+          <p className="verification-date">
+            Верифицирован: {new Date(verificationStatus.phoneVerifiedAt).toLocaleDateString('ru-RU')}
+          </p>
+          <div className="success-benefits">
+            <h4>Преимущества верификации:</h4>
+            <ul>
+              <li>✅ Повышенная безопасность аккаунта</li>
+              <li>✅ Быстрое восстановление доступа</li>
+              <li>✅ Доступ ко всем функциям платформы</li>
+              <li>✅ Защита от мошенничества</li>
+            </ul>
+          </div>
+        </div>
+      );
+    }
+
+    if (verificationStep === 'started') {
+      return (
+        <div className="verification-progress">
+          <div className="progress-animation">
+            <div className="progress-icon">
+              <Clock size={48} />
             </div>
+            <div className="progress-dots">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+          
+          <h3>Ожидание подтверждения...</h3>
+          
+          {requestId && (
+            <div className="request-info">
+              <p className="request-id">
+                <strong>Номер заявки:</strong> 
+                <span className="request-number">{requestId}</span>
+              </p>
+              <p className="request-instructions">
+                Покажите этот номер боту в Telegram для быстрой обработки
+              </p>
+            </div>
+          )}
+          
+          <div className="progress-status">
+            <p>Проверка статуса: {checkCount} раз</p>
+            <div className="progress-bar">
+              <div 
+                className="progress-fill" 
+                style={{ width: `${Math.min((checkCount * 3) / 120 * 100, 100)}%` }}
+              ></div>
+            </div>
+          </div>
+          
+          <div className="progress-tips">
+            <h4>💡 Что делать дальше:</h4>
+            <ul>
+              <li>Откройте Telegram и найдите бота @SocialSpaceWEB_bot</li>
+              <li>Отправьте команду /start</li>
+              <li>Нажмите кнопку "📱 Отправить номер телефона"</li>
+              <li>Верификация произойдет автоматически!</li>
+            </ul>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="verification-process">
+        <div className="verification-info">
+          <h3>Зачем нужна верификация?</h3>
+          <p>
+            Верификация номера телефона помогает обеспечить безопасность вашего аккаунта 
+            и защитить его от несанкционированного доступа.
+          </p>
+        </div>
+
+        {instructions && (
+          <div className="verification-steps">
+            <h3>Как верифицировать номер:</h3>
+            
+            <div className="steps-list">
+              {instructions.steps.map((step) => (
+                <div key={step.step} className="step-item">
+                  <div className="step-number">{step.step}</div>
+                  <div className="step-content">
+                    <h4>{step.title}</h4>
+                    <p>{step.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="bot-actions">
+              <button 
+                className="btn btn-primary"
+                onClick={openTelegramBot}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <div className="btn-spinner"></div>
+                    Инициализация...
+                  </>
+                ) : (
+                  <>
+                    <ExternalLink size={16} />
+                    Перейти в бота (автоматическая верификация)
+                  </>
+                )}
+              </button>
+              
+              <button 
+                className="btn btn-secondary"
+                onClick={() => copyToClipboard('https://t.me/SocialSpaceWEB_bot')}
+              >
+                <Copy size={16} />
+                Скопировать ссылку
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className="verification-info">
+          <h3>🚀 Автоматическая верификация</h3>
+          <p>
+            После нажатия кнопки "Перейти в бота" и отправки контакта в Telegram, 
+            ваш номер телефона будет автоматически верифицирован на сайте.
+          </p>
+          
+          <div className="verification-tips">
+            <h4>💡 Как это работает:</h4>
+            <ul>
+              <li>Нажмите кнопку "Перейти в бота"</li>
+              <li>Отправьте команду /start в Telegram</li>
+              <li>Нажмите кнопку "📱 Отправить номер телефона"</li>
+              <li>Верификация произойдет автоматически!</li>
+              <li>Вернитесь на сайт - статус обновится</li>
+            </ul>
           </div>
         </div>
       </div>
     );
-  }
+  };
 
   return (
     <div className="phone-verification-overlay">
@@ -253,92 +416,7 @@ const PhoneVerification = ({ onClose }) => {
             </div>
           )}
 
-          {verificationStatus?.phoneVerified ? (
-            <div className="verification-success">
-              <div className="success-icon">
-                <CheckCircle size={48} />
-              </div>
-              <h3>Номер телефона верифицирован!</h3>
-              <p className="phone-number">+{verificationStatus.phoneNumber}</p>
-              <p className="verification-date">
-                Верифицирован: {new Date(verificationStatus.phoneVerifiedAt).toLocaleDateString('ru-RU')}
-              </p>
-              <div className="success-benefits">
-                <h4>Преимущества верификации:</h4>
-                <ul>
-                  <li>✅ Повышенная безопасность аккаунта</li>
-                  <li>✅ Быстрое восстановление доступа</li>
-                  <li>✅ Доступ ко всем функциям платформы</li>
-                  <li>✅ Защита от мошенничества</li>
-                </ul>
-              </div>
-            </div>
-          ) : (
-            <div className="verification-process">
-              <div className="verification-info">
-                <h3>Зачем нужна верификация?</h3>
-                <p>
-                  Верификация номера телефона помогает обеспечить безопасность вашего аккаунта 
-                  и защитить его от несанкционированного доступа.
-                </p>
-              </div>
-
-              {instructions && (
-                <div className="verification-steps">
-                  <h3>Как верифицировать номер:</h3>
-                  
-                  <div className="steps-list">
-                    {instructions.steps.map((step) => (
-                      <div key={step.step} className="step-item">
-                        <div className="step-number">{step.step}</div>
-                        <div className="step-content">
-                          <h4>{step.title}</h4>
-                          <p>{step.description}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="bot-actions">
-                    <button 
-                      className="btn btn-primary"
-                      onClick={openTelegramBot}
-                    >
-                      <ExternalLink size={16} />
-                      Перейти в бота (автоматическая верификация)
-                    </button>
-                    
-                    <button 
-                      className="btn btn-secondary"
-                      onClick={() => copyToClipboard('https://t.me/SocialSpaceWEB_bot')}
-                    >
-                      <Copy size={16} />
-                      Скопировать ссылку
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              <div className="verification-info">
-                <h3>🚀 Автоматическая верификация</h3>
-                <p>
-                  После нажатия кнопки "Перейти в бота" и отправки контакта в Telegram, 
-                  ваш номер телефона будет автоматически верифицирован на сайте.
-                </p>
-                
-                <div className="verification-tips">
-                  <h4>💡 Как это работает:</h4>
-                  <ul>
-                    <li>Нажмите кнопку "Перейти в бота"</li>
-                    <li>Отправьте команду /start в Telegram</li>
-                    <li>Нажмите кнопку "📱 Отправить номер телефона"</li>
-                    <li>Верификация произойдет автоматически!</li>
-                    <li>Вернитесь на сайт - статус обновится</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          )}
+          {renderContent()}
         </div>
       </div>
     </div>
