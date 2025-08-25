@@ -3922,19 +3922,7 @@ const HomePage = () => {
 
         {/* Верификация телефона */}
         {showPhoneVerification && (
-          <div className="modal-overlay" onClick={() => setShowPhoneVerification(false)}>
-            <div className="modal-content phone-verification-modal" onClick={(e) => e.stopPropagation()}>
-              <div className="modal-header">
-                <h3>Верификация номера телефона</h3>
-                <button onClick={() => setShowPhoneVerification(false)} className="modal-close">
-                  <X size={16} />
-                </button>
-              </div>
-              <div className="modal-body">
-                <PhoneVerification />
-              </div>
-            </div>
-          </div>
+          <PhoneVerification onClose={() => setShowPhoneVerification(false)} />
         )}
 
         {/* Лицензионное соглашение */}

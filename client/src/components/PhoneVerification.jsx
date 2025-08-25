@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Phone, CheckCircle, AlertCircle, Copy, ExternalLink } from 'lucide-react';
 import './PhoneVerification.css';
 
-const PhoneVerification = () => {
+const PhoneVerification = ({ onClose }) => {
   const [verificationStatus, setVerificationStatus] = useState(null);
   const [instructions, setInstructions] = useState(null);
   const [verificationCode, setVerificationCode] = useState('');
@@ -178,12 +178,20 @@ const PhoneVerification = () => {
     );
   }
 
-  return (
-    <div className="phone-verification">
-             <div className="phone-verification-header">
-         <Phone size={24} />
-         <h2>Автоматическая верификация номера телефона</h2>
-       </div>
+    return (
+    <div className="phone-verification-overlay">
+      <div className="phone-verification">
+        <div className="phone-verification-header">
+          <div className="header-content">
+            <Phone size={24} />
+            <h2>Автоматическая верификация номера телефона</h2>
+          </div>
+          <button className="close-btn" onClick={onClose}>
+            ✕
+          </button>
+        </div>
+        
+        <div className="phone-verification-content">
 
       {message && (
         <div className={`message ${messageType}`}>
@@ -278,6 +286,8 @@ const PhoneVerification = () => {
            </div>
         </div>
       )}
+        </div>
+      </div>
     </div>
   );
 };

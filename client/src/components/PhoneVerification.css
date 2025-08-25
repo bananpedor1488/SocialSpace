@@ -1,53 +1,139 @@
-.phone-verification {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 20px;
-  box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
-  overflow: hidden;
-  position: relative;
+/* Overlay для модального окна */
+.phone-verification-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(15px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease-out;
+  padding: 100px 20px 20px 20px;
 }
 
-.phone-verification::before {
+.phone-verification {
+  background: var(--modal-bg, #ffffff);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 900px;
+  max-height: 85vh;
+  overflow: hidden;
+  box-shadow: 0 32px 64px rgba(0, 0, 0, 0.3), 0 8px 16px rgba(0, 0, 0, 0.1);
+  animation: slideInUp 0.4s ease-out;
+  color: var(--text-color, #1f2937);
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Темная тема */
+body:has(link[href*="HomePage.css"]) .phone-verification,
+.dark-theme .phone-verification {
+  --modal-bg: #1e293b;
+  --text-color: #e2e8f0;
+  --border-color: #374151;
+  --card-bg: #334155;
+  --card-border: #475569;
+  --input-bg: #374151;
+  --input-text: #e2e8f0;
+  --label-color: #d1d5db;
+  --hint-color: #9ca3af;
+  --btn-bg: #374151;
+  --btn-hover: #4b5563;
+  --btn-text: #e2e8f0;
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --danger-color: #ef4444;
+  --primary-color: #3b82f6;
+  --secondary-color: #6b7280;
+}
+
+/* Светлая тема */
+body:has(link[href*="HomePage1.css"]) .phone-verification,
+.light-theme .phone-verification {
+  --modal-bg: #ffffff;
+  --text-color: #1f2937;
+  --border-color: #e5e7eb;
+  --card-bg: #f9fafb;
+  --card-border: #e5e7eb;
+  --input-bg: #ffffff;
+  --input-text: #1f2937;
+  --label-color: #374151;
+  --hint-color: #6b7280;
+  --btn-bg: #f3f4f6;
+  --btn-hover: #e5e7eb;
+  --btn-text: #1f2937;
+  --success-color: #059669;
+  --warning-color: #d97706;
+  --danger-color: #dc2626;
+  --primary-color: #2563eb;
+  --secondary-color: #6b7280;
+}
+
+/* Анимации */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.phone-verification-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  color: white;
+  padding: 28px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.phone-verification-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  animation: shimmer 4s infinite;
+}
+
+.phone-verification-header::after {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  z-index: 1;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.1)"/><circle cx="10" cy="60" r="0.5" fill="rgba(255,255,255,0.1)"/><circle cx="90" cy="40" r="0.5" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+  opacity: 0.3;
 }
 
-.phone-verification > * {
+.header-content {
   position: relative;
-  z-index: 2;
-}
-
-.phone-verification-header {
+  z-index: 1;
   display: flex;
   align-items: center;
   gap: 16px;
-  margin: 0;
-  padding: 40px 40px 30px 40px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  position: relative;
 }
 
-.phone-verification-header::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-}
-
-.phone-verification-header h2 {
+.header-content h2 {
   margin: 0;
   color: white;
   font-size: 28px;
@@ -55,15 +141,45 @@
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.phone-verification-header svg {
+.header-content svg {
   color: white;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.close-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 12px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+  backdrop-filter: blur(10px);
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%) translateY(-100%) rotate(0deg); }
+  100% { transform: translateX(100%) translateY(100%) rotate(360deg); }
+}
+
+.phone-verification-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px;
+  max-height: 60vh;
 }
 
 .phone-verification-loading {
   text-align: center;
   padding: 60px 40px;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--modal-bg);
 }
 
 .loading-spinner {
@@ -87,7 +203,7 @@
   gap: 12px;
   padding: 16px 20px;
   border-radius: 12px;
-  margin: 20px 40px;
+  margin: 0 0 20px 0;
   font-weight: 500;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   border: 1px solid transparent;
@@ -109,7 +225,7 @@
 .verification-success {
   text-align: center;
   padding: 60px 40px;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--modal-bg);
 }
 
 .success-icon {
@@ -173,27 +289,28 @@
   display: flex;
   flex-direction: column;
   gap: 0;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--modal-bg);
 }
 
 .verification-info {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  background: var(--card-bg);
   padding: 30px 40px;
   border-radius: 0;
-  border-left: 6px solid #667eea;
+  border-left: 6px solid var(--primary-color);
   margin: 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color);
 }
 
 .verification-info h3 {
-  color: #333;
+  color: var(--text-color);
   margin-bottom: 16px;
   font-size: 20px;
   font-weight: 700;
 }
 
 .verification-info p {
-  color: #666;
+  color: var(--hint-color);
   line-height: 1.7;
   margin: 0;
   font-size: 16px;
@@ -202,11 +319,11 @@
 /* Шаги верификации */
 .verification-steps {
   padding: 40px;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--modal-bg);
 }
 
 .verification-steps h3 {
-  color: #333;
+  color: var(--text-color);
   margin-bottom: 30px;
   font-size: 22px;
   font-weight: 700;
@@ -225,9 +342,9 @@
   align-items: flex-start;
   gap: 20px;
   padding: 24px;
-  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  background: var(--card-bg);
   border-radius: 16px;
-  border: 2px solid #e9ecef;
+  border: 2px solid var(--card-border);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
 }
@@ -235,7 +352,7 @@
 .step-item:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  border-color: #667eea;
+  border-color: var(--primary-color);
 }
 
 .step-number {
@@ -254,14 +371,14 @@
 }
 
 .step-content h4 {
-  color: #333;
+  color: var(--text-color);
   margin: 0 0 8px 0;
   font-size: 18px;
   font-weight: 700;
 }
 
 .step-content p {
-  color: #666;
+  color: var(--hint-color);
   margin: 0;
   line-height: 1.6;
   font-size: 15px;
@@ -273,7 +390,7 @@
   gap: 16px;
   justify-content: center;
   flex-wrap: wrap;
-  padding: 0 20px 40px 20px;
+  padding: 0 0 20px 0;
 }
 
 .btn {
@@ -383,16 +500,16 @@
 
 /* Советы */
 .verification-tips {
-  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  background: var(--card-bg);
   padding: 24px;
   border-radius: 16px;
-  border: 2px solid #e9ecef;
+  border: 2px solid var(--card-border);
   margin-top: 20px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .verification-tips h4 {
-  color: #333;
+  color: var(--text-color);
   margin-bottom: 16px;
   font-size: 18px;
   font-weight: 700;
@@ -406,7 +523,7 @@
 
 .verification-tips li {
   padding: 8px 0;
-  color: #666;
+  color: var(--hint-color);
   font-size: 15px;
   line-height: 1.6;
   position: relative;
@@ -417,36 +534,43 @@
   content: '→';
   position: absolute;
   left: 0;
-  color: #667eea;
+  color: var(--primary-color);
   font-weight: bold;
 }
 
 /* Адаптивность */
 @media (max-width: 768px) {
+  .phone-verification-overlay {
+    padding: 60px 10px 10px 10px;
+  }
+  
   .phone-verification {
-    margin: 10px;
     border-radius: 16px;
   }
   
   .phone-verification-header {
-    padding: 30px 20px 20px 20px;
+    padding: 20px 20px 15px 20px;
   }
   
-  .phone-verification-header h2 {
+  .header-content h2 {
     font-size: 22px;
   }
   
+  .phone-verification-content {
+    padding: 20px;
+  }
+  
   .verification-steps {
-    padding: 30px 20px;
+    padding: 20px;
   }
   
   .verification-info {
-    padding: 25px 20px;
+    padding: 20px;
   }
   
   .bot-actions {
     flex-direction: column;
-    padding: 0 20px 30px 20px;
+    padding: 0 0 15px 0;
   }
   
   .btn {
@@ -466,7 +590,7 @@
   }
   
   .message {
-    margin: 15px 20px;
+    margin: 0 0 15px 0;
     padding: 14px 16px;
   }
   
