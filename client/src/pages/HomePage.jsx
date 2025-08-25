@@ -7,7 +7,8 @@ import {
   Home, MessageCircle, User, LogOut, Plus,
   Heart, MessageSquare, Repeat, Pencil, Trash2, Users, UserCheck, Send, X, ChevronDown, ChevronLeft,
   Moon, Sun, Wifi, WifiOff, Flame, Clock, Phone, Settings, Trophy, DollarSign,
-  Check, Play, HelpCircle, History, Crown, Gift, ArrowLeft, MoreVertical, FileText
+  Check, Play, HelpCircle, History, Crown, Gift, ArrowLeft, MoreVertical, FileText,
+  Info, Shield, Lock, Calendar
 } from 'lucide-react';
 
 import CallInterface from '../components/CallInterface';
@@ -3483,7 +3484,10 @@ const HomePage = () => {
                     </h2>
                     
                     <div className="more-item">
-                      <div className="more-label">Настройки аккаунта</div>
+                      <div className="more-label">
+                        <User size={18} />
+                        Настройки аккаунта
+                      </div>
                       <button 
                         className="more-button"
                         onClick={() => setShowAccountSettings(true)}
@@ -3493,47 +3497,125 @@ const HomePage = () => {
                     </div>
                     
                     <div className="more-item">
-                      <div className="more-label">Тема оформления</div>
+                      <div className="more-label">
+                        <Moon size={18} />
+                        Тема оформления
+                      </div>
                       <div className="more-value">
                         {isDarkTheme ? 'Темная' : 'Светлая'}
                       </div>
                     </div>
                     
                     <div className="more-item">
-                      <div className="more-label">Статус подключения</div>
+                      <div className="more-label">
+                        <Wifi size={18} />
+                        Статус подключения
+                      </div>
                       <div className="more-value">
                         {isConnected ? 'Подключено' : 'Отключено'}
+                      </div>
+                    </div>
+                    
+                    <div className="more-item">
+                      <div className="more-label">
+                        <Clock size={18} />
+                        Время в сети
+                      </div>
+                      <div className="more-value">
+                        {user?.lastSeen ? new Date(user.lastSeen).toLocaleDateString('ru-RU') : 'Неизвестно'}
                       </div>
                     </div>
                   </div>
                   
                   <div className="more-section">
-                    <h3 className="more-title">
-                      <HelpCircle size={20} /> 
+                    <h2 className="more-title">
+                      <HelpCircle size={24} /> 
                       Помощь и поддержка
-                    </h3>
+                    </h2>
                     
                     <div className="more-item">
-                      <div className="more-label">Список изменений</div>
+                      <div className="more-label">
+                        <FileText size={18} />
+                        Версия приложения
+                      </div>
                       <div className="more-value">
                         v1.0.0
                       </div>
                     </div>
                     
                     <div className="more-item">
-                      <div className="more-label">О приложении</div>
+                      <div className="more-label">
+                        <Info size={18} />
+                        О приложении
+                      </div>
                       <div className="more-value">
                         SocialSpace
                       </div>
                     </div>
                     
                     <div className="more-item">
-                      <div className="more-label">Лицензионное соглашение</div>
+                      <div className="more-label">
+                        <FileText size={18} />
+                        Лицензионное соглашение
+                      </div>
                       <button 
                         className="more-button"
                         onClick={() => setShowLicense(true)}
                       >
                         <FileText size={16} /> Читать
+                      </button>
+                    </div>
+                    
+                    <div className="more-item">
+                      <div className="more-label">
+                        <MessageCircle size={18} />
+                        Обратная связь
+                      </div>
+                      <button 
+                        className="more-button"
+                        onClick={() => window.open('mailto:support@socialspace.com', '_blank')}
+                      >
+                        <Send size={16} /> Написать
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div className="more-section">
+                    <h2 className="more-title">
+                      <Shield size={24} /> 
+                      Безопасность
+                    </h2>
+                    
+                    <div className="more-item">
+                      <div className="more-label">
+                        <Lock size={18} />
+                        Статус аккаунта
+                      </div>
+                      <div className="more-value">
+                        {user?.emailVerified ? 'Подтвержден' : 'Не подтвержден'}
+                      </div>
+                    </div>
+                    
+                    <div className="more-item">
+                      <div className="more-label">
+                        <Calendar size={18} />
+                        Дата регистрации
+                      </div>
+                      <div className="more-value">
+                        {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('ru-RU') : 'Неизвестно'}
+                      </div>
+                    </div>
+                    
+                    <div className="more-item">
+                      <div className="more-label">
+                        <LogOut size={18} />
+                        Выйти из аккаунта
+                      </div>
+                      <button 
+                        className="more-button logout-button"
+                        onClick={handleLogout}
+                      >
+                        <LogOut size={16} /> Выйти
                       </button>
                     </div>
                   </div>
