@@ -1215,11 +1215,11 @@ body {
 
 /* Стили для вкладки "Еще" на ПК */
 .more-page {
-  max-width: 1200px;
+  width: 100%;
+  max-width: 800px;
   margin: 0 auto;
-  padding: 40px;
-  min-height: calc(100vh - 160px);
-  animation: fadeInUp 0.6s ease-out;
+  padding: 20px;
+  min-height: calc(100vh - 120px);
 }
 
 @keyframes fadeInUp {
@@ -1234,38 +1234,18 @@ body {
 }
 
 .more-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-  gap: 30px;
-  align-items: start;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
 }
 
 .more-section {
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%);
-  border-radius: 24px;
-  padding: 35px;
-  border: 1px solid rgba(71, 85, 105, 0.4);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-  backdrop-filter: blur(20px);
-  animation: slideInUp 0.8s ease-out;
-  animation-fill-mode: both;
-}
-
-.more-section:nth-child(1) { animation-delay: 0.1s; }
-.more-section:nth-child(2) { animation-delay: 0.2s; }
-.more-section:nth-child(3) { animation-delay: 0.3s; }
-
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  background: rgba(30, 41, 59, 0.9);
+  border-radius: 16px;
+  padding: 25px;
+  border: 1px solid rgba(71, 85, 105, 0.3);
+  transition: all 0.3s ease;
 }
 
 .more-section::before {
@@ -1292,25 +1272,12 @@ body {
 
 .more-title {
   color: #f1f5f9;
-  font-size: 26px;
-  font-weight: 700;
-  margin: 0 0 35px 0;
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 20px 0;
   display: flex;
   align-items: center;
-  gap: 18px;
-  position: relative;
-  padding-bottom: 15px;
-}
-
-.more-title::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 60px;
-  height: 3px;
-  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-  border-radius: 2px;
+  gap: 12px;
 }
 
 .more-title h3 {
@@ -1323,18 +1290,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 22px 0;
+  padding: 15px 0;
   border-bottom: 1px solid rgba(71, 85, 105, 0.2);
-  transition: all 0.3s ease;
-  position: relative;
-}
-
-.more-item:hover {
-  background: rgba(59, 130, 246, 0.05);
-  border-radius: 12px;
-  padding-left: 15px;
-  padding-right: 15px;
-  margin: 0 -15px;
 }
 
 .more-item:last-child {
@@ -1343,163 +1300,63 @@ body {
 
 .more-label {
   color: #e2e8f0;
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.more-label svg {
-  color: #94a3b8;
-  transition: color 0.3s ease;
-}
-
-.more-item:hover .more-label svg {
-  color: #3b82f6;
-}
-
-.more-value {
-  color: rgba(148, 163, 184, 0.9);
-  font-size: 15px;
-  font-weight: 500;
-  padding: 6px 12px;
-  background: rgba(71, 85, 105, 0.2);
-  border-radius: 8px;
-  border: 1px solid rgba(71, 85, 105, 0.3);
-}
-
-.more-button {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  border: none;
-  color: white;
-  padding: 14px 28px;
-  border-radius: 14px;
-  cursor: pointer;
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 15px;
-  font-weight: 600;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
-  position: relative;
-  overflow: hidden;
-  min-width: 120px;
-  justify-content: center;
 }
 
-.more-button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.6s ease;
+.more-value {
+  color: rgba(148, 163, 184, 0.8);
+  font-size: 14px;
 }
 
-.more-button::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(255, 255, 255, 0.1) 100%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
+.more-button {
+  background: #3b82f6;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
 }
 
 .more-button:hover {
-  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-  transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 12px 30px rgba(59, 130, 246, 0.5);
-}
-
-.more-button:hover::before {
-  left: 100%;
-}
-
-.more-button:hover::after {
-  opacity: 1;
-}
-
-.more-button:active {
-  transform: translateY(-1px) scale(0.98);
-  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
-}
-
-.more-button svg {
-  transition: transform 0.3s ease;
-}
-
-.more-button:hover svg {
-  transform: scale(1.1);
+  background: #2563eb;
+  transform: translateY(-1px);
 }
 
 /* Специальные стили для кнопки выхода */
 .more-button.logout-button {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
+  background: #ef4444;
 }
 
 .more-button.logout-button:hover {
-  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-  box-shadow: 0 12px 30px rgba(239, 68, 68, 0.5);
-}
-
-.more-button.logout-button::before {
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  background: #dc2626;
 }
 
 /* Адаптивные стили для вкладки "Еще" */
-@media (max-width: 1200px) {
-  .more-container {
-    grid-template-columns: 1fr;
-    max-width: 800px;
-    margin: 0 auto;
-  }
-}
-
 @media (max-width: 768px) {
   .more-page {
-    padding: 20px;
-    min-height: auto;
-  }
-  
-  .more-container {
-    gap: 20px;
+    padding: 15px;
   }
   
   .more-section {
-    padding: 25px;
-    border-radius: 16px;
+    padding: 20px;
   }
   
   .more-title {
-    font-size: 22px;
-    margin-bottom: 25px;
+    font-size: 18px;
   }
   
   .more-item {
-    padding: 18px 0;
-  }
-  
-  .more-label {
-    font-size: 16px;
-  }
-  
-  .more-value {
-    font-size: 14px;
-    padding: 4px 10px;
-  }
-  
-  .more-button {
-    padding: 12px 20px;
-    font-size: 14px;
-    min-width: 100px;
+    padding: 12px 0;
   }
 }
 
