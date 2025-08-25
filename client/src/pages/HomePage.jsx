@@ -19,6 +19,7 @@ import Avatar from '../components/Avatar';
 import Points from '../components/Points';
 import PointsModals from '../components/PointsModals';
 import PhoneVerification from '../components/PhoneVerification';
+import TokenDebug from '../components/TokenDebug';
 import { usePoints } from '../context/PointsContext';
 
 import useOnlineStatus from '../hooks/useOnlineStatus';
@@ -3968,9 +3969,12 @@ const HomePage = () => {
         )}
         
         <PointsModals />
+        
+        {/* Отладочный компонент для токенов */}
+        {process.env.NODE_ENV === 'development' && <TokenDebug />}
       </div>
       </>
   );
 };
 
-export default HomePage;
+export default HomePage

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Phone, CheckCircle, AlertCircle, Copy, ExternalLink } from 'lucide-react';
+import API_CONFIG from '../config/api';
 import './PhoneVerification.css';
 
 const PhoneVerification = ({ onClose }) => {
@@ -16,15 +17,25 @@ const PhoneVerification = ({ onClose }) => {
   const checkVerificationStatus = async () => {
     try {
       setIsLoading(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('accessToken');
+      
+      console.log('🔍 Checking verification status...');
+      console.log('Token present:', !!token);
+      console.log('Token length:', token ? token.length : 0);
       
       if (!token) {
-        setMessage('Токен авторизации не найден');
+        console.error('❌ No token found in localStorage');
+        setMessage('Токен авторизации не найден. Пожалуйста, войдите в систему заново.');
         setMessageType('error');
         return;
       }
       
-      const response = await fetch('https://server-pqqy.onrender.com/api/phone-verification/status', {
+      // Используем конфигурацию API для определения правильного URL
+      const apiUrl = process.env.NODE_ENV === 'development' 
+        ? API_CONFIG.getRelativeUrl('/api/phone-verification/status')
+        : API_CONFIG.getApiUrl('/api/phone-verification/status');
+      
+      const response = await fetch(apiUrl, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -32,8 +43,20 @@ const PhoneVerification = ({ onClose }) => {
         }
       });
       
+      if (response.status === 401) {
+        setMessage('Сессия истекла. Пожалуйста, войдите в систему заново.');
+        setMessageType('error');
+        // Очищаем токены и перенаправляем на страницу входа
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
+        window.location.href = '/auth';
+        return;
+      }
+      
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
       
       const data = await response.json();
@@ -60,13 +83,18 @@ const PhoneVerification = ({ onClose }) => {
 
   const getInstructions = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('accessToken');
       
       if (!token) {
         return;
       }
       
-      const response = await fetch('/api/phone-verification/instructions', {
+      // Используем конфигурацию API для определения правильного URL
+      const apiUrl = process.env.NODE_ENV === 'development' 
+        ? API_CONFIG.getRelativeUrl('/api/phone-verification/instructions')
+        : API_CONFIG.getApiUrl('/api/phone-verification/instructions');
+      
+      const response = await fetch(apiUrl, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -74,8 +102,19 @@ const PhoneVerification = ({ onClose }) => {
         }
       });
       
+      if (response.status === 401) {
+        setMessage('Сессия истекла. Пожалуйста, войдите в систему заново.');
+        setMessageType('error');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
+        window.location.href = '/auth';
+        return;
+      }
+      
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
       
       const data = await response.json();
@@ -97,16 +136,42 @@ const PhoneVerification = ({ onClose }) => {
 
   const openTelegramBot = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('accessToken');
+      
+      console.log('🚀 Opening Telegram bot...');
+      console.log('Token present:', !!token);
+      console.log('Token length:', token ? token.length : 0);
+      
+      if (!token) {
+        console.error('❌ No token found in localStorage for Telegram bot');
+        setMessage('Токен авторизации не найден. Пожалуйста, войдите в систему заново.');
+        setMessageType('error');
+        return;
+      }
+      
+      // Используем конфигурацию API для определения правильного URL
+      const apiUrl = process.env.NODE_ENV === 'development' 
+        ? API_CONFIG.getRelativeUrl('/api/phone-verification/start-auto-verification')
+        : API_CONFIG.getApiUrl('/api/phone-verification/start-auto-verification');
       
       // Инициация автоматической верификации
-      const response = await fetch('/api/phone-verification/start-auto-verification', {
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         }
       });
+      
+      if (response.status === 401) {
+        setMessage('Сессия истекла. Пожалуйста, войдите в систему заново.');
+        setMessageType('error');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
+        window.location.href = '/auth';
+        return;
+      }
       
       const data = await response.json();
       
@@ -133,12 +198,12 @@ const PhoneVerification = ({ onClose }) => {
         }, 120000);
         
       } else {
-        setMessage(data.message);
+        setMessage(data.message || 'Ошибка при инициации верификации');
         setMessageType('error');
       }
     } catch (error) {
       console.error('Error starting auto-verification:', error);
-      setMessage('Ошибка при инициации автоматической верификации');
+      setMessage('Ошибка при инициации автоматической верификации: ' + error.message);
       setMessageType('error');
     }
   };
