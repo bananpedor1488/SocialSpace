@@ -75,7 +75,9 @@ function AppRouter() {
 
   const checkAuthStatus = async () => {
     // Проверяем режим обслуживания
+    console.log('Проверка режима обслуживания:', API_CONFIG.isMaintenanceMode());
     if (API_CONFIG.isMaintenanceMode()) {
+      console.log('Режим обслуживания включен!');
       setIsLoading(false);
       return;
     }
@@ -123,7 +125,9 @@ function AppRouter() {
   }
 
   // Если включен режим обслуживания, показываем страницу обслуживания
+  console.log('Проверка перед рендером:', API_CONFIG.isMaintenanceMode());
   if (API_CONFIG.isMaintenanceMode()) {
+    console.log('Показываем страницу обслуживания!');
     return <MaintenancePage />;
   }
 

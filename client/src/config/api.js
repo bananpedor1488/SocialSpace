@@ -4,7 +4,7 @@ const API_CONFIG = {
   BASE_URL: process.env.REACT_APP_API_URL || 'https://server-pqqy.onrender.com',
   
   // Режим обслуживания - установите true для включения страницы "сайт закрыт"
-  MAINTENANCE_MODE: process.env.REACT_APP_MAINTENANCE_MODE === 'true',
+  MAINTENANCE_MODE: true, // Временно включен для тестирования
   
   // Полный URL для API endpoints
   getApiUrl: (endpoint) => {
@@ -21,6 +21,7 @@ const API_CONFIG = {
   
   // Проверить, включен ли режим обслуживания
   isMaintenanceMode: () => {
+    console.log('MAINTENANCE_MODE значение:', API_CONFIG.MAINTENANCE_MODE);
     return API_CONFIG.MAINTENANCE_MODE;
   }
 };
