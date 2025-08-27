@@ -3,7 +3,9 @@ import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import AuthPage from './pages/AuthPage';
 import HomePage from './pages/HomePage';
 import EmailVerificationPage from './pages/EmailVerificationPage';
+import MaintenancePage from './pages/MaintenancePage';
 import { PointsProvider } from './context/PointsContext';
+import API_CONFIG from './config/api';
 import axios from 'axios';
 
 // Настройка axios interceptors для автоматической отправки токенов
@@ -72,6 +74,12 @@ function AppRouter() {
   }, []);
 
   const checkAuthStatus = async () => {
+    // Проверяем режим обслуживания
+    if (API_CONFIG.isMaintenanceMode()) {
+      setIsLoading(false);
+      return;
+    }
+
     const token = localStorage.getItem('accessToken');
     
     if (!token) {
@@ -112,6 +120,11 @@ function AppRouter() {
          Проверка авторизации...
       </div>
     );
+  }
+
+  // Если включен режим обслуживания, показываем страницу обслуживания
+  if (API_CONFIG.isMaintenanceMode()) {
+    return <MaintenancePage />;
   }
 
   return (
