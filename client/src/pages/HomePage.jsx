@@ -1653,6 +1653,40 @@ const HomePage = () => {
     setSelectedFiles(prev => [...prev, ...validFiles]);
   };
 
+  // Обработчик вставки из буфера обмена (Ctrl+V)
+  const handlePaste = (e) => {
+    const items = e.clipboardData.items;
+    const files = [];
+    
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (item.type.indexOf('image') !== -1 || item.type.indexOf('video') !== -1) {
+        const file = item.getAsFile();
+        if (file) {
+          files.push(file);
+        }
+      }
+    }
+    
+    if (files.length > 0) {
+      const validFiles = files.filter(file => {
+        const maxSize = 10 * 1024 * 1024; // 10MB
+        if (file.size > maxSize) {
+          alert(`Файл слишком большой. Максимальный размер: 10MB`);
+          return false;
+        }
+        return true;
+      });
+      
+      if (selectedFiles.length + validFiles.length > 5) {
+        alert('Максимум 5 файлов');
+        return;
+      }
+      
+      setSelectedFiles(prev => [...prev, ...validFiles]);
+    }
+  };
+
   const handleCreatePost = async () => {
     if (!postText.trim() && selectedFiles.length === 0) {
       alert('Добавьте текст или файлы');
@@ -1667,7 +1701,7 @@ const HomePage = () => {
         formData.append('files', file);
       });
 
-      await axios.post('https://server-pqqy.onrender.com/api/posts', formData, {
+      const response = await axios.post('https://server-pqqy.onrender.com/api/posts', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -1676,6 +1710,11 @@ const HomePage = () => {
           setFileUploadProgress(percentCompleted);
         }
       });
+      
+      // Добавляем новый пост в начало списка
+      if (response.data) {
+        setPosts(prevPosts => [response.data, ...prevPosts]);
+      }
       
       setPostText('');
       setSelectedFiles([]);
@@ -1948,10 +1987,10 @@ const HomePage = () => {
                     {file.mimetype.startsWith('image/') ? (
                       <div className="image-attachment">
                         <img 
-                          src={`https://server-pqqy.onrender.com${file.url}`} 
+                          src={file.data || file.url} 
                           alt={file.originalName}
                           className="post-image"
-                          onClick={() => window.open(`https://server-pqqy.onrender.com${file.url}`, '_blank')}
+                          onClick={() => window.open(file.data || file.url, '_blank')}
                         />
                       </div>
                     ) : file.mimetype.startsWith('video/') ? (
@@ -1959,7 +1998,7 @@ const HomePage = () => {
                         <video 
                           controls 
                           className="post-video"
-                          src={`https://server-pqqy.onrender.com${file.url}`}
+                          src={file.data || file.url}
                         >
                           Ваш браузер не поддерживает видео.
                         </video>
@@ -1967,10 +2006,11 @@ const HomePage = () => {
                     ) : (
                       <div className="file-attachment-link">
                         <a 
-                          href={`https://server-pqqy.onrender.com${file.url}`} 
+                          href={file.data || file.url} 
                           target="_blank" 
                           rel="noopener noreferrer"
                           className="file-link"
+                          download={file.originalName}
                         >
                           {file.mimetype.startsWith('image/') ? (
                             <Image size={16} />
@@ -2561,6 +2601,7 @@ const HomePage = () => {
                       <textarea
                         value={postText}
                         onChange={(e) => setPostText(e.target.value)}
+                        onPaste={handlePaste}
                         placeholder="Поделитесь своими мыслями... или перетащите файлы сюда"
                         rows="3"
                         className="create-post-input"

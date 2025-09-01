@@ -10748,13 +10748,14 @@
   
   .drag-drop-zone .create-post-input {
     background: transparent;
-    border: none;
+    border: 1px solid rgba(71, 85, 105, 0.3);
     position: relative;
     z-index: 1;
   }
   
   .drag-drop-zone.drag-over .create-post-input {
     background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(59, 130, 246, 0.6);
   }
   
   .drag-hint {
