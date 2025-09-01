@@ -8,7 +8,7 @@ import {
   Heart, MessageSquare, Repeat, Pencil, Trash2, Users, UserCheck, Send, X, ChevronDown, ChevronLeft,
   Moon, Sun, Wifi, WifiOff, Flame, Clock, Phone, Settings, Trophy, DollarSign,
   Check, Play, HelpCircle, History, Crown, Gift, ArrowLeft, MoreVertical, FileText,
-  Info, Shield, Lock, Calendar
+  Info, Shield, Lock, Calendar, Paperclip, Image, File, Video
 } from 'lucide-react';
 
 import CallInterface from '../components/CallInterface';
@@ -44,6 +44,8 @@ const HomePage = () => {
 
   const [activeTab, setActiveTab] = useState('home');
   const [postText, setPostText] = useState('');
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [fileUploadProgress, setFileUploadProgress] = useState(0);
   const [showProfileSettings, setShowProfileSettings] = useState(false);
   const [showAccountSettings, setShowAccountSettings] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -1594,16 +1596,59 @@ const HomePage = () => {
     }
   };
 
-  const handleCreatePost = async () => {
-    if (postText.trim()) {
-      try {
-        await axios.post('https://server-pqqy.onrender.com/api/posts', { 
-          content: postText 
-        });
-        setPostText('');
-      } catch (err) {
-        console.error('Ошибка создания поста:', err);
+  const handleFileSelect = (event) => {
+    const files = Array.from(event.target.files);
+    const validFiles = files.filter(file => {
+      const maxSize = 10 * 1024 * 1024; // 10MB
+      if (file.size > maxSize) {
+        alert(`Файл ${file.name} слишком большой. Максимальный размер: 10MB`);
+        return false;
       }
+      return true;
+    });
+    
+    if (selectedFiles.length + validFiles.length > 5) {
+      alert('Максимум 5 файлов');
+      return;
+    }
+    
+    setSelectedFiles(prev => [...prev, ...validFiles]);
+  };
+
+  const removeFile = (index) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleCreatePost = async () => {
+    if (!postText.trim() && selectedFiles.length === 0) {
+      alert('Добавьте текст или файлы');
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('content', postText);
+      
+      selectedFiles.forEach(file => {
+        formData.append('files', file);
+      });
+
+      await axios.post('https://server-pqqy.onrender.com/api/posts', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          setFileUploadProgress(percentCompleted);
+        }
+      });
+      
+      setPostText('');
+      setSelectedFiles([]);
+      setFileUploadProgress(0);
+    } catch (err) {
+      console.error('Ошибка создания поста:', err);
+      alert('Ошибка при создании поста');
     }
   };
 
@@ -1860,6 +1905,55 @@ const HomePage = () => {
             <p className="post-text">
               {post.isRepost ? post.originalPost?.content || post.content : post.content}
             </p>
+            
+            {/* Отображение файлов */}
+            {(post.isRepost ? post.originalPost?.files : post.files) && (post.isRepost ? post.originalPost?.files : post.files).length > 0 && (
+              <div className="post-files">
+                {(post.isRepost ? post.originalPost?.files : post.files).map((file, index) => (
+                  <div key={index} className="file-attachment">
+                    {file.mimetype.startsWith('image/') ? (
+                      <div className="image-attachment">
+                        <img 
+                          src={`https://server-pqqy.onrender.com${file.url}`} 
+                          alt={file.originalName}
+                          className="post-image"
+                          onClick={() => window.open(`https://server-pqqy.onrender.com${file.url}`, '_blank')}
+                        />
+                      </div>
+                    ) : file.mimetype.startsWith('video/') ? (
+                      <div className="video-attachment">
+                        <video 
+                          controls 
+                          className="post-video"
+                          src={`https://server-pqqy.onrender.com${file.url}`}
+                        >
+                          Ваш браузер не поддерживает видео.
+                        </video>
+                      </div>
+                    ) : (
+                      <div className="file-attachment-link">
+                        <a 
+                          href={`https://server-pqqy.onrender.com${file.url}`} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="file-link"
+                        >
+                          {file.mimetype.startsWith('image/') ? (
+                            <Image size={16} />
+                          ) : file.mimetype.startsWith('video/') ? (
+                            <Video size={16} />
+                          ) : (
+                            <File size={16} />
+                          )}
+                          <span className="file-name">{file.originalName}</span>
+                          <span className="file-size">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           
           <div className="post-actions">
@@ -2431,15 +2525,73 @@ const HomePage = () => {
                       rows="3"
                       className="create-post-input"
                     />
+                    
+                    {/* Выбранные файлы */}
+                    {selectedFiles.length > 0 && (
+                      <div className="selected-files">
+                        {selectedFiles.map((file, index) => (
+                          <div key={index} className="file-item">
+                            <div className="file-info">
+                              {file.type.startsWith('image/') ? (
+                                <Image size={16} />
+                              ) : file.type.startsWith('video/') ? (
+                                <Video size={16} />
+                              ) : (
+                                <File size={16} />
+                              )}
+                              <span className="file-name">{file.name}</span>
+                              <span className="file-size">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                            </div>
+                            <button 
+                              onClick={() => removeFile(index)}
+                              className="remove-file-btn"
+                            >
+                              <X size={14} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {/* Прогресс загрузки */}
+                    {fileUploadProgress > 0 && fileUploadProgress < 100 && (
+                      <div className="upload-progress">
+                        <div className="progress-bar">
+                          <div 
+                            className="progress-fill" 
+                            style={{ width: `${fileUploadProgress}%` }}
+                          ></div>
+                        </div>
+                        <span className="progress-text">{fileUploadProgress}%</span>
+                      </div>
+                    )}
+                    
                     <div className="create-post-footer">
-                      <div className="post-stats">
-                        <span className={`char-count ${postText.length > 250 ? 'warning' : ''} ${postText.length > 280 ? 'error' : ''}`}>
-                          {postText.length}/280
-                        </span>
+                      <div className="post-actions">
+                        <label className="file-upload-btn">
+                          <Paperclip size={18} />
+                          <input
+                            type="file"
+                            multiple
+                            accept="image/*,video/*,.pdf,.doc,.docx,.txt"
+                            onChange={handleFileSelect}
+                            style={{ display: 'none' }}
+                          />
+                        </label>
+                        <div className="post-stats">
+                          <span className={`char-count ${postText.length > 250 ? 'warning' : ''} ${postText.length > 280 ? 'error' : ''}`}>
+                            {postText.length}/280
+                          </span>
+                          {selectedFiles.length > 0 && (
+                            <span className="file-count">
+                              {selectedFiles.length}/5 файлов
+                            </span>
+                          )}
+                        </div>
                       </div>
                       <button 
                         onClick={handleCreatePost} 
-                        disabled={!postText.trim() || postText.length > 280}
+                        disabled={(!postText.trim() && selectedFiles.length === 0) || postText.length > 280}
                         className="publish-btn"
                       >
                         <Plus size={18} /> Опубликовать

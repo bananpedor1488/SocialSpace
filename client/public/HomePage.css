@@ -10519,3 +10519,189 @@
     }
   }
   
+  /* Стили для загрузки файлов */
+  .post-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .file-upload-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+  }
+  
+  .file-upload-btn:hover {
+    background: rgba(59, 130, 246, 0.2);
+    transform: scale(1.05);
+  }
+  
+  .selected-files {
+    margin: 15px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .file-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 15px;
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 10px;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+  }
+  
+  .file-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #e2e8f0;
+  }
+  
+  .file-name {
+    font-weight: 500;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .file-size {
+    color: rgba(148, 163, 184, 0.8);
+    font-size: 12px;
+  }
+  
+  .remove-file-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .remove-file-btn:hover {
+    background: rgba(239, 68, 68, 0.2);
+    transform: scale(1.1);
+  }
+  
+  .upload-progress {
+    margin: 15px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .progress-bar {
+    flex: 1;
+    height: 6px;
+    background: rgba(71, 85, 105, 0.3);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+  }
+  
+  .progress-text {
+    color: #e2e8f0;
+    font-size: 12px;
+    font-weight: 500;
+    min-width: 40px;
+  }
+  
+  .file-count {
+    color: rgba(148, 163, 184, 0.8);
+    font-size: 12px;
+    margin-left: 10px;
+  }
+  
+  /* Стили для отображения файлов в постах */
+  .post-files {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .file-attachment {
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  
+  .image-attachment {
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+  
+  .image-attachment:hover {
+    transform: scale(1.02);
+  }
+  
+  .post-image {
+    width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+  
+  .video-attachment {
+    width: 100%;
+  }
+  
+  .post-video {
+    width: 100%;
+    max-height: 400px;
+    border-radius: 10px;
+  }
+  
+  .file-attachment-link {
+    padding: 12px 15px;
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 10px;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+  }
+  
+  .file-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #3b82f6;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+  
+  .file-link:hover {
+    color: #60a5fa;
+  }
+  
+  .file-link .file-name {
+    color: inherit;
+    max-width: none;
+  }
+  
+  .file-link .file-size {
+    color: rgba(148, 163, 184, 0.8);
+  }
+  
