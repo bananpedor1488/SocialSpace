@@ -46,6 +46,7 @@ const HomePage = () => {
   const [postText, setPostText] = useState('');
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [fileUploadProgress, setFileUploadProgress] = useState(0);
+  const [isDragOver, setIsDragOver] = useState(false);
   const [showProfileSettings, setShowProfileSettings] = useState(false);
   const [showAccountSettings, setShowAccountSettings] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -1619,6 +1620,39 @@ const HomePage = () => {
     setSelectedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
+  // Drag & Drop функции
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    
+    const files = Array.from(e.dataTransfer.files);
+    const validFiles = files.filter(file => {
+      const maxSize = 10 * 1024 * 1024; // 10MB
+      if (file.size > maxSize) {
+        alert(`Файл ${file.name} слишком большой. Максимальный размер: 10MB`);
+        return false;
+      }
+      return true;
+    });
+    
+    if (selectedFiles.length + validFiles.length > 5) {
+      alert('Максимум 5 файлов');
+      return;
+    }
+    
+    setSelectedFiles(prev => [...prev, ...validFiles]);
+  };
+
   const handleCreatePost = async () => {
     if (!postText.trim() && selectedFiles.length === 0) {
       alert('Добавьте текст или файлы');
@@ -2518,13 +2552,30 @@ const HomePage = () => {
                     <h3>Что нового?</h3>
                   </div>
                   <div className="create-post-body">
-                    <textarea
-                      value={postText}
-                      onChange={(e) => setPostText(e.target.value)}
-                      placeholder="Поделитесь своими мыслями..."
-                      rows="3"
-                      className="create-post-input"
-                    />
+                    <div 
+                      className={`drag-drop-zone ${isDragOver ? 'drag-over' : ''}`}
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                      onDrop={handleDrop}
+                    >
+                      <textarea
+                        value={postText}
+                        onChange={(e) => setPostText(e.target.value)}
+                        placeholder="Поделитесь своими мыслями... или перетащите файлы сюда"
+                        rows="3"
+                        className="create-post-input"
+                      />
+                      
+                      {/* Drag & Drop подсказка */}
+                      {isDragOver && (
+                        <div className="drag-overlay">
+                          <div className="drag-message">
+                            <Paperclip size={32} />
+                            <p>Отпустите файлы здесь</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                     
                     {/* Выбранные файлы */}
                     {selectedFiles.length > 0 && (
@@ -2578,16 +2629,19 @@ const HomePage = () => {
                             style={{ display: 'none' }}
                           />
                         </label>
-                        <div className="post-stats">
-                          <span className={`char-count ${postText.length > 250 ? 'warning' : ''} ${postText.length > 280 ? 'error' : ''}`}>
-                            {postText.length}/280
-                          </span>
-                          {selectedFiles.length > 0 && (
-                            <span className="file-count">
-                              {selectedFiles.length}/5 файлов
-                            </span>
-                          )}
-                        </div>
+                                                 <div className="post-stats">
+                           <span className={`char-count ${postText.length > 250 ? 'warning' : ''} ${postText.length > 280 ? 'error' : ''}`}>
+                             {postText.length}/280
+                           </span>
+                           {selectedFiles.length > 0 && (
+                             <span className="file-count">
+                               {selectedFiles.length}/5 файлов
+                             </span>
+                           )}
+                           <span className="drag-hint">
+                             или перетащите файлы
+                           </span>
+                         </div>
                       </div>
                       <button 
                         onClick={handleCreatePost} 

@@ -6956,6 +6956,65 @@ body.mobile-chat-open {
   max-width: none;
 }
 
-.file-link .file-size {
-  color: rgba(107, 114, 128, 0.8);
-}
+  .file-link .file-size {
+    color: rgba(107, 114, 128, 0.8);
+  }
+  
+  /* Drag & Drop стили (светлая тема) */
+  .drag-drop-zone {
+    position: relative;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+  }
+  
+  .drag-drop-zone.drag-over {
+    background: rgba(59, 130, 246, 0.1);
+    border: 2px dashed rgba(59, 130, 246, 0.5);
+    transform: scale(1.02);
+  }
+  
+  .drag-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(59, 130, 246, 0.15);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    backdrop-filter: blur(4px);
+  }
+  
+  .drag-message {
+    text-align: center;
+    color: #3b82f6;
+    font-weight: 600;
+    font-size: 16px;
+  }
+  
+  .drag-message p {
+    margin: 10px 0 0 0;
+    font-size: 14px;
+    opacity: 0.9;
+  }
+  
+  .drag-drop-zone .create-post-input {
+    background: transparent;
+    border: none;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .drag-drop-zone.drag-over .create-post-input {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  .drag-hint {
+    color: rgba(107, 114, 128, 0.6);
+    font-size: 11px;
+    font-style: italic;
+    margin-left: 10px;
+  }
