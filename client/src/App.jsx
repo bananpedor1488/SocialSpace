@@ -125,9 +125,7 @@ function AppRouter() {
   }
 
   // Если включен режим обслуживания, показываем страницу обслуживания
-  console.log('Проверка перед рендером:', API_CONFIG.isMaintenanceMode());
   if (API_CONFIG.isMaintenanceMode()) {
-    console.log('Показываем страницу обслуживания!');
     return <MaintenancePage />;
   }
 
