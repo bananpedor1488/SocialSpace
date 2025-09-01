@@ -1987,10 +1987,10 @@ const HomePage = () => {
                     {file.mimetype.startsWith('image/') ? (
                       <div className="image-attachment">
                         <img 
-                          src={file.data || file.url} 
+                          src={file.url} 
                           alt={file.originalName}
                           className="post-image"
-                          onClick={() => window.open(file.data || file.url, '_blank')}
+                          onClick={() => window.open(file.url, '_blank')}
                         />
                       </div>
                     ) : file.mimetype.startsWith('video/') ? (
@@ -1998,7 +1998,7 @@ const HomePage = () => {
                         <video 
                           controls 
                           className="post-video"
-                          src={file.data || file.url}
+                          src={file.url}
                         >
                           Ваш браузер не поддерживает видео.
                         </video>
@@ -2006,7 +2006,7 @@ const HomePage = () => {
                     ) : (
                       <div className="file-attachment-link">
                         <a 
-                          href={file.data || file.url} 
+                          href={file.url} 
                           target="_blank" 
                           rel="noopener noreferrer"
                           className="file-link"
