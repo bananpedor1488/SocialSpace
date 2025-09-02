@@ -1987,18 +1987,45 @@ formData.append('files', file);
             {/* Отображение файлов */}
             {(post.isRepost ? post.originalPost?.files : post.files) && (post.isRepost ? post.originalPost?.files : post.files).length > 0 && (
               <div className="post-files">
-                {(post.isRepost ? post.originalPost?.files : post.files).map((file, index) => (
-                  <div key={index} className="file-attachment">
-                    {file.mimetype.startsWith('image/') ? (
-                      <div className="image-attachment">
-                        <img 
-                          src={file.url} 
-                          alt={file.originalName}
-                          className="post-image"
-                          onClick={() => window.open(file.url, '_blank')}
-                        />
-                      </div>
-                    ) : file.mimetype.startsWith('video/') ? (
+                {(post.isRepost ? post.originalPost?.files : post.files).map((file, index) => {
+                  console.log('Rendering file:', {
+                    fileName: file.originalName,
+                    url: file.url,
+                    mimetype: file.mimetype,
+                    isRepost: post.isRepost
+                  });
+                  
+                  return (
+                    <div key={index} className="file-attachment">
+                      {file.mimetype.startsWith('image/') ? (
+                        <div className="image-attachment">
+                          {file.url ? (
+                            <img 
+                              src={file.url} 
+                              alt={file.originalName}
+                              className="post-image"
+                              onClick={() => window.open(file.url, '_blank')}
+                              onError={(e) => {
+                                console.error('Image load error:', {
+                                  src: e.target.src,
+                                  fileName: file.originalName,
+                                  url: file.url
+                                });
+                                // Показываем fallback если изображение не загружается
+                                e.target.style.display = 'none';
+                                e.target.nextSibling.style.display = 'block';
+                              }}
+                            />
+                          ) : null}
+                          <div className="image-fallback" style={{ display: file.url ? 'none' : 'block' }}>
+                            <div className="broken-image">
+                              <Image size={32} />
+                              <p>Изображение недоступно</p>
+                              <p className="file-name">{file.originalName}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ) : file.mimetype.startsWith('video/') ? (
                       <div className="video-attachment">
                         <video 
                           controls 
@@ -2030,7 +2057,8 @@ formData.append('files', file);
                       </div>
                     )}
                   </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

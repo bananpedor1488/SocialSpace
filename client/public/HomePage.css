@@ -10665,6 +10665,38 @@
     border-radius: 10px;
   }
   
+  .image-fallback {
+    width: 100%;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(51, 65, 85, 0.3);
+    border: 2px dashed rgba(148, 163, 184, 0.3);
+    border-radius: 10px;
+    color: #94a3b8;
+  }
+  
+  .broken-image {
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .broken-image svg {
+    margin-bottom: 10px;
+    opacity: 0.5;
+  }
+  
+  .broken-image p {
+    margin: 5px 0;
+    font-size: 14px;
+  }
+  
+  .broken-image .file-name {
+    font-size: 12px;
+    opacity: 0.7;
+  }
+  
   .video-attachment {
     width: 100%;
   }
