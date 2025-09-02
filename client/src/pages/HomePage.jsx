@@ -1726,7 +1726,21 @@ formData.append('files', file);
       setFileUploadProgress(0);
     } catch (err) {
       console.error('Ошибка создания поста:', err);
-      alert('Ошибка при создании поста');
+      
+      // Показываем более детальное сообщение об ошибке
+      let errorMessage = 'Ошибка при создании поста';
+      
+      if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err.response?.status === 401) {
+        errorMessage = 'Сессия истекла. Пожалуйста, войдите заново.';
+      } else if (err.response?.status === 500) {
+        errorMessage = 'Ошибка сервера. Попробуйте позже.';
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
+      alert(errorMessage);
     }
   };
 
