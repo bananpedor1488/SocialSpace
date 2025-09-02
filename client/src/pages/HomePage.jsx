@@ -412,6 +412,7 @@ const HomePage = () => {
           displayName: newPost.author?.displayName || newPost.author?.username || 'Unknown',
           avatar: newPost.author?.avatar || null,
           content: newPost.content,
+          files: newPost.files || [], // Добавляем файлы поста
           likes: newPost.likes?.length || 0,
           liked: newPost.likes?.includes(user._id || user.id) || false,
           date: new Date(newPost.createdAt || Date.now()).toLocaleDateString('ru-RU', {
@@ -442,6 +443,7 @@ const HomePage = () => {
           displayName: repostData.repostedBy?.displayName || repostData.repostedBy?.username || 'Unknown',
           avatar: repostData.repostedBy?.avatar || null,
           content: repostData.originalPost?.content || '',
+          files: repostData.originalPost?.files || [], // Добавляем файлы оригинального поста
           likes: repostData.originalPost?.likes?.length || 0,
           liked: repostData.originalPost?.likes?.includes(user._id || user.id) || false,
           date: new Date(repostData.createdAt || Date.now()).toLocaleDateString('ru-RU', {
@@ -458,6 +460,7 @@ const HomePage = () => {
             _id: repostData.originalPost?._id,
             author: repostData.originalPost?.author,
             content: repostData.originalPost?.content,
+            files: repostData.originalPost?.files || [], // Добавляем файлы в originalPost
             createdAt: repostData.originalPost?.createdAt
           },
           repostedBy: repostData.repostedBy,
@@ -1504,6 +1507,7 @@ const HomePage = () => {
           username: username,
           author: post.author, // Добавляем полный объект автора с аватаркой
           content: post.content,
+          files: post.files || [], // Добавляем файлы поста
           likes: Array.isArray(post.likes) ? post.likes.length : (post.likes || 0),
           liked: Array.isArray(post.likes) && user ? post.likes.includes(user._id || user.id) : false,
           commentsCount: post.commentsCount || (post.comments ? post.comments.length : 0),
@@ -1515,7 +1519,10 @@ const HomePage = () => {
             minute: '2-digit'
           }),
           isRepost: post.isRepost || false,
-          originalPost: post.originalPost || null,
+          originalPost: post.originalPost ? {
+            ...post.originalPost,
+            files: post.originalPost.files || [] // Добавляем файлы в originalPost
+          } : null,
           repostedBy: post.repostedBy || null
         };
       });
@@ -1687,7 +1694,7 @@ const HomePage = () => {
     }
   };
 
-  const handleCreatePost = async () => {
+    const handleCreatePost = async () => {
     if (!postText.trim() && selectedFiles.length === 0) {
       alert('Добавьте текст или файлы');
       return;
@@ -1698,7 +1705,7 @@ const HomePage = () => {
       formData.append('content', postText);
       
       selectedFiles.forEach(file => {
-        formData.append('files', file);
+formData.append('files', file);
       });
 
       const response = await axios.post('https://server-pqqy.onrender.com/api/posts', formData, {
@@ -1711,10 +1718,8 @@ const HomePage = () => {
         }
       });
       
-      // Добавляем новый пост в начало списка
-      if (response.data) {
-        setPosts(prevPosts => [response.data, ...prevPosts]);
-      }
+      // НЕ добавляем пост локально - он придет через Socket.IO событие 'newPost'
+      // Это предотвращает дублирование постов
       
       setPostText('');
       setSelectedFiles([]);
