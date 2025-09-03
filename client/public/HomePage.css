@@ -9172,7 +9172,55 @@
       user-drag: none;
     }
   }
-  
+  /* Стили для отображения файлов в постах */
+.post-files {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%; /* Убедимся, что контейнер занимает полную ширину поста */
+  align-items: center; /* Центрируем изображения для красоты */
+}
+
+.file-attachment {
+  border-radius: 10px;
+  overflow: hidden;
+  max-width: 100%; /* Контейнер не выходит за пределы */
+  display: flex;
+  justify-content: center; /* Центрируем содержимое */
+}
+
+.image-attachment {
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  display: inline-block; /* Чтобы изображение не растягивалось лишне */
+}
+
+.image-attachment:hover {
+  transform: scale(1.02);
+}
+
+.post-image {
+  width: auto; /* Нативная ширина */
+  max-width: 100%; /* Не шире контейнера поста */
+  height: auto; /* Нативная высота, с сохранением пропорций */
+  object-fit: contain; /* Показываем целиком, без обрезки, масштабируя если нужно */
+  border-radius: 10px; /* Закруглённые углы для красоты */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Лёгкая тень для эстетики */
+  transition: box-shadow 0.3s ease; /* Плавный ховер-эффект */
+}
+
+.post-image:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Усиленная тень на ховер */
+}
+
+/* Для мобильных устройств (чтобы фото не выходило за экран) */
+@media (max-width: 767px) {
+  .post-image {
+      max-width: 100%; /* Обязательно вписываем в ширину экрана */
+      height: auto;
+  }
+}
   /* Исправления для очень старых браузеров */
   @media (max-width: 1024px) {
     .messages-container {
