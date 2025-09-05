@@ -2537,7 +2537,14 @@ formData.append('files', file);
 
   return (
     <>
-      <div className={`home-container ${activeTab === 'home' ? 'show-right-sidebar' : ''}`}>
+      <div 
+        className={`home-container ${activeTab === 'home' ? 'show-right-sidebar' : ''}`}
+        style={{
+          maxWidth: '100vw',
+          overflowX: 'hidden',
+          width: '100%'
+        }}
+      >
           <header className="header">
             <div className="header-content">
               <div className="logo"><h1><Flame size={24} /> SocialSpace</h1></div>
