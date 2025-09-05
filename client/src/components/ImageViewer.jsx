@@ -165,8 +165,12 @@ const ImageViewer = ({
   };
 
   const handleBackdropClick = (e) => {
-    // Закрываем только если клик по самому overlay, а не по его дочерним элементам
-    if (e.target === e.currentTarget) {
+    // Закрываем при клике по любому месту за пределами картинки
+    if (e.target === e.currentTarget || 
+        e.target.classList.contains('image-viewer-overlay') ||
+        e.target.classList.contains('image-viewer-container') ||
+        e.target.classList.contains('image-viewer-content') ||
+        e.target.classList.contains('image-container')) {
       onClose();
     }
   };
@@ -183,7 +187,7 @@ const ImageViewer = ({
     >
       <div className="image-viewer-container" ref={containerRef}>
         {/* Заголовок */}
-        <div className="image-viewer-header">
+        <div className="image-viewer-header" onClick={(e) => e.stopPropagation()}>
           <div className="image-info">
             <span className="image-name">{currentImage.originalName}</span>
             {images.length > 1 && (
@@ -285,6 +289,7 @@ const ImageViewer = ({
                 onLoad={handleImageLoad}
                 onError={handleImageError}
                 onMouseDown={handleMouseDown}
+                onClick={(e) => e.stopPropagation()}
                 draggable={false}
               />
             )}
@@ -304,7 +309,7 @@ const ImageViewer = ({
 
         {/* Миниатюры */}
         {images.length > 1 && (
-          <div className="image-thumbnails">
+          <div className="image-thumbnails" onClick={(e) => e.stopPropagation()}>
             {images.map((image, index) => (
               <div
                 key={index}

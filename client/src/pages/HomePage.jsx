@@ -21,6 +21,7 @@ import PointsModals from '../components/PointsModals';
 import PhoneVerification from '../components/PhoneVerification';
 import TokenDebug from '../components/TokenDebug';
 import ImageViewer from '../components/ImageViewer';
+import VideoPlayer from '../components/VideoPlayer';
 import { usePoints } from '../context/PointsContext';
 import '../styles/PostImages.css';
 
@@ -131,6 +132,10 @@ const HomePage = () => {
   const [imageViewerOpen, setImageViewerOpen] = useState(false);
   const [imageViewerImages, setImageViewerImages] = useState([]);
   const [imageViewerIndex, setImageViewerIndex] = useState(0);
+  
+  // Состояние для видеоплеера
+  const [videoPlayerOpen, setVideoPlayerOpen] = useState(false);
+  const [currentVideo, setCurrentVideo] = useState(null);
 
   const updateMobileChatOffsets = () => {
     try {
@@ -373,6 +378,18 @@ const HomePage = () => {
     setImageViewerOpen(false);
     setImageViewerImages([]);
     setImageViewerIndex(0);
+  };
+
+  // Функция для открытия видеоплеера
+  const openVideoPlayer = (videoFile) => {
+    setCurrentVideo(videoFile);
+    setVideoPlayerOpen(true);
+  };
+
+  // Функция для закрытия видеоплеера
+  const closeVideoPlayer = () => {
+    setVideoPlayerOpen(false);
+    setCurrentVideo(null);
   };
 
   // Socket.IO подключение и обработчики
@@ -2072,13 +2089,12 @@ formData.append('files', file);
                         </div>
                       ) : file.mimetype.startsWith('video/') ? (
                       <div className="video-attachment">
-                        <video 
-                          controls 
-                          className="post-video"
+                        <VideoPlayer 
                           src={file.url}
-                        >
-                          Ваш браузер не поддерживает видео.
-                        </video>
+                          title={file.originalName}
+                          className="post-video"
+                          onClick={() => openVideoPlayer(file)}
+                        />
                       </div>
                     ) : (
                       <div className="file-attachment-link">
@@ -4302,6 +4318,16 @@ formData.append('files', file);
           isOpen={imageViewerOpen}
           onClose={closeImageViewer}
         />
+        
+        {/* Полноэкранный видеоплеер */}
+        {videoPlayerOpen && currentVideo && (
+          <VideoPlayer 
+            src={currentVideo.url}
+            title={currentVideo.originalName}
+            isFullscreen={true}
+            onClose={closeVideoPlayer}
+          />
+        )}
         
         {/* Отладочный компонент для токенов */}
         {process.env.NODE_ENV === 'development' && <TokenDebug />}
