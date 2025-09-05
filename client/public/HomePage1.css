@@ -1,4 +1,300 @@
 /* ==========================
+   GLOBAL HORIZONTAL SCROLL FIX - УБИРАЕМ ГОРИЗОНТАЛЬНУЮ ПРОКРУТКУ
+   ========================== */
+
+/* Глобальные стили для всех устройств */
+html, body {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+}
+
+#root {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+}
+
+.home-container {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+  width: 100% !important;
+}
+
+.home-container * {
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Исключаем поиск из глобальных ограничений */
+.home-container .header-search,
+.home-container .header-search-input,
+.home-container .mobile-search-container,
+.home-container .mobile-search-input {
+  max-width: none !important;
+}
+
+.home-container .header-search {
+  max-width: 400px !important;
+  min-width: 200px !important;
+}
+
+/* Исправляем возможные проблемы с контентом */
+.home-container .post,
+.home-container .post-content,
+.home-container img,
+.home-container video,
+.home-container .file-item {
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+.home-container .post-content {
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+}
+
+/* Дополнительная защита от горизонтальной прокрутки */
+.post {
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+  word-wrap: break-word !important;
+}
+
+.post-content {
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+}
+
+/* Исправляем изображения и видео в постах */
+.post img,
+.post video {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+/* ==========================
+   GLOBAL MOBILE FIXES - ПРЕДОТВРАЩЕНИЕ НАЛОЖЕНИЯ ПОД ХЕДЕР И НИЖНЮЮ ПАНЕЛЬ
+   ========================== */
+
+/* Глобальные исправления для мобильных устройств */
+@media (max-width: 767px) {
+    /* Основной контейнер приложения */
+    body {
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+      margin: 0 !important;
+      overflow-x: hidden !important;
+      position: relative !important;
+      min-height: 100vh !important;
+    }
+  
+    /* Главный контейнер */
+    .app-container,
+    .main-container,
+    #root {
+      padding: 0 !important;
+      margin: 0 !important;
+      min-height: 100vh !important;
+      width: 100vw !important;
+      max-width: 100vw !important;
+      overflow-x: hidden !important;
+      position: relative !important;
+    }
+  
+    /* ФИКСИРОВАННЫЙ КОНТЕЙНЕР КОНТЕНТА - НЕ ЗАХОДИТ ПОД ХЕДЕР И НАВИГАЦИЮ */
+    .home-container {
+      position: fixed !important;
+      top: calc(60px + env(safe-area-inset-top)) !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: calc(60px + env(safe-area-inset-bottom)) !important;
+      width: 100vw !important;
+      height: calc(100vh - 120px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      background: rgba(255, 255, 255, 0.95) !important;
+      z-index: 1 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      /* Дополнительный отступ снизу для предотвращения наложения под навигацию */
+      padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
+    }
+  
+    /* Хедер - фиксированная позиция */
+    .header,
+    .app-header,
+    header {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      z-index: 10000 !important;
+      height: 60px !important;
+      background: rgba(255, 255, 255, 0.98) !important;
+      backdrop-filter: blur(10px) !important;
+      border-bottom: 1px solid rgba(156, 163, 175, 0.3) !important;
+      padding-top: env(safe-area-inset-top) !important;
+      margin: 0 !important;
+      border-radius: 0 !important;
+    }
+  
+    /* Нижняя навигация - фиксированная позиция */
+    .mobile-nav,
+    .bottom-nav,
+    .navigation {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      z-index: 10000 !important;
+      height: 60px !important;
+      background: rgba(255, 255, 255, 0.98) !important;
+      backdrop-filter: blur(10px) !important;
+      border-top: 1px solid rgba(156, 163, 175, 0.3) !important;
+      padding-bottom: env(safe-area-inset-bottom) !important;
+      margin: 0 !important;
+      border-radius: 0 !important;
+    }
+  
+    /* Основной контент - правильные отступы */
+    .main-content,
+    .content,
+    .page-content {
+      margin: 0 !important;
+      padding: 15px !important;
+      padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      overflow-x: hidden !important;
+      flex: 1 !important;
+      min-height: 0 !important;
+      box-sizing: border-box !important;
+      height: 100% !important;
+      display: flex !important;
+      flex-direction: column !important;
+    }
+  
+    /* Специальные стили для страницы лидерборда */
+    .main-content.leaderboard-page,
+    .page-content.leaderboard-page {
+      padding-bottom: 0 !important;
+      height: calc(100vh - 120px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+    }
+  
+    /* Специфичные исправления для основного контейнера */
+    .home-container {
+      margin: 0 !important;
+      padding: 0 !important;
+      min-height: 100vh !important;
+      width: 100vw !important;
+      max-width: 100vw !important;
+      overflow-x: hidden !important;
+      display: flex !important;
+      flex-direction: column !important;
+    }
+  
+    /* Все модальные окна и оверлеи */
+    .modal,
+    .overlay,
+    .popup {
+      z-index: 10001 !important;
+    }
+  
+    /* Исправления для всех скроллируемых областей */
+    .scrollable,
+    .scroll-area,
+    [class*="scroll"] {
+      -webkit-overflow-scrolling: touch !important;
+      scroll-behavior: smooth !important;
+    }
+  
+    /* Исправления для всех input полей */
+    input,
+    textarea,
+    select {
+      -webkit-appearance: none !important;
+      -moz-appearance: none !important;
+      appearance: none !important;
+      font-size: 16px !important; /* Предотвращает зум на iOS */
+    }
+  
+    /* Исправления для всех кнопок */
+    button {
+      -webkit-tap-highlight-color: transparent !important;
+      touch-action: manipulation !important;
+    }
+  
+    /* Дополнительные исправления для предотвращения наложения */
+    * {
+      box-sizing: border-box !important;
+    }
+  
+    /* Исправления для всех фиксированных элементов */
+    [class*="fixed"],
+    [class*="sticky"] {
+      z-index: 9999 !important;
+    }
+  
+    /* Исправления для всех модальных окон */
+    [class*="modal"],
+    [class*="popup"],
+    [class*="overlay"] {
+      z-index: 10001 !important;
+    }
+  
+    /* Исправления для всех dropdown меню */
+    [class*="dropdown"],
+    [class*="menu"] {
+      z-index: 10002 !important;
+    }
+  
+    /* Принудительное исправление для body при открытом чате */
+    body.mobile-chat-open {
+      overflow: hidden !important;
+      position: fixed !important;
+      width: 100% !important;
+      height: 100% !important;
+    }
+  
+    /* Скрытие основного контента при открытом чате */
+    body.mobile-chat-open .home-container {
+      display: none !important;
+    }
+  
+    /* Показ только чата при открытом чате */
+    body.mobile-chat-open .messages-container {
+      display: block !important;
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      z-index: 1000 !important;
+      background: #ffffff !important;
+    }
+  
+    /* Исправления для предотвращения прозрачности */
+    body.mobile-chat-open .messages-container * {
+      background: inherit !important;
+    }
+  
+    /* Исправления для правильных отступов */
+    body.mobile-chat-open .chats-sidebar,
+    body.mobile-chat-open .chat-area {
+      background: #ffffff !important;
+    }
+  
+    /* Убираем лишние отступы */
+    body.mobile-chat-open .home-container {
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+  }
+
+/* ==========================
    Mobile Messenger Styles (White Theme)
    ========================== */
 
