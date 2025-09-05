@@ -20,7 +20,10 @@ import Points from '../components/Points';
 import PointsModals from '../components/PointsModals';
 import PhoneVerification from '../components/PhoneVerification';
 import TokenDebug from '../components/TokenDebug';
+import ImageViewer from '../components/ImageViewer';
 import { usePoints } from '../context/PointsContext';
+import '../styles/PostImages.css';
+import '../styles/PostStyles.css';
 
 import useOnlineStatus from '../hooks/useOnlineStatus';
 import { 
@@ -124,6 +127,11 @@ const HomePage = () => {
   // Состояние для мобильного мессенджера
   const [isMobile, setIsMobile] = useState(false);
   const [mobileView, setMobileView] = useState('chats'); // 'chats' | 'chat'
+  
+  // Состояние для просмотрщика изображений
+  const [imageViewerOpen, setImageViewerOpen] = useState(false);
+  const [imageViewerImages, setImageViewerImages] = useState([]);
+  const [imageViewerIndex, setImageViewerIndex] = useState(0);
 
   const updateMobileChatOffsets = () => {
     try {
@@ -347,6 +355,25 @@ const HomePage = () => {
       clearTokens();
       throw error;
     }
+  };
+
+  // Функция для открытия просмотрщика изображений
+  const openImageViewer = (images, startIndex = 0) => {
+    // Фильтруем только изображения
+    const imageFiles = images.filter(file => file.mimetype.startsWith('image/'));
+    
+    if (imageFiles.length === 0) return;
+    
+    setImageViewerImages(imageFiles);
+    setImageViewerIndex(startIndex);
+    setImageViewerOpen(true);
+  };
+
+  // Функция для закрытия просмотрщика изображений
+  const closeImageViewer = () => {
+    setImageViewerOpen(false);
+    setImageViewerImages([]);
+    setImageViewerIndex(0);
   };
 
   // Socket.IO подключение и обработчики
@@ -2018,7 +2045,12 @@ formData.append('files', file);
                               src={file.url} 
                               alt={file.originalName}
                               className="post-image"
-                              onClick={() => window.open(file.url, '_blank')}
+                              onClick={() => {
+                                const postFiles = post.isRepost ? post.originalPost?.files : post.files;
+                                const imageFiles = postFiles.filter(f => f.mimetype.startsWith('image/'));
+                                const imageIndex = imageFiles.findIndex(f => f.url === file.url);
+                                openImageViewer(imageFiles, imageIndex);
+                              }}
                               onError={(e) => {
                                 console.error('Image load error:', {
                                   src: e.target.src,
@@ -4263,6 +4295,14 @@ formData.append('files', file);
         )}
         
         <PointsModals />
+        
+        {/* Просмотрщик изображений */}
+        <ImageViewer 
+          images={imageViewerImages}
+          currentIndex={imageViewerIndex}
+          isOpen={imageViewerOpen}
+          onClose={closeImageViewer}
+        />
         
         {/* Отладочный компонент для токенов */}
         {process.env.NODE_ENV === 'development' && <TokenDebug />}

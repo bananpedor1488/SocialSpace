@@ -1,0 +1,283 @@
+/* PostImages.css - Стили для изображений в постах */
+
+/* Стили для изображений в постах */
+.post-image {
+  max-width: 100%;
+  max-height: 400px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  object-fit: cover;
+}
+
+.post-image:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  filter: brightness(1.05);
+}
+
+.post-image:active {
+  transform: scale(0.98);
+}
+
+.image-attachment {
+  position: relative;
+  display: inline-block;
+  margin: 8px 0;
+}
+
+.image-attachment::after {
+  content: '🔍';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 4px 6px;
+  border-radius: 6px;
+  font-size: 12px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.image-attachment:hover::after {
+  opacity: 1;
+}
+
+.post-files {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.file-attachment {
+  display: flex;
+  align-items: center;
+}
+
+/* Стили для видео в постах */
+.post-video {
+  max-width: 100%;
+  max-height: 400px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.video-attachment {
+  margin: 8px 0;
+}
+
+/* Стили для файловых ссылок */
+.file-attachment-link {
+  margin: 8px 0;
+}
+
+.file-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #fff;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.file-link:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.file-name {
+  font-weight: 500;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-size {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+}
+
+/* Fallback для сломанных изображений */
+.image-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  border: 2px dashed rgba(255, 255, 255, 0.3);
+}
+
+.broken-image {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+}
+
+.broken-image p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.broken-image .file-name {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Адаптивность для изображений */
+@media (max-width: 768px) {
+  .post-image {
+    max-height: 300px;
+  }
+  
+  .post-video {
+    max-height: 300px;
+  }
+  
+  .image-attachment::after {
+    font-size: 14px;
+    padding: 6px 8px;
+  }
+  
+  .file-link {
+    padding: 10px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .post-image {
+    max-height: 250px;
+  }
+  
+  .post-video {
+    max-height: 250px;
+  }
+  
+  .file-link {
+    padding: 8px 10px;
+    font-size: 14px;
+  }
+  
+  .file-size {
+    font-size: 11px;
+  }
+}
+
+/* Анимации для плавного появления файлов */
+.post-files {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Эффект при загрузке изображений */
+.post-image {
+  animation: imageLoad 0.4s ease-out;
+}
+
+@keyframes imageLoad {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Стили для множественных изображений */
+.post-files.multiple-images {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 8px;
+}
+
+.post-files.multiple-images .image-attachment {
+  margin: 0;
+}
+
+.post-files.multiple-images .post-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+/* Стили для галереи изображений */
+.image-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.image-gallery .image-attachment {
+  margin: 0;
+}
+
+.image-gallery .post-image {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* Индикатор количества изображений */
+.image-count-indicator {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  backdrop-filter: blur(10px);
+}
+
+/* Стили для превью изображений */
+.image-preview {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.image-preview::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.image-preview:hover::before {
+  opacity: 1;
+}
