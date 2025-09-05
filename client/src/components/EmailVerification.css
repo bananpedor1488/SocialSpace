@@ -394,6 +394,34 @@
 .email-verification-container input.code-input {
   background: transparent !important;
   box-shadow: none !important;
+  border: 2px solid rgba(139, 92, 246, 0.35) !important;
+  outline: none !important;
+}
+
+/* Убираем все возможные рамки от браузера */
+.email-verification-container input {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.email-verification-container input.code-input {
+  border: 2px solid rgba(139, 92, 246, 0.35) !important;
+}
+
+/* Убираем все возможные рамки от всех элементов */
+.email-verification-container * {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.email-verification-container .code-input {
+  border: 2px solid rgba(139, 92, 246, 0.35) !important;
+}
+
+.email-verification-container .verification-box {
+  border: 1px solid rgba(139, 92, 246, 0.2) !important;
 }
 
 .submit-btn {
