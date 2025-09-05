@@ -52,6 +52,27 @@ html, body {
   overflow-wrap: break-word !important;
 }
 
+/* Дополнительная защита от горизонтальной прокрутки */
+.post {
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+  word-wrap: break-word !important;
+}
+
+.post-content {
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+}
+
+/* Исправляем изображения и видео в постах */
+.post img,
+.post video {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
 /* ==========================
    GLOBAL MOBILE FIXES - ПРЕДОТВРАЩЕНИЕ НАЛОЖЕНИЯ ПОД ХЕДЕР И НИЖНЮЮ ПАНЕЛЬ
    ========================== */
