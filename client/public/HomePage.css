@@ -37,6 +37,47 @@ html, body {
   min-width: 200px !important;
 }
 
+/* Исключаем модальные окна и плашки из глобальных ограничений */
+.home-container .modal,
+.home-container .modal-content,
+.home-container .wallet-modal,
+.home-container .transfer-modal,
+.home-container .history-modal,
+.home-container .points-modal,
+.home-container .popup,
+.home-container .overlay,
+.home-container .dialog,
+.home-container .card,
+.home-container .panel,
+.home-container .box,
+.home-container .wallet-container,
+.home-container .transfer-container,
+.home-container .history-container,
+.home-container .points-container,
+.home-container .balance-card,
+.home-container .transfer-card,
+.home-container .history-card,
+.home-container .points-card,
+.home-container .modal-dialog,
+.home-container .modal-body,
+.home-container .modal-header,
+.home-container .modal-footer {
+  max-width: none !important;
+  width: auto !important;
+}
+
+/* Дополнительные исключения для всех возможных модальных элементов */
+.home-container [class*="modal"],
+.home-container [class*="popup"],
+.home-container [class*="overlay"],
+.home-container [class*="dialog"],
+.home-container [class*="card"],
+.home-container [class*="panel"],
+.home-container [class*="box"] {
+  max-width: none !important;
+  width: auto !important;
+}
+
 /* Исправляем возможные проблемы с контентом */
 .home-container .post,
 .home-container .post-content,
