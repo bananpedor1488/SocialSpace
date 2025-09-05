@@ -28,13 +28,6 @@
   gap: 0 !important;
 }
 
-/* Убираем ВСЕ возможные рамки и стили */
-.auth-container * {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
-
 .auth-container .form-input {
   border: 2px solid rgba(139, 92, 246, 0.3) !important;
   background: rgba(255, 255, 255, 0.08) !important;
