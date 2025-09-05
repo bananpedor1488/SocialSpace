@@ -24,6 +24,19 @@ html, body {
   box-sizing: border-box !important;
 }
 
+/* Исключаем поиск из глобальных ограничений */
+.home-container .header-search,
+.home-container .header-search-input,
+.home-container .mobile-search-container,
+.home-container .mobile-search-input {
+  max-width: none !important;
+}
+
+.home-container .header-search {
+  max-width: 400px !important;
+  min-width: 200px !important;
+}
+
 /* Исправляем возможные проблемы с контентом */
 .home-container .post,
 .home-container .post-content,
