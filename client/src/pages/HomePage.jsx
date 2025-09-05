@@ -2713,14 +2713,31 @@ formData.append('files', file);
                       <div className="selected-files">
                         {selectedFiles.map((file, index) => (
                           <div key={index} className="file-item">
-                            <div className="file-info">
+                            <div className="file-preview">
                               {file.type.startsWith('image/') ? (
-                                <Image size={16} />
+                                <img 
+                                  src={URL.createObjectURL(file)} 
+                                  alt={file.name}
+                                  className="file-thumbnail"
+                                />
                               ) : file.type.startsWith('video/') ? (
-                                <Video size={16} />
+                                <div className="video-thumbnail">
+                                  <video 
+                                    src={URL.createObjectURL(file)}
+                                    className="file-thumbnail"
+                                    muted
+                                  />
+                                  <div className="video-play-icon">
+                                    <Play size={16} />
+                                  </div>
+                                </div>
                               ) : (
-                                <File size={16} />
+                                <div className="file-icon-thumbnail">
+                                  <File size={24} />
+                                </div>
                               )}
+                            </div>
+                            <div className="file-details">
                               <span className="file-name">{file.name}</span>
                               <span className="file-size">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
                             </div>

@@ -1,12 +1,6 @@
-* {
-  margin: 0;
-  padding: 0;
+/* Убираем глобальные стили которые могут конфликтовать */
+.email-verification-container * {
   box-sizing: border-box;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  overflow: hidden;
 }
 
 .email-verification-container {
@@ -17,6 +11,7 @@ body {
   min-height: 100vh;
   background: linear-gradient(135deg, #1e1e2e 0%, #2a2a40 25%, #3c3c5c 50%, #2a2a40 75%, #1e1e2e 100%);
   overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
 
 /* частицы на фоне */
@@ -162,7 +157,7 @@ body {
 
 .verification-wrapper {
   position: relative;
-  z-index: 1;
+  z-index: 10;
   animation: slideUp 1s ease-out;
 }
 
@@ -188,6 +183,8 @@ body {
     0 20px 40px rgba(0, 0, 0, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
   transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  position: relative;
+  z-index: 1;
 }
 
 .verification-wrapper::before {
@@ -200,6 +197,7 @@ body {
   background: radial-gradient(circle at center, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
   animation: rotate 20s linear infinite;
   z-index: -1;
+  pointer-events: none;
 }
 
 @keyframes rotate {
@@ -730,7 +728,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 9999;
   animation: fadeIn 0.3s ease-out;
 }
 
