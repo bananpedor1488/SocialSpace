@@ -50,6 +50,12 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   overflow: hidden;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+  justify-content: unset !important;
+  align-items: unset !important;
+  min-height: 100vh !important;
 }
 
 .auth-container {
