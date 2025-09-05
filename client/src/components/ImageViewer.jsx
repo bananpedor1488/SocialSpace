@@ -165,6 +165,7 @@ const ImageViewer = ({
   };
 
   const handleBackdropClick = (e) => {
+    // Закрываем только если клик по самому overlay, а не по его дочерним элементам
     if (e.target === e.currentTarget) {
       onClose();
     }
@@ -326,29 +327,6 @@ const ImageViewer = ({
           </div>
         )}
 
-        {/* Подсказки */}
-        <div className="image-viewer-hints">
-          <div className="hint-group">
-            <span>Колесико мыши</span>
-            <span>Зум</span>
-          </div>
-          <div className="hint-group">
-            <span>Перетаскивание</span>
-            <span>Панорамирование</span>
-          </div>
-          <div className="hint-group">
-            <span>R</span>
-            <span>Поворот</span>
-          </div>
-          <div className="hint-group">
-            <span>0</span>
-            <span>Сброс</span>
-          </div>
-          <div className="hint-group">
-            <span>← →</span>
-            <span>Навигация</span>
-          </div>
-        </div>
       </div>
     </div>
   );
