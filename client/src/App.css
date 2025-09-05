@@ -9,6 +9,37 @@ body {
   justify-content: center;
   align-items: center;
   color: #fff;
+  overflow-x: hidden;
+}
+
+/* Убираем горизонтальную прокрутку */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+#root {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Жёстко убираем горизонтальную прокрутку у всех элементов */
+* {
+  max-width: 100vw;
+  box-sizing: border-box;
+}
+
+/* Дополнительная защита от переполнения */
+.app-container,
+.main-container,
+.home-container {
+  max-width: 100vw !important;
+  overflow-x: hidden !important;
 }
 
 form {
