@@ -173,8 +173,8 @@
 }
 
 .verification-box {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: none;
   border-radius: 24px;
   padding: 40px;
   width: 420px;
@@ -339,17 +339,16 @@
 .code-input {
   width: 50px;
   height: 60px;
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(139, 92, 246, 0.35);
   border-radius: 16px;
   text-align: center;
   font-size: 24px;
   font-weight: 700;
   font-family: inherit;
   color: white;
-  background: rgba(255, 255, 255, 0.08);
+  background: transparent;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
-  backdrop-filter: blur(10px);
 }
 
 .code-input::placeholder {
@@ -358,16 +357,16 @@
 
 .code-input:focus {
   border-color: #8b5cf6;
-  background: rgba(255, 255, 255, 0.12);
+  background: transparent;
   transform: translateY(-2px);
   box-shadow: 
-    0 8px 32px rgba(139, 92, 246, 0.2),
-    0 0 0 4px rgba(139, 92, 246, 0.1);
+    0 8px 32px rgba(139, 92, 246, 0.25),
+    0 0 0 4px rgba(139, 92, 246, 0.15);
 }
 
 .code-input:not(:placeholder-shown) {
   border-color: #8b5cf6;
-  background: rgba(255, 255, 255, 0.12);
+  background: transparent;
 }
 
 .submit-btn {
