@@ -64,6 +64,26 @@ html, body {
 .home-container .modal-footer {
   max-width: none !important;
   width: auto !important;
+  min-width: 300px !important;
+  max-width: 500px !important;
+}
+
+/* Окно перевода баллов поверх всего контента */
+.home-container .transfer-modal {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 10000 !important;
+  background: rgba(30, 41, 59, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  border-radius: 20px !important;
+  padding: 30px !important;
+  border: 1px solid rgba(71, 85, 105, 0.4) !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
+  min-width: 400px !important;
+  max-width: 500px !important;
+  width: 90vw !important;
 }
 
 /* Дополнительные исключения для всех возможных модальных элементов */
@@ -75,6 +95,18 @@ html, body {
 .home-container [class*="panel"],
 .home-container [class*="box"] {
   max-width: none !important;
+  width: auto !important;
+  min-width: 300px !important;
+  max-width: 500px !important;
+}
+
+/* Общие стили для всех модальных окон */
+.home-container .modal,
+.home-container .popup,
+.home-container .overlay,
+.home-container .dialog {
+  min-width: 350px !important;
+  max-width: 600px !important;
   width: auto !important;
 }
 
