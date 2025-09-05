@@ -178,7 +178,7 @@
   border-radius: 24px;
   padding: 40px;
   width: 420px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.2);
   box-shadow: 
     0 20px 40px rgba(0, 0, 0, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -489,14 +489,14 @@
 .resend-btn {
   background: rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.2);
 }
 
 .resend-btn:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.12);
   color: white;
   transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(139, 92, 246, 0.1);
 }
 
 .resend-btn:disabled {
@@ -523,14 +523,14 @@
 .back-btn {
   background: rgba(255, 255, 255, 0.05);
   color: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.2);
 }
 
 .back-btn:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 0.9);
   transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(139, 92, 246, 0.1);
 }
 
 .back-btn:disabled {
@@ -544,7 +544,7 @@
   padding: 20px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.2);
   animation: slideDown 0.3s ease-out;
 }
 
@@ -576,7 +576,7 @@
   font-size: 16px;
   font-family: inherit;
   background: rgba(255, 255, 255, 0.08);
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(139, 92, 246, 0.2);
   border-radius: 16px;
   color: white;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -641,14 +641,14 @@
 .cancel-btn {
   background: rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.2);
 }
 
 .cancel-btn:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.12);
   color: white;
   transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(139, 92, 246, 0.1);
 }
 
 .cancel-btn:disabled {
