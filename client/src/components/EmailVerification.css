@@ -314,6 +314,13 @@
 
 .verification-form {
   margin-bottom: 25px;
+  /* Гасим глобальные стили form из App.css */
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  width: auto !important;
+  display: block !important;
 }
 
 .code-input-group {
