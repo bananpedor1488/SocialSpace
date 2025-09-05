@@ -415,15 +415,14 @@ body {
   stroke-width: 2;
   transition: all 0.3s ease;
 }
-.form-input:-webkit-autofill {
+.form-input:-webkit-autofill,
+.form-input:-webkit-autofill:hover,
+.form-input:-webkit-autofill:focus {
   box-shadow: 0 0 0px 1000px rgba(255, 255, 255, 0.08) inset !important;
   -webkit-text-fill-color: white !important;
   transition: background-color 5000s ease-in-out 0s;
   caret-color: white;
-}
-
-.form-input:-webkit-autofill:focus {
-  box-shadow: 0 0 0px 1000px rgba(255, 255, 255, 0.12) inset !important;
+  border-color: #8b5cf6 !important;
 }
 
 .form-input:-webkit-autofill::first-line {
@@ -437,7 +436,7 @@ body {
   font-size: 16px;
   font-family: inherit;
   background: rgba(255, 255, 255, 0.08);
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(139, 92, 246, 0.3);
   border-radius: 16px;
   color: white;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
