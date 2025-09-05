@@ -349,6 +349,8 @@
   background: transparent;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
+  appearance: none;
+  -webkit-appearance: none;
 }
 
 .code-input::placeholder {
@@ -367,6 +369,24 @@
 .code-input:not(:placeholder-shown) {
   border-color: #8b5cf6;
   background: transparent;
+}
+
+/* Убираем белую заливку автозаполнения/браузера */
+.code-input:-webkit-autofill,
+.code-input:-webkit-autofill:hover,
+.code-input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
+  box-shadow: 0 0 0px 1000px transparent inset !important;
+  background: transparent !important;
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff !important;
+  border-color: #8b5cf6;
+}
+
+/* На всякий случай гасим любые глобальные стили input внутри компонента */
+.email-verification-container input.code-input {
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 .submit-btn {
