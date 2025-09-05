@@ -208,11 +208,52 @@
   }
 }
 
-/* Стили для множественных изображений */
-.post-files.multiple-images {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+/* Стили для кнопки публикации */
+.publish-btn {
+  background: #00d8ff;
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
   gap: 8px;
+  font-size: 14px;
+}
+
+.publish-btn:hover:not(:disabled) {
+  background: #00b5d1;
+  transform: translateY(-1px);
+}
+
+.publish-btn:disabled {
+  background: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.5);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.publish-btn.posting {
+  background: rgba(0, 216, 255, 0.7);
+  color: #000;
+  cursor: not-allowed;
+}
+
+.loading-spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-top: 2px solid #000;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .post-files.multiple-images .image-attachment {

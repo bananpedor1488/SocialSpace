@@ -21,7 +21,6 @@ import PointsModals from '../components/PointsModals';
 import PhoneVerification from '../components/PhoneVerification';
 import TokenDebug from '../components/TokenDebug';
 import ImageViewer from '../components/ImageViewer';
-import VideoPlayer from '../components/VideoPlayer';
 import { usePoints } from '../context/PointsContext';
 import '../styles/PostImages.css';
 
@@ -133,9 +132,8 @@ const HomePage = () => {
   const [imageViewerImages, setImageViewerImages] = useState([]);
   const [imageViewerIndex, setImageViewerIndex] = useState(0);
   
-  // Состояние для видеоплеера
-  const [videoPlayerOpen, setVideoPlayerOpen] = useState(false);
-  const [currentVideo, setCurrentVideo] = useState(null);
+  // Состояние для создания поста
+  const [isPosting, setIsPosting] = useState(false);
 
   const updateMobileChatOffsets = () => {
     try {
@@ -378,18 +376,6 @@ const HomePage = () => {
     setImageViewerOpen(false);
     setImageViewerImages([]);
     setImageViewerIndex(0);
-  };
-
-  // Функция для открытия видеоплеера
-  const openVideoPlayer = (videoFile) => {
-    setCurrentVideo(videoFile);
-    setVideoPlayerOpen(true);
-  };
-
-  // Функция для закрытия видеоплеера
-  const closeVideoPlayer = () => {
-    setVideoPlayerOpen(false);
-    setCurrentVideo(null);
   };
 
   // Socket.IO подключение и обработчики
@@ -1738,11 +1724,18 @@ const HomePage = () => {
   };
 
     const handleCreatePost = async () => {
+    // Защита от множественных отправок
+    if (isPosting) {
+      return;
+    }
+    
     if (!postText.trim() && selectedFiles.length === 0) {
       alert('Добавьте текст или файлы');
       return;
     }
 
+    setIsPosting(true);
+    
     try {
       const formData = new FormData();
       formData.append('content', postText);
@@ -1784,6 +1777,8 @@ formData.append('files', file);
       }
       
       alert(errorMessage);
+    } finally {
+      setIsPosting(false);
     }
   };
 
@@ -2089,12 +2084,13 @@ formData.append('files', file);
                         </div>
                       ) : file.mimetype.startsWith('video/') ? (
                       <div className="video-attachment">
-                        <VideoPlayer 
-                          src={file.url}
-                          title={file.originalName}
+                        <video 
+                          controls 
                           className="post-video"
-                          onClick={() => openVideoPlayer(file)}
-                        />
+                          src={file.url}
+                        >
+                          Ваш браузер не поддерживает видео.
+                        </video>
                       </div>
                     ) : (
                       <div className="file-attachment-link">
@@ -2780,10 +2776,19 @@ formData.append('files', file);
                       </div>
                       <button 
                         onClick={handleCreatePost} 
-                        disabled={(!postText.trim() && selectedFiles.length === 0) || postText.length > 280}
-                        className="publish-btn"
+                        disabled={(!postText.trim() && selectedFiles.length === 0) || postText.length > 280 || isPosting}
+                        className={`publish-btn ${isPosting ? 'posting' : ''}`}
                       >
-                        <Plus size={18} /> Опубликовать
+                        {isPosting ? (
+                          <>
+                            <div className="loading-spinner-small"></div>
+                            Публикация...
+                          </>
+                        ) : (
+                          <>
+                            <Plus size={18} /> Опубликовать
+                          </>
+                        )}
                       </button>
                     </div>
                   </div>
@@ -4318,16 +4323,6 @@ formData.append('files', file);
           isOpen={imageViewerOpen}
           onClose={closeImageViewer}
         />
-        
-        {/* Полноэкранный видеоплеер */}
-        {videoPlayerOpen && currentVideo && (
-          <VideoPlayer 
-            src={currentVideo.url}
-            title={currentVideo.originalName}
-            isFullscreen={true}
-            onClose={closeVideoPlayer}
-          />
-        )}
         
         {/* Отладочный компонент для токенов */}
         {process.env.NODE_ENV === 'development' && <TokenDebug />}
