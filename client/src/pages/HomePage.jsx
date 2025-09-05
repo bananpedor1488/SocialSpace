@@ -23,7 +23,6 @@ import TokenDebug from '../components/TokenDebug';
 import ImageViewer from '../components/ImageViewer';
 import { usePoints } from '../context/PointsContext';
 import '../styles/PostImages.css';
-import '../styles/PostStyles.css';
 
 import useOnlineStatus from '../hooks/useOnlineStatus';
 import { 
