@@ -73,8 +73,8 @@ html, body {
   }
 
   .home-container .header-search {
-    max-width: 400px !important;
-    min-width: 200px !important;
+    max-width: 600px !important;
+    min-width: 300px !important;
   }
 
   /* Исключаем модальные окна из ограничений на мобильных */
@@ -1269,14 +1269,14 @@ html, body {
   .header-search {
     position: relative;
     flex: 0 0 auto;
-    max-width: 400px;
-    min-width: 200px;
+    max-width: 600px;
+    min-width: 300px;
     z-index: 10001;
   }
   
   .header-search-input {
     width: 100%;
-    max-width: 400px;
+    max-width: 600px;
     background: rgba(51, 65, 85, 0.7);
     border: 1px solid rgba(71, 85, 105, 0.5);
     border-radius: 25px;
