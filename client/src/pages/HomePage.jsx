@@ -1824,15 +1824,26 @@ formData.append('files', file);
       formData.append('postType', 'giveaway');
       formData.append('giveawayData', JSON.stringify({
         prize: giveawayData.prize,
+        prizeType: giveawayData.prizeType || 'text',
+        prizeAmount: giveawayData.prizeAmount || 0,
         description: giveawayData.description,
         endDate: giveawayData.endDate,
         pointsRequired: giveawayData.pointsRequired,
-        participants: []
+        participants: [],
+        isCompleted: false
       }));
 
       await axios.post('https://server-pqqy.onrender.com/api/posts', formData);
       
-      setGiveawayData({ prize: '', description: '', endDate: '', pointsRequired: 0, participants: [] });
+      setGiveawayData({ 
+        prize: '', 
+        prizeType: 'text',
+        prizeAmount: 0,
+        description: '', 
+        endDate: '', 
+        pointsRequired: 0, 
+        participants: [] 
+      });
       setPostType('text');
     } catch (err) {
       console.error('Ошибка создания розыгрыша:', err);
@@ -1844,9 +1855,27 @@ formData.append('files', file);
 
   const handleJoinGiveaway = async (postId) => {
     try {
-      await axios.post(`https://server-pqqy.onrender.com/api/posts/${postId}/join-giveaway`);
+      const response = await axios.post(`https://server-pqqy.onrender.com/api/posts/${postId}/join-giveaway`);
+      
+      // Обновляем состояние поста
+      setPosts(prevPosts => 
+        prevPosts.map(post => 
+          post._id === postId 
+            ? { 
+                ...post, 
+                giveawayData: { 
+                  ...post.giveawayData, 
+                  participants: [...(post.giveawayData.participants || []), user._id || user.id]
+                }
+              }
+            : post
+        )
+      );
+      
+      alert('Вы успешно присоединились к розыгрышу!');
     } catch (err) {
       console.error('Ошибка участия в розыгрыше:', err);
+      alert(err.response?.data?.message || 'Ошибка при участии в розыгрыше');
     }
   };
 
@@ -1884,11 +1913,29 @@ formData.append('files', file);
 
   const handleVotePoll = async (postId, optionIndex) => {
     try {
-      await axios.post(`https://server-pqqy.onrender.com/api/posts/${postId}/vote-poll`, {
+      const response = await axios.post(`https://server-pqqy.onrender.com/api/posts/${postId}/vote-poll`, {
         optionIndex
       });
+      
+      // Обновляем состояние поста
+      setPosts(prevPosts => 
+        prevPosts.map(post => 
+          post._id === postId 
+            ? { 
+                ...post, 
+                pollData: { 
+                  ...post.pollData, 
+                  votes: response.data.votes || post.pollData.votes
+                }
+              }
+            : post
+        )
+      );
+      
+      alert('Ваш голос учтен!');
     } catch (err) {
       console.error('Ошибка голосования:', err);
+      alert(err.response?.data?.message || 'Ошибка при голосовании');
     }
   };
 
@@ -1929,6 +1976,22 @@ formData.append('files', file);
       const response = await axios.post(`https://server-pqqy.onrender.com/api/posts/${postId}/answer-quiz`, {
         answerIndex
       });
+      
+      // Обновляем состояние поста
+      setPosts(prevPosts => 
+        prevPosts.map(post => 
+          post._id === postId 
+            ? { 
+                ...post, 
+                quizData: { 
+                  ...post.quizData, 
+                  attempts: response.data.attempts || post.quizData.attempts
+                }
+              }
+            : post
+        )
+      );
+      
       return response.data; // { correct: boolean, explanation: string }
     } catch (err) {
       console.error('Ошибка ответа на квиз:', err);
@@ -2328,28 +2391,39 @@ formData.append('files', file);
               
               <div className="giveaway-actions">
                 {!post.giveawayData.isCompleted ? (
-                  <button 
-                    className="join-giveaway-btn"
-                    onClick={() => handleJoinGiveaway(post._id)}
-                  >
-                    <Gift size={16} />
-                    Участвовать в розыгрыше
-                  </button>
+                  <>
+                    <button 
+                      className="join-giveaway-btn"
+                      onClick={() => handleJoinGiveaway(post._id)}
+                      disabled={post.giveawayData.participants?.includes(user._id || user.id)}
+                    >
+                      <Gift size={16} />
+                      {post.giveawayData.participants?.includes(user._id || user.id) 
+                        ? 'Вы участвуете' 
+                        : 'Участвовать в розыгрыше'
+                      }
+                    </button>
+                    
+                    {post.userId === (user._id || user.id) && (
+                      <button 
+                        className="view-participants-btn"
+                        onClick={() => {/* Показать участников */}}
+                      >
+                        <Users size={16} />
+                        Участники ({post.giveawayData.participants?.length || 0})
+                      </button>
+                    )}
+                  </>
                 ) : (
                   <div className="giveaway-completed">
                     <Check size={16} />
                     <span>Розыгрыш завершен</span>
+                    {post.giveawayData.winner && (
+                      <span className="winner-info">
+                        Победитель: @{post.giveawayData.winner}
+                      </span>
+                    )}
                   </div>
-                )}
-                
-                {post.userId === (user._id || user.id) && (
-                  <button 
-                    className="view-participants-btn"
-                    onClick={() => {/* Показать участников */}}
-                  >
-                    <Users size={16} />
-                    Участники ({post.giveawayData.participants?.length || 0})
-                  </button>
                 )}
               </div>
             </div>
@@ -2364,6 +2438,7 @@ formData.append('files', file);
                     <button 
                       className={`poll-option-btn ${post.pollData.votes?.[user._id || user.id]?.includes(index) ? 'voted' : ''}`}
                       onClick={() => handleVotePoll(post._id, index)}
+                      disabled={post.pollData.isActive === false}
                     >
                       {option}
                     </button>
@@ -2386,6 +2461,11 @@ formData.append('files', file);
               <p className="poll-total-votes">
                 Всего голосов: {Object.values(post.pollData.votes || {}).flat().length}
               </p>
+              {post.pollData.endDate && (
+                <p className="poll-end-date">
+                  Окончание: {new Date(post.pollData.endDate).toLocaleString('ru-RU')}
+                </p>
+              )}
             </div>
           )}
           
@@ -2398,6 +2478,7 @@ formData.append('files', file);
                     key={index}
                     className={`quiz-option-btn ${post.quizData.attempts?.[user._id || user.id] ? 'attempted' : ''}`}
                     onClick={async () => {
+                      if (post.quizData.attempts?.[user._id || user.id]) return;
                       const result = await handleAnswerQuiz(post._id, index);
                       if (result.correct) {
                         alert('Правильно! ' + result.explanation);
@@ -2405,15 +2486,21 @@ formData.append('files', file);
                         alert('Неправильно! ' + result.explanation);
                       }
                     }}
+                    disabled={post.quizData.attempts?.[user._id || user.id] !== undefined}
                   >
                     {option}
                   </button>
                 ))}
               </div>
-              {post.quizData.attempts?.[user._id || user.id] && (
-                <p className="quiz-result">
-                  Ваш ответ: {post.quizData.options[post.quizData.attempts[user._id || user.id]]}
-                </p>
+              {post.quizData.attempts?.[user._id || user.id] !== undefined && (
+                <div className="quiz-result">
+                  <p className="quiz-answer">
+                    Ваш ответ: {post.quizData.options[post.quizData.attempts[user._id || user.id]]}
+                  </p>
+                  <p className="quiz-explanation">
+                    {post.quizData.explanation}
+                  </p>
+                </div>
               )}
             </div>
           )}
@@ -3018,31 +3105,34 @@ formData.append('files', file);
                     </div>
                   </div>
                   <div className="create-post-body">
-                    <div 
-                      className={`drag-drop-zone ${isDragOver ? 'drag-over' : ''}`}
-                      onDragOver={handleDragOver}
-                      onDragLeave={handleDragLeave}
-                      onDrop={handleDrop}
-                    >
-                      <textarea
-                        value={postText}
-                        onChange={(e) => setPostText(e.target.value)}
-                        onPaste={handlePaste}
-                        placeholder="Поделитесь своими мыслями... или перетащите файлы сюда"
-                        rows="3"
-                        className="create-post-input"
-                      />
-                      
-                      {/* Drag & Drop подсказка */}
-                      {isDragOver && (
-                        <div className="drag-overlay">
-                          <div className="drag-message">
-                            <Paperclip size={32} />
-                            <p>Отпустите файлы здесь</p>
+                    {/* Показываем текстовый инпут только для текстовых постов */}
+                    {postType === 'text' && (
+                      <div 
+                        className={`drag-drop-zone ${isDragOver ? 'drag-over' : ''}`}
+                        onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
+                        onDrop={handleDrop}
+                      >
+                        <textarea
+                          value={postText}
+                          onChange={(e) => setPostText(e.target.value)}
+                          onPaste={handlePaste}
+                          placeholder="Поделитесь своими мыслями... или перетащите файлы сюда"
+                          rows="3"
+                          className="create-post-input"
+                        />
+                        
+                        {/* Drag & Drop подсказка */}
+                        {isDragOver && (
+                          <div className="drag-overlay">
+                            <div className="drag-message">
+                              <Paperclip size={32} />
+                              <p>Отпустите файлы здесь</p>
+                            </div>
                           </div>
-                        </div>
-                      )}
-                    </div>
+                        )}
+                      </div>
+                    )}
                     
                     {/* Условные формы для разных типов постов */}
                     {postType === 'giveaway' && (
@@ -3225,6 +3315,13 @@ formData.append('files', file);
                             </label>
                           </div>
                         ))}
+                        <button
+                          type="button"
+                          onClick={() => setQuizData(prev => ({ ...prev, options: [...prev.options, ''] }))}
+                          className="add-option-btn"
+                        >
+                          + Добавить вариант
+                        </button>
                         <textarea
                           placeholder="Объяснение правильного ответа (необязательно)"
                           value={quizData.explanation}
