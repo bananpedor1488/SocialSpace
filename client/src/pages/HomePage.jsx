@@ -477,7 +477,12 @@ const HomePage = () => {
           originalPost: newPost.originalPost || null,
           repostedBy: newPost.repostedBy || null,
           // Добавляем полный объект автора для совместимости с renderPosts
-          author: newPost.author
+          author: newPost.author,
+          // Добавляем поля для интерактивных элементов
+          postType: newPost.postType || 'text',
+          giveawayData: newPost.giveawayData || null,
+          pollData: newPost.pollData || null,
+          quizData: newPost.quizData || null
         };
 
         setPosts(prev => [formattedPost, ...prev]);
@@ -510,11 +515,21 @@ const HomePage = () => {
             author: repostData.originalPost?.author,
             content: repostData.originalPost?.content,
             files: repostData.originalPost?.files || [], // Добавляем файлы в originalPost
-            createdAt: repostData.originalPost?.createdAt
+            createdAt: repostData.originalPost?.createdAt,
+            // Добавляем поля для интерактивных элементов в originalPost
+            postType: repostData.originalPost?.postType || 'text',
+            giveawayData: repostData.originalPost?.giveawayData || null,
+            pollData: repostData.originalPost?.pollData || null,
+            quizData: repostData.originalPost?.quizData || null
           },
           repostedBy: repostData.repostedBy,
           // Добавляем полный объект автора для совместимости с renderPosts
-          author: repostData.repostedBy
+          author: repostData.repostedBy,
+          // Добавляем поля для интерактивных элементов
+          postType: repostData.originalPost?.postType || 'text',
+          giveawayData: repostData.originalPost?.giveawayData || null,
+          pollData: repostData.originalPost?.pollData || null,
+          quizData: repostData.originalPost?.quizData || null
         };
 
         setPosts(prev => [formattedRepost, ...prev]);
@@ -1572,7 +1587,12 @@ const HomePage = () => {
             ...post.originalPost,
             files: post.originalPost.files || [] // Добавляем файлы в originalPost
           } : null,
-          repostedBy: post.repostedBy || null
+          repostedBy: post.repostedBy || null,
+          // Добавляем поля для интерактивных элементов
+          postType: post.postType || 'text',
+          giveawayData: post.giveawayData || null,
+          pollData: post.pollData || null,
+          quizData: post.quizData || null
         };
       });
 
@@ -2081,7 +2101,12 @@ formData.append('files', file);
         }),
         isRepost: post.isRepost || false,
         originalPost: post.originalPost || null,
-        repostedBy: post.repostedBy || null
+        repostedBy: post.repostedBy || null,
+        // Добавляем поля для интерактивных элементов
+        postType: post.postType || 'text',
+        giveawayData: post.giveawayData || null,
+        pollData: post.pollData || null,
+        quizData: post.quizData || null
       }));
       
       setProfilePosts(formattedProfilePosts);
