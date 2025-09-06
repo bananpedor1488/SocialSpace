@@ -3596,194 +3596,6 @@ formData.append('files', file);
               </div>
             )}
 
-            {/* Wallet Transfer Modal */}
-            {showWalletTransfer && (
-              <div className="modal-overlay" onClick={() => {
-                setShowWalletTransfer(false);
-                setTransferSuggestions([]);
-                setShowTransferSuggestions(false);
-                setTransferSuppressSearch(false);
-                setFoundUser(null);
-                setFoundUserStatus(null);
-              }}>
-                <div className="modal-content transfer-modal" onClick={(e) => e.stopPropagation()}>
-                  <div className="modal-header">
-                    <h3>Перевод баллов</h3>
-                    <button onClick={() => {
-                      setShowWalletTransfer(false);
-                      setTransferSuggestions([]);
-                      setShowTransferSuggestions(false);
-                      setTransferSuppressSearch(false);
-                      setFoundUser(null);
-                      setFoundUserStatus(null);
-                    }} className="close-btn">
-                      <X size={16} />
-                    </button>
-                  </div>
-                  
-                  <form onSubmit={handleWalletTransfer}>
-                    <div className="form-group transfer-search-wrapper">
-                      <label>Получатель (username):</label>
-                      <input
-                        type="text"
-                        value={transferData.recipientUsername}
-                        onChange={(e) => {
-                          setTransferData(prev => ({ ...prev, recipientUsername: e.target.value }));
-                          // Сбрасываем найденного пользователя при изменении
-                          if (!e.target.value.trim()) {
-                            setFoundUser(null);
-                            setFoundUserStatus(null);
-                          }
-                        }}
-                        placeholder="@username"
-                        className="form-input"
-                        onFocus={() => { if (transferSuggestions.length) setShowTransferSuggestions(true); }}
-                      />
-                      {showTransferSuggestions && transferSuggestions.length > 0 && (
-                        <div className="transfer-search-results" onMouseDown={(e) => e.preventDefault()}>
-                          {transferSuggestions.slice(0, 5).map(user => (
-                            <div
-                              key={user._id}
-                              className="transfer-search-result"
-                              onClick={() => {
-                                setTransferSuppressSearch(true);
-                                setTransferData(prev => ({ ...prev, recipientUsername: `@${user.username}` }));
-                                setShowTransferSuggestions(false);
-                                setTransferSuggestions([]);
-                                // Увеличиваем задержку, чтобы подсказки не появлялись снова
-                                setTimeout(() => setTransferSuppressSearch(false), 2000);
-                              }}
-                            >
-                              <Avatar 
-                                src={user.avatar || null}
-                                alt={user.displayName || user.username}
-                                size="small"
-                                className="search-result-avatar"
-                              />
-                              <div className="search-result-info">
-                                <span className="header-search-username">@{user.username}</span>
-                                {user.displayName && (
-                                  <span className="header-search-name">
-                                    {user.displayName}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    
-                    {/* Плашка с информацией о найденном пользователе */}
-                    {foundUser && (
-                      <div className="found-user-card">
-                        <div className="found-user-header">
-                          <div className="found-user-check">
-                            <svg viewBox="0 0 24 24" fill="currentColor">
-                              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-                            </svg>
-                          </div>
-                          <span className="found-user-title">Пользователь найден</span>
-                        </div>
-                        <div className="found-user-content">
-                          <div className="found-user-avatar">
-                            <Avatar 
-                              src={foundUser.avatar || null}
-                              alt={foundUser.displayName || foundUser.username}
-                              size="medium"
-                            />
-                            {foundUserStatus && (
-                              <div className="found-user-status">
-                                <OnlineStatus
-                                  userId={foundUser._id}
-                                  isOnline={foundUserStatus.isOnline}
-                                  lastSeen={foundUserStatus.lastSeen}
-                                  size="small"
-                                />
-                              </div>
-                            )}
-                          </div>
-                          <div className="found-user-info">
-                            <div className="found-user-name">
-                              {foundUser.displayName || foundUser.username}
-                              {foundUser.premium && (
-                                <span className="found-user-premium">
-                                  <svg viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
-                                  </svg>
-                                </span>
-                              )}
-                            </div>
-                            <div className="found-user-username">@{foundUser.username}</div>
-                            {foundUserStatus && !foundUserStatus.isOnline && foundUserStatus.lastSeen && (
-                              <div className="found-user-last-seen">
-                                Был в сети {new Date(foundUserStatus.lastSeen).toLocaleDateString('ru-RU', {
-                                  day: 'numeric',
-                                  month: 'short',
-                                  hour: '2-digit',
-                                  minute: '2-digit'
-                                })}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    
-                    <div className="form-group">
-                      <label>Сумма:</label>
-                      <input
-                        type="number"
-                        value={transferData.amount}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          if (value === '' || (parseInt(value) > 0)) {
-                            setTransferData(prev => ({ ...prev, amount: value }));
-                          }
-                        }}
-                        placeholder="Введите сумму"
-                        className="form-input"
-                      />
-                    </div>
-                    
-                    <div className="form-group">
-                      <label>Описание (необязательно):</label>
-                      <input
-                        type="text"
-                        value={transferData.description}
-                        onChange={(e) => setTransferData(prev => ({ ...prev, description: e.target.value }))}
-                        placeholder="Описание перевода"
-                        className="form-input"
-                      />
-                    </div>
-
-                    <div className="form-group">
-                      <div style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 6,
-                        color: '#94a3b8',
-                        fontSize: 13
-                      }}>
-                        <div>Комиссия (без премиума): {transferPreview.commission} баллов</div>
-                        <div>Дойдёт получателю: {transferPreview.netAmount} баллов</div>
-                        <div>С премиумом комиссия 0%</div>
-                      </div>
-                    </div>
-                    
-                    {walletError && <div className="error-message">{walletError}</div>}
-                    
-                    <button 
-                      type="submit" 
-                      disabled={walletLoading}
-                      className="submit-btn"
-                    >
-                      {walletLoading ? 'Выполняется...' : 'Перевести'}
-                    </button>
-                  </form>
-                </div>
-              </div>
-            )}
 
             {activeTab === 'leaderboard' && (
               <div className="leaderboard-view">
@@ -4339,6 +4151,195 @@ formData.append('files', file);
         )}
         
         <PointsModals />
+        
+        {/* Wallet Transfer Modal - Глобальная модалка */}
+        {showWalletTransfer && (
+          <div className="modal-overlay" onClick={() => {
+            setShowWalletTransfer(false);
+            setTransferSuggestions([]);
+            setShowTransferSuggestions(false);
+            setTransferSuppressSearch(false);
+            setFoundUser(null);
+            setFoundUserStatus(null);
+          }}>
+            <div className="modal-content transfer-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3>Перевод баллов</h3>
+                <button onClick={() => {
+                  setShowWalletTransfer(false);
+                  setTransferSuggestions([]);
+                  setShowTransferSuggestions(false);
+                  setTransferSuppressSearch(false);
+                  setFoundUser(null);
+                  setFoundUserStatus(null);
+                }} className="close-btn">
+                  <X size={16} />
+                </button>
+              </div>
+              
+              <form onSubmit={handleWalletTransfer}>
+                <div className="form-group transfer-search-wrapper">
+                  <label>Получатель (username):</label>
+                  <input
+                    type="text"
+                    value={transferData.recipientUsername}
+                    onChange={(e) => {
+                      setTransferData(prev => ({ ...prev, recipientUsername: e.target.value }));
+                      // Сбрасываем найденного пользователя при изменении
+                      if (!e.target.value.trim()) {
+                        setFoundUser(null);
+                        setFoundUserStatus(null);
+                      }
+                    }}
+                    placeholder="@username"
+                    className="form-input"
+                    onFocus={() => { if (transferSuggestions.length) setShowTransferSuggestions(true); }}
+                  />
+                  {showTransferSuggestions && transferSuggestions.length > 0 && (
+                    <div className="transfer-search-results" onMouseDown={(e) => e.preventDefault()}>
+                      {transferSuggestions.slice(0, 5).map(user => (
+                        <div
+                          key={user._id}
+                          className="transfer-search-result"
+                          onClick={() => {
+                            setTransferSuppressSearch(true);
+                            setTransferData(prev => ({ ...prev, recipientUsername: `@${user.username}` }));
+                            setShowTransferSuggestions(false);
+                            setTransferSuggestions([]);
+                            // Увеличиваем задержку, чтобы подсказки не появлялись снова
+                            setTimeout(() => setTransferSuppressSearch(false), 2000);
+                          }}
+                        >
+                          <Avatar 
+                            src={user.avatar || null}
+                            alt={user.displayName || user.username}
+                            size="small"
+                            className="search-result-avatar"
+                          />
+                          <div className="search-result-info">
+                            <span className="header-search-username">@{user.username}</span>
+                            {user.displayName && (
+                              <span className="header-search-name">
+                                {user.displayName}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                
+                {/* Плашка с информацией о найденном пользователе */}
+                {foundUser && (
+                  <div className="found-user-card">
+                    <div className="found-user-header">
+                      <div className="found-user-check">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                        </svg>
+                      </div>
+                      <span className="found-user-title">Пользователь найден</span>
+                    </div>
+                    <div className="found-user-content">
+                      <div className="found-user-avatar">
+                        <Avatar 
+                          src={foundUser.avatar || null}
+                          alt={foundUser.displayName || foundUser.username}
+                          size="medium"
+                        />
+                        {foundUserStatus && (
+                          <div className="found-user-status">
+                            <OnlineStatus
+                              userId={foundUser._id}
+                              isOnline={foundUserStatus.isOnline}
+                              lastSeen={foundUserStatus.lastSeen}
+                              size="small"
+                            />
+                          </div>
+                        )}
+                      </div>
+                      <div className="found-user-info">
+                        <div className="found-user-name">
+                          {foundUser.displayName || foundUser.username}
+                          {foundUser.premium && (
+                            <span className="found-user-premium">
+                              <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z"/>
+                              </svg>
+                            </span>
+                          )}
+                        </div>
+                        <div className="found-user-username">@{foundUser.username}</div>
+                        {foundUserStatus && !foundUserStatus.isOnline && foundUserStatus.lastSeen && (
+                          <div className="found-user-last-seen">
+                            Был в сети {new Date(foundUserStatus.lastSeen).toLocaleDateString('ru-RU', {
+                              day: 'numeric',
+                              month: 'short',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                <div className="form-group">
+                  <label>Сумма:</label>
+                  <input
+                    type="number"
+                    value={transferData.amount}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value === '' || (parseInt(value) > 0)) {
+                        setTransferData(prev => ({ ...prev, amount: value }));
+                      }
+                    }}
+                    placeholder="Введите сумму"
+                    className="form-input"
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>Описание (необязательно):</label>
+                  <input
+                    type="text"
+                    value={transferData.description}
+                    onChange={(e) => setTransferData(prev => ({ ...prev, description: e.target.value }))}
+                    placeholder="Описание перевода"
+                    className="form-input"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 6,
+                    color: '#94a3b8',
+                    fontSize: 13
+                  }}>
+                    <div>Комиссия (без премиума): {transferPreview.commission} баллов</div>
+                    <div>Дойдёт получателю: {transferPreview.netAmount} баллов</div>
+                    <div>С премиумом комиссия 0%</div>
+                  </div>
+                </div>
+                
+                {walletError && <div className="error-message">{walletError}</div>}
+                
+                <button 
+                  type="submit" 
+                  disabled={walletLoading}
+                  className="submit-btn"
+                >
+                  {walletLoading ? 'Выполняется...' : 'Перевести'}
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
         
         {/* Просмотрщик изображений */}
         <ImageViewer 
