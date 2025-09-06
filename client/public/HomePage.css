@@ -9,7 +9,7 @@ html, body {
 }
 
 /* Общие стили для модальных окон - предотвращаем растягивание до краев */
-.modal-content,
+.modal-overlay .modal-content,
 .popup,
 .overlay,
 .dialog {
@@ -6010,7 +6010,10 @@ html, body {
     color: #64748b;
   }
   
-  .transfer-search-wrapper { position: relative; }
+  .transfer-search-wrapper { 
+    position: relative; 
+    width: 100%;
+  }
   .transfer-search-results {
     position: absolute;
     top: 100%;
@@ -6023,6 +6026,7 @@ html, body {
     max-height: 240px;
     overflow-y: auto;
     z-index: 1000;
+    width: 100%;
   }
   .transfer-search-result {
     display: flex;
