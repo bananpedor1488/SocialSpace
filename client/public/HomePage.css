@@ -18,6 +18,12 @@ html, body {
   margin: 0 auto !important;
 }
 
+/* Исключаем модалку переводов из общих ограничений */
+.transfer-modal .modal-content {
+  max-width: 700px !important;
+  width: auto !important;
+}
+
 /* Специальные модальные окна */
 .premium-modal .modal-content,
 .gift-modal .modal-content {
@@ -6016,8 +6022,9 @@ html, body {
   }
   
   .transfer-search-wrapper .form-input {
-    width: 100%;
-    max-width: 100%;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
   
   .transfer-search-results {
@@ -7450,6 +7457,7 @@ html, body {
     .transfer-modal .modal-content {
       max-width: 700px !important;
       width: auto !important;
+      padding: 24px !important;
     }
     
     .modal-header h3 {
