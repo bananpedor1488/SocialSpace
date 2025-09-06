@@ -8,6 +8,28 @@ html, body {
   max-width: 100vw !important;
 }
 
+/* Общие стили для модальных окон - предотвращаем растягивание до краев */
+.modal-content,
+.popup,
+.overlay,
+.dialog {
+  width: auto !important;
+  max-width: 500px !important;
+  margin: 0 auto !important;
+}
+
+/* Специальные модальные окна */
+.premium-modal .modal-content,
+.gift-modal .modal-content {
+  max-width: 600px !important;
+  width: auto !important;
+}
+
+.history-modal .modal-content {
+  max-width: 700px !important;
+  width: auto !important;
+}
+
 #root {
   overflow-x: hidden !important;
   max-width: 100vw !important;
@@ -3230,7 +3252,7 @@ html, body {
   
     .modal-content {
       margin: 20px !important;
-      max-width: calc(100vw - 40px) !important;
+      max-width: 500px !important;
       max-height: calc(100vh - 40px) !important;
       position: relative !important;
       z-index: 10001 !important;
@@ -6801,8 +6823,8 @@ html, body {
     backdrop-filter: blur(20px);
     border-radius: 20px;
     padding: 32px;
-    width: 100%;
     max-width: 500px;
+    width: auto;
     max-height: 90vh;
     overflow-y: auto;
     box-shadow: 
@@ -6962,6 +6984,7 @@ html, body {
   /* Стили для премиум модального окна */
   .premium-modal .modal-content {
     max-width: 600px;
+    width: auto;
   }
   
   .premium-active {
@@ -7145,6 +7168,7 @@ html, body {
   /* Стили для подарка премиума */
   .gift-modal .modal-content {
     max-width: 600px;
+    width: auto;
   }
   
   .gift-info {
@@ -7219,6 +7243,7 @@ html, body {
   /* Стили для истории транзакций */
   .history-modal .modal-content {
     max-width: 700px;
+    width: auto;
     max-height: 80vh;
   }
   
@@ -7388,7 +7413,9 @@ html, body {
     
     .modal-content {
       padding: 24px;
-      max-width: 100%;
+      max-width: 500px;
+      width: auto;
+      margin: 0 auto;
     }
     
     .modal-header h3 {
@@ -7415,6 +7442,9 @@ html, body {
   @media (max-width: 480px) {
     .modal-content {
       padding: 20px;
+      max-width: calc(100vw - 20px);
+      width: auto;
+      margin: 0 auto;
     }
     
     .modal-header h3 {
@@ -8274,7 +8304,7 @@ html, body {
   
     .modal-content {
       margin: 20px !important;
-      max-width: calc(100vw - 40px) !important;
+      max-width: 500px !important;
       max-height: calc(100vh - 40px) !important;
       position: relative !important;
       z-index: 10001 !important;
