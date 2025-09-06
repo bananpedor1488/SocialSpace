@@ -21,6 +21,8 @@ import PointsModals from '../components/PointsModals';
 import PhoneVerification from '../components/PhoneVerification';
 import TokenDebug from '../components/TokenDebug';
 import ImageViewer from '../components/ImageViewer';
+import NotificationContainer from '../components/NotificationContainer';
+import useNotifications from '../hooks/useNotifications';
 import { usePoints } from '../context/PointsContext';
 import '../styles/PostImages.css';
 
@@ -43,6 +45,9 @@ import {
 
 const HomePage = () => {
   const [user, setUser] = useState(null);
+  
+  // Система уведомлений
+  const { notifications, showSuccess, showError, showWarning, showInfo, removeNotification } = useNotifications();
 
   const [activeTab, setActiveTab] = useState('home');
   const [postText, setPostText] = useState('');
@@ -1164,10 +1169,10 @@ const HomePage = () => {
         if (shouldCleanup) {
           emergencyCleanup();
         }
-      } else if (err.response?.status === 400) {
-        alert('Нельзя позвонить самому себе.');
+      } else       if (err.response?.status === 400) {
+        showError('Нельзя позвонить самому себе.');
       } else {
-        alert('Не удалось начать звонок. Проверьте подключение.');
+        showError('Не удалось начать звонок. Проверьте подключение.');
       }
     }
   };
@@ -1222,7 +1227,7 @@ const HomePage = () => {
       
     } catch (err) {
       console.error('Ошибка принятия звонка:', err);
-      alert('Не удалось принять звонок. Попробуйте еще раз.');
+      showError('Не удалось принять звонок. Попробуйте еще раз.');
       // При ошибке сбрасываем звонок
       setCurrentCall(null);
       setIsIncomingCall(false);
@@ -1281,7 +1286,7 @@ const HomePage = () => {
       
       if (!silent && response.data.cleanedCount > 0) {
         console.log(`Cleaned up ${response.data.cleanedCount} calls`);
-        alert(`Очищено ${response.data.cleanedCount} зависших звонков! Теперь можно звонить снова.`);
+        showSuccess(`Очищено ${response.data.cleanedCount} зависших звонков! Теперь можно звонить снова.`);
       } else if (!silent) {
         console.log('No stuck calls found - all good!');
       }
@@ -1290,7 +1295,7 @@ const HomePage = () => {
     } catch (err) {
       if (!silent) {
         console.error('Emergency cleanup failed:', err);
-        alert('Не удалось очистить звонки. Обновите страницу (F5).');
+        showError('Не удалось очистить звонки. Обновите страницу (F5).');
       }
       return false;
     }
@@ -1678,14 +1683,14 @@ const HomePage = () => {
     const validFiles = files.filter(file => {
       const maxSize = 10 * 1024 * 1024; // 10MB
       if (file.size > maxSize) {
-        alert(`Файл ${file.name} слишком большой. Максимальный размер: 10MB`);
+        showWarning(`Файл ${file.name} слишком большой. Максимальный размер: 10MB`);
         return false;
       }
       return true;
     });
     
     if (selectedFiles.length + validFiles.length > 5) {
-      alert('Максимум 5 файлов');
+      showWarning('Максимум 5 файлов');
       return;
     }
     
@@ -1715,14 +1720,14 @@ const HomePage = () => {
     const validFiles = files.filter(file => {
       const maxSize = 10 * 1024 * 1024; // 10MB
       if (file.size > maxSize) {
-        alert(`Файл ${file.name} слишком большой. Максимальный размер: 10MB`);
+        showWarning(`Файл ${file.name} слишком большой. Максимальный размер: 10MB`);
         return false;
       }
       return true;
     });
     
     if (selectedFiles.length + validFiles.length > 5) {
-      alert('Максимум 5 файлов');
+      showWarning('Максимум 5 файлов');
       return;
     }
     
@@ -1748,14 +1753,14 @@ const HomePage = () => {
       const validFiles = files.filter(file => {
         const maxSize = 10 * 1024 * 1024; // 10MB
         if (file.size > maxSize) {
-          alert(`Файл слишком большой. Максимальный размер: 10MB`);
+          showWarning(`Файл слишком большой. Максимальный размер: 10MB`);
           return false;
         }
         return true;
       });
       
       if (selectedFiles.length + validFiles.length > 5) {
-        alert('Максимум 5 файлов');
+        showWarning('Максимум 5 файлов');
         return;
       }
       
@@ -1770,7 +1775,7 @@ const HomePage = () => {
     }
     
     if (!postText.trim() && selectedFiles.length === 0) {
-      alert('Добавьте текст или файлы');
+      showWarning('Добавьте текст или файлы');
       return;
     }
 
@@ -1816,7 +1821,7 @@ formData.append('files', file);
         errorMessage = err.message;
       }
       
-      alert(errorMessage);
+      showError(errorMessage);
     } finally {
       setIsPosting(false);
     }
@@ -1825,7 +1830,19 @@ formData.append('files', file);
   // Функции для работы с розыгрышами
   const handleCreateGiveaway = async () => {
     if (!giveawayData.prize.trim() || !giveawayData.description.trim()) {
-      alert('Заполните все поля розыгрыша');
+      showWarning('Заполните все поля розыгрыша');
+      return;
+    }
+
+    // Проверяем, что для баллов выбран период премиума
+    if (giveawayData.prizeType === 'premium' && !giveawayData.prizeAmount) {
+      showWarning('Выберите период премиума');
+      return;
+    }
+
+    // Проверяем, что для баллов указано количество
+    if (giveawayData.prizeType === 'points' && (!giveawayData.prizeAmount || giveawayData.prizeAmount < 1)) {
+      showWarning('Укажите количество баллов (минимум 1)');
       return;
     }
 
@@ -1851,6 +1868,12 @@ formData.append('files', file);
       const response = await axios.post('https://server-pqqy.onrender.com/api/posts', formData);
       console.log('Giveaway created successfully:', response.data);
       
+      // Если розыгрыш с баллами, обновляем баланс пользователя
+      if (giveawayData.prizeType === 'points' && response.data.userBalance !== undefined) {
+        setWalletBalance(response.data.userBalance);
+        console.log('Updated user balance:', response.data.userBalance);
+      }
+      
       // Обновляем список постов
       await loadPosts();
       
@@ -1865,7 +1888,7 @@ formData.append('files', file);
       setPostType('text');
     } catch (err) {
       console.error('Ошибка создания розыгрыша:', err);
-      alert('Ошибка при создании розыгрыша');
+      showError('Ошибка при создании розыгрыша');
     } finally {
       setIsPosting(false);
     }
@@ -1890,17 +1913,17 @@ formData.append('files', file);
         )
       );
       
-      alert('Вы успешно присоединились к розыгрышу!');
+      showSuccess('Вы успешно присоединились к розыгрышу!');
     } catch (err) {
       console.error('Ошибка участия в розыгрыше:', err);
-      alert(err.response?.data?.message || 'Ошибка при участии в розыгрыше');
+      showError(err.response?.data?.message || 'Ошибка при участии в розыгрыше');
     }
   };
 
   // Функции для работы с опросами
   const handleCreatePoll = async () => {
     if (!pollData.question.trim() || pollData.options.some(opt => !opt.trim())) {
-      alert('Заполните вопрос и все варианты ответов');
+      showWarning('Заполните вопрос и все варианты ответов');
       return;
     }
 
@@ -1923,7 +1946,7 @@ formData.append('files', file);
       setPostType('text');
     } catch (err) {
       console.error('Ошибка создания опроса:', err);
-      alert('Ошибка при создании опроса');
+      showError('Ошибка при создании опроса');
     } finally {
       setIsPosting(false);
     }
@@ -1950,10 +1973,10 @@ formData.append('files', file);
         )
       );
       
-      alert('Ваш голос учтен!');
+      showSuccess('Ваш голос учтен!');
     } catch (err) {
       console.error('Ошибка голосования:', err);
-      alert(err.response?.data?.message || 'Ошибка при голосовании');
+      showError(err.response?.data?.message || 'Ошибка при голосовании');
     }
   };
 
@@ -1985,7 +2008,7 @@ formData.append('files', file);
     } catch (err) {
       console.error('Ошибка репоста:', err);
       if (err.response?.data?.message) {
-        alert(err.response.data.message);
+        showError(err.response.data.message);
       }
     }
   };
@@ -2005,7 +2028,7 @@ formData.append('files', file);
       console.log('Пост успешно удален');
     } catch (err) {
       console.error('Ошибка удаления поста:', err);
-      alert('Не удалось удалить пост. Попробуйте еще раз.');
+      showError('Не удалось удалить пост. Попробуйте еще раз.');
     }
   };
 
@@ -2335,7 +2358,7 @@ formData.append('files', file);
                 <h5>
                   {post.giveawayData?.prizeType === 'text' 
                     ? post.giveawayData?.prize || 'Приз не указан'
-                    : `${post.giveawayData?.prizeAmount || 0} ${post.giveawayData?.prizeType === 'balance' ? 'рублей' : 'дней премиума'}`
+                    : `${post.giveawayData?.prizeAmount || 0} ${post.giveawayData?.prizeType === 'points' ? 'баллов' : 'дней премиума'}`
                   }
                 </h5>
               </div>
@@ -3076,11 +3099,11 @@ formData.append('files', file);
                               <input
                                 type="radio"
                                 name="prizeType"
-                                value="balance"
-                                checked={giveawayData.prizeType === 'balance'}
+                                value="points"
+                                checked={giveawayData.prizeType === 'points'}
                                 onChange={(e) => setGiveawayData(prev => ({ ...prev, prizeType: e.target.value }))}
                               />
-                              <span>Баланс</span>
+                              <span>Баллы</span>
                             </label>
                             <label className="prize-type-option">
                               <input
@@ -3106,25 +3129,33 @@ formData.append('files', file);
                               className="form-input"
                             />
                           </div>
+                        ) : giveawayData.prizeType === 'premium' ? (
+                          <div className="form-field">
+                            <label className="form-label">Период премиума:</label>
+                            <select
+                              value={giveawayData.prizeAmount}
+                              onChange={(e) => setGiveawayData(prev => ({ ...prev, prizeAmount: parseInt(e.target.value) }))}
+                              className="form-input"
+                            >
+                              <option value={0}>Выберите период</option>
+                              <option value={30}>30 дней</option>
+                              <option value={60}>60 дней</option>
+                              <option value={90}>90 дней</option>
+                            </select>
+                            <small className="form-hint">Выберите один из доступных периодов</small>
+                          </div>
                         ) : (
                           <div className="form-field">
-                            <label className="form-label">
-                              {giveawayData.prizeType === 'balance' ? 'Сумма в рублях:' : 'Количество дней премиума:'}
-                            </label>
+                            <label className="form-label">Количество баллов:</label>
                             <input
                               type="number"
-                              placeholder={giveawayData.prizeType === 'balance' ? 'Введите сумму в рублях' : 'Введите количество дней'}
+                              placeholder="Введите количество баллов"
                               value={giveawayData.prizeAmount}
                               onChange={(e) => setGiveawayData(prev => ({ ...prev, prizeAmount: parseInt(e.target.value) || 0 }))}
                               className="form-input"
                               min="1"
                             />
-                            <small className="form-hint">
-                              {giveawayData.prizeType === 'balance' 
-                                ? 'Минимум 1 рубль' 
-                                : 'Минимум 1 день'
-                              }
-                            </small>
+                            <small className="form-hint">Минимум 1 балл. Баллы будут списаны с вашего баланса</small>
                           </div>
                         )}
 
@@ -4888,6 +4919,12 @@ formData.append('files', file);
         
         {/* Отладочный компонент для токенов */}
         {process.env.NODE_ENV === 'development' && <TokenDebug />}
+        
+        {/* Контейнер уведомлений */}
+        <NotificationContainer 
+          notifications={notifications}
+          onRemoveNotification={removeNotification}
+        />
       </div>
       </>
   );
