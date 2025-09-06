@@ -21,3 +21,4 @@ const NotificationContainer = ({ notifications, onRemoveNotification }) => {
 };
 
 export default NotificationContainer;
+
