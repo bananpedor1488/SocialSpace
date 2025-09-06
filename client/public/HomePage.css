@@ -1268,7 +1268,7 @@ html, body {
   
   .header-search {
     position: relative;
-    flex: 1;
+    flex: 0 0 auto;
     max-width: 400px;
     min-width: 200px;
     z-index: 10001;
@@ -1276,6 +1276,7 @@ html, body {
   
   .header-search-input {
     width: 100%;
+    max-width: 400px;
     background: rgba(51, 65, 85, 0.7);
     border: 1px solid rgba(71, 85, 105, 0.5);
     border-radius: 25px;
