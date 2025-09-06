@@ -52,6 +52,8 @@ html, body {
 .transfer-modal .modal-content {
   z-index: 100001 !important;
   position: relative !important;
+  max-width: 700px !important;
+  width: auto !important;
 }
 
 #root {
@@ -137,7 +139,7 @@ html, body {
   .post img,
   .post video {
     max-width: 100% !important;
-    height: auto !important;
+    height: auto !important; 
   }
 }
 
