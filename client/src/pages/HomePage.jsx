@@ -109,7 +109,7 @@ const HomePage = () => {
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   
   // Новые состояния для интерактивных элементов
-  const [postType, setPostType] = useState('text'); // 'text', 'giveaway', 'poll', 'quiz'
+  const [postType, setPostType] = useState('text'); // 'text', 'giveaway', 'poll'
   const [giveawayData, setGiveawayData] = useState({
     prize: '',
     description: '',
@@ -125,13 +125,6 @@ const HomePage = () => {
     allowMultiple: false,
     endDate: '',
     votes: {}
-  });
-  const [quizData, setQuizData] = useState({
-    question: '',
-    options: ['', '', '', ''],
-    correctAnswer: 0,
-    explanation: '',
-    attempts: {}
   });
   const [reactions, setReactions] = useState({}); // Расширенные реакции
   
@@ -1939,65 +1932,6 @@ formData.append('files', file);
     }
   };
 
-  // Функции для работы с квизами
-  const handleCreateQuiz = async () => {
-    if (!quizData.question.trim() || quizData.options.some(opt => !opt.trim())) {
-      alert('Заполните вопрос и все варианты ответов');
-      return;
-    }
-
-    setIsPosting(true);
-    try {
-      const formData = new FormData();
-      formData.append('content', `🧠 КВИЗ: ${quizData.question}`);
-      formData.append('postType', 'quiz');
-      formData.append('quizData', JSON.stringify({
-        question: quizData.question,
-        options: quizData.options.filter(opt => opt.trim()),
-        correctAnswer: quizData.correctAnswer,
-        explanation: quizData.explanation,
-        attempts: {}
-      }));
-
-      await axios.post('https://server-pqqy.onrender.com/api/posts', formData);
-      
-      setQuizData({ question: '', options: ['', '', '', ''], correctAnswer: 0, explanation: '', attempts: {} });
-      setPostType('text');
-    } catch (err) {
-      console.error('Ошибка создания квиза:', err);
-      alert('Ошибка при создании квиза');
-    } finally {
-      setIsPosting(false);
-    }
-  };
-
-  const handleAnswerQuiz = async (postId, answerIndex) => {
-    try {
-      const response = await axios.post(`https://server-pqqy.onrender.com/api/posts/${postId}/answer-quiz`, {
-        answerIndex
-      });
-      
-      // Обновляем состояние поста
-      setPosts(prevPosts => 
-        prevPosts.map(post => 
-          post._id === postId 
-            ? { 
-                ...post, 
-                quizData: { 
-                  ...post.quizData, 
-                  attempts: response.data.attempts || post.quizData.attempts
-                }
-              }
-            : post
-        )
-      );
-      
-      return response.data; // { correct: boolean, explanation: string }
-    } catch (err) {
-      console.error('Ошибка ответа на квиз:', err);
-      return { correct: false, explanation: 'Ошибка при отправке ответа' };
-    }
-  };
 
   // Функции для расширенных реакций
   const handleReaction = async (postId, reactionType) => {
@@ -2349,7 +2283,8 @@ formData.append('files', file);
           </div>
           
           {/* Интерактивные элементы постов */}
-          {post.postType === 'giveaway' && post.giveawayData && (
+          {console.log('Post type:', post.postType, 'Giveaway data:', post.giveawayData)}
+          {post.postType === 'giveaway' && (
             <div className="giveaway-widget">
               <div className="giveaway-header">
                 <div className="giveaway-title">
@@ -2358,30 +2293,30 @@ formData.append('files', file);
                 </div>
                 <div className="giveaway-stats">
                   <span className="participants-count">
-                    {post.giveawayData.participants?.length || 0} участников
+                    {post.giveawayData?.participants?.length || 0} участников
                   </span>
                 </div>
               </div>
               
               <div className="giveaway-prize">
                 <h5>
-                  {post.giveawayData.prizeType === 'text' 
-                    ? post.giveawayData.prize
-                    : `${post.giveawayData.prizeAmount} ${post.giveawayData.prizeType === 'points' ? 'баллов' : post.giveawayData.prizeType === 'balance' ? 'рублей' : 'дней премиума'}`
+                  {post.giveawayData?.prizeType === 'text' 
+                    ? post.giveawayData?.prize || 'Приз не указан'
+                    : `${post.giveawayData?.prizeAmount || 0} ${post.giveawayData?.prizeType === 'points' ? 'баллов' : post.giveawayData?.prizeType === 'balance' ? 'рублей' : 'дней премиума'}`
                   }
                 </h5>
               </div>
               
-              <p className="giveaway-description">{post.giveawayData.description}</p>
+              <p className="giveaway-description">{post.giveawayData?.description || 'Описание не указано'}</p>
               
               <div className="giveaway-info">
-                {post.giveawayData.pointsRequired > 0 && (
+                {post.giveawayData?.pointsRequired > 0 && (
                   <div className="giveaway-points">
                     <DollarSign size={16} />
                     <span>Стоимость участия: {post.giveawayData.pointsRequired} баллов</span>
                   </div>
                 )}
-                {post.giveawayData.endDate && (
+                {post.giveawayData?.endDate && (
                   <div className="giveaway-end">
                     <Clock size={16} />
                     <span>Окончание: {new Date(post.giveawayData.endDate).toLocaleString('ru-RU')}</span>
@@ -2390,15 +2325,15 @@ formData.append('files', file);
               </div>
               
               <div className="giveaway-actions">
-                {!post.giveawayData.isCompleted ? (
+                {!post.giveawayData?.isCompleted ? (
                   <>
                     <button 
                       className="join-giveaway-btn"
                       onClick={() => handleJoinGiveaway(post._id)}
-                      disabled={post.giveawayData.participants?.includes(user._id || user.id)}
+                      disabled={post.giveawayData?.participants?.includes(user._id || user.id)}
                     >
                       <Gift size={16} />
-                      {post.giveawayData.participants?.includes(user._id || user.id) 
+                      {post.giveawayData?.participants?.includes(user._id || user.id) 
                         ? 'Вы участвуете' 
                         : 'Участвовать в розыгрыше'
                       }
@@ -2410,7 +2345,7 @@ formData.append('files', file);
                         onClick={() => {/* Показать участников */}}
                       >
                         <Users size={16} />
-                        Участники ({post.giveawayData.participants?.length || 0})
+                        Участники ({post.giveawayData?.participants?.length || 0})
                       </button>
                     )}
                   </>
@@ -2418,7 +2353,7 @@ formData.append('files', file);
                   <div className="giveaway-completed">
                     <Check size={16} />
                     <span>Розыгрыш завершен</span>
-                    {post.giveawayData.winner && (
+                    {post.giveawayData?.winner && (
                       <span className="winner-info">
                         Победитель: @{post.giveawayData.winner}
                       </span>
@@ -2469,41 +2404,6 @@ formData.append('files', file);
             </div>
           )}
           
-          {post.postType === 'quiz' && post.quizData && (
-            <div className="quiz-widget">
-              <h4>🧠 {post.quizData.question}</h4>
-              <div className="quiz-options">
-                {post.quizData.options.map((option, index) => (
-                  <button 
-                    key={index}
-                    className={`quiz-option-btn ${post.quizData.attempts?.[user._id || user.id] ? 'attempted' : ''}`}
-                    onClick={async () => {
-                      if (post.quizData.attempts?.[user._id || user.id]) return;
-                      const result = await handleAnswerQuiz(post._id, index);
-                      if (result.correct) {
-                        alert('Правильно! ' + result.explanation);
-                      } else {
-                        alert('Неправильно! ' + result.explanation);
-                      }
-                    }}
-                    disabled={post.quizData.attempts?.[user._id || user.id] !== undefined}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </div>
-              {post.quizData.attempts?.[user._id || user.id] !== undefined && (
-                <div className="quiz-result">
-                  <p className="quiz-answer">
-                    Ваш ответ: {post.quizData.options[post.quizData.attempts[user._id || user.id]]}
-                  </p>
-                  <p className="quiz-explanation">
-                    {post.quizData.explanation}
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
           
           <div className="post-actions">
             <button 
@@ -3095,13 +2995,6 @@ formData.append('files', file);
                         <BarChart3 size={16} />
                         Опрос
                       </button>
-                      <button 
-                        className={`post-type-btn ${postType === 'quiz' ? 'active' : ''}`}
-                        onClick={() => setPostType('quiz')}
-                      >
-                        <HelpCircle size={16} />
-                        Квиз
-                      </button>
                     </div>
                   </div>
                   <div className="create-post-body">
@@ -3281,56 +3174,6 @@ formData.append('files', file);
                       </div>
                     )}
                     
-                    {postType === 'quiz' && (
-                      <div className="quiz-form">
-                        <h4>🧠 Создание квиза</h4>
-                        <input
-                          type="text"
-                          placeholder="Вопрос квиза"
-                          value={quizData.question}
-                          onChange={(e) => setQuizData(prev => ({ ...prev, question: e.target.value }))}
-                          className="form-input"
-                        />
-                        {quizData.options.map((option, index) => (
-                          <div key={index} className="quiz-option">
-                            <input
-                              type="text"
-                              placeholder={`Вариант ${index + 1}`}
-                              value={option}
-                              onChange={(e) => {
-                                const newOptions = [...quizData.options];
-                                newOptions[index] = e.target.value;
-                                setQuizData(prev => ({ ...prev, options: newOptions }));
-                              }}
-                              className="form-input"
-                            />
-                            <label className="radio-label">
-                              <input
-                                type="radio"
-                                name="correctAnswer"
-                                checked={quizData.correctAnswer === index}
-                                onChange={() => setQuizData(prev => ({ ...prev, correctAnswer: index }))}
-                              />
-                              Правильный ответ
-                            </label>
-                          </div>
-                        ))}
-                        <button
-                          type="button"
-                          onClick={() => setQuizData(prev => ({ ...prev, options: [...prev.options, ''] }))}
-                          className="add-option-btn"
-                        >
-                          + Добавить вариант
-                        </button>
-                        <textarea
-                          placeholder="Объяснение правильного ответа (необязательно)"
-                          value={quizData.explanation}
-                          onChange={(e) => setQuizData(prev => ({ ...prev, explanation: e.target.value }))}
-                          className="form-textarea"
-                          rows="2"
-                        />
-                      </div>
-                    )}
                     
                     {/* Выбранные файлы */}
                     {selectedFiles.length > 0 && (
@@ -3424,9 +3267,6 @@ formData.append('files', file);
                             case 'poll':
                               handleCreatePoll();
                               break;
-                            case 'quiz':
-                              handleCreateQuiz();
-                              break;
                             default:
                               handleCreatePost();
                           }
@@ -3436,7 +3276,6 @@ formData.append('files', file);
                           (postType === 'text' && postText.length > 280) ||
                           (postType === 'giveaway' && (!giveawayData.prize.trim() || !giveawayData.description.trim())) ||
                           (postType === 'poll' && (!pollData.question.trim() || pollData.options.some(opt => !opt.trim()))) ||
-                          (postType === 'quiz' && (!quizData.question.trim() || quizData.options.some(opt => !opt.trim()))) ||
                           isPosting
                         }
                         className={`publish-btn ${isPosting ? 'posting' : ''}`}
