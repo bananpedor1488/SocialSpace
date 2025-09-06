@@ -6389,6 +6389,11 @@ html, body {
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
+  /* Стили для модального окна перевода балов */
+  .points-modal {
+    z-index: 1000 !important;
+  }
+  
   .points-dropdown.show {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -7241,6 +7246,10 @@ html, body {
   }
   
   /* Стили для истории транзакций */
+  .history-modal {
+    z-index: 100000 !important;
+  }
+  
   .history-modal .modal-content {
     max-width: 700px;
     width: auto;
@@ -9347,6 +9356,12 @@ html, body {
       max-width: 100%; /* Обязательно вписываем в ширину экрана */
       height: auto;
   }
+  
+  /* Стили для изображений в постах профиля на мобильных */
+  .profile-posts .post-image {
+      max-width: 100%; /* Обязательно вписываем в ширину экрана */
+      height: auto;
+  }
 }
   /* Исправления для очень старых браузеров */
   @media (max-width: 1024px) {
@@ -10334,6 +10349,21 @@ html, body {
     box-sizing: border-box;
   }
   
+  /* Стили для изображений в постах профиля - как в ленте */
+  .profile-posts .post-image {
+    width: auto; /* Нативная ширина */
+    max-width: 100%; /* Не шире контейнера поста */
+    height: auto; /* Нативная высота, с сохранением пропорций */
+    object-fit: contain; /* Показываем целиком, без обрезки, масштабируя если нужно */
+    border-radius: 10px; /* Закруглённые углы для красоты */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Лёгкая тень для эстетики */
+    transition: box-shadow 0.3s ease; /* Плавный ховер-эффект */
+  }
+  
+  .profile-posts .post-image:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Усиленная тень на ховер */
+  }
+  
   .profile-posts-header {
     display: flex;
     justify-content: space-between;
@@ -10834,10 +10864,17 @@ html, body {
   }
   
   .post-image {
-    width: 100%;
-    max-height: 400px;
-    object-fit: cover;
-    border-radius: 10px;
+    width: auto; /* Нативная ширина */
+    max-width: 100%; /* Не шире контейнера поста */
+    height: auto; /* Нативная высота, с сохранением пропорций */
+    object-fit: contain; /* Показываем целиком, без обрезки, масштабируя если нужно */
+    border-radius: 10px; /* Закруглённые углы для красоты */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Лёгкая тень для эстетики */
+    transition: box-shadow 0.3s ease; /* Плавный ховер-эффект */
+  }
+  
+  .post-image:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Усиленная тень на ховер */
   }
   
   .image-fallback {
