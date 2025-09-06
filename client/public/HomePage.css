@@ -6014,6 +6014,12 @@ html, body {
     position: relative; 
     width: 100%;
   }
+  
+  .transfer-search-wrapper .form-input {
+    width: 100%;
+    max-width: 100%;
+  }
+  
   .transfer-search-results {
     position: absolute;
     top: 100%;
@@ -7441,6 +7447,11 @@ html, body {
       margin: 0 auto;
     }
     
+    .transfer-modal .modal-content {
+      max-width: 700px !important;
+      width: auto !important;
+    }
+    
     .modal-header h3 {
       font-size: 20px;
     }
@@ -8025,6 +8036,8 @@ html, body {
   
   .transfer-modal .modal-content {
     z-index: 100001 !important;
+    max-width: 700px !important;
+    width: auto !important;
   }
   
   /* Мобильная навигация */
