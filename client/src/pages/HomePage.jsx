@@ -8,7 +8,7 @@ import {
   Heart, MessageSquare, Repeat, Pencil, Trash2, Users, UserCheck, Send, X, ChevronDown, ChevronLeft,
   Moon, Sun, Wifi, WifiOff, Flame, Clock, Phone, Settings, Trophy, DollarSign,
   Check, Play, HelpCircle, History, Crown, Gift, ArrowLeft, MoreVertical, FileText,
-  Info, Shield, Lock, Calendar, Paperclip, Image, File, Video
+  Info, Shield, Lock, Calendar, Paperclip, Image, File, Video, BarChart3
 } from 'lucide-react';
 
 import CallInterface from '../components/CallInterface';
@@ -115,6 +115,8 @@ const HomePage = () => {
     description: '',
     endDate: '',
     pointsRequired: 0,
+    prizeType: 'text', // 'text', 'points', 'balance', 'premium'
+    prizeAmount: 0,
     participants: []
   });
   const [pollData, setPollData] = useState({
@@ -2287,35 +2289,66 @@ formData.append('files', file);
           {post.postType === 'giveaway' && post.giveawayData && (
             <div className="giveaway-widget">
               <div className="giveaway-header">
-                <h4>🎁 Розыгрыш: {post.giveawayData.prize}</h4>
-                <span className="participants-count">
-                  {post.giveawayData.participants?.length || 0} участников
-                </span>
+                <div className="giveaway-title">
+                  <Gift size={20} />
+                  <h4>Розыгрыш</h4>
+                </div>
+                <div className="giveaway-stats">
+                  <span className="participants-count">
+                    {post.giveawayData.participants?.length || 0} участников
+                  </span>
+                </div>
               </div>
+              
+              <div className="giveaway-prize">
+                <h5>
+                  {post.giveawayData.prizeType === 'text' 
+                    ? post.giveawayData.prize
+                    : `${post.giveawayData.prizeAmount} ${post.giveawayData.prizeType === 'points' ? 'баллов' : post.giveawayData.prizeType === 'balance' ? 'рублей' : 'дней премиума'}`
+                  }
+                </h5>
+              </div>
+              
               <p className="giveaway-description">{post.giveawayData.description}</p>
-              {post.giveawayData.pointsRequired > 0 && (
-                <p className="giveaway-points">
-                  💰 Стоимость участия: {post.giveawayData.pointsRequired} баллов
-                </p>
-              )}
-              {post.giveawayData.endDate && (
-                <p className="giveaway-end">
-                  Окончание: {new Date(post.giveawayData.endDate).toLocaleString('ru-RU')}
-                </p>
-              )}
+              
+              <div className="giveaway-info">
+                {post.giveawayData.pointsRequired > 0 && (
+                  <div className="giveaway-points">
+                    <DollarSign size={16} />
+                    <span>Стоимость участия: {post.giveawayData.pointsRequired} баллов</span>
+                  </div>
+                )}
+                {post.giveawayData.endDate && (
+                  <div className="giveaway-end">
+                    <Clock size={16} />
+                    <span>Окончание: {new Date(post.giveawayData.endDate).toLocaleString('ru-RU')}</span>
+                  </div>
+                )}
+              </div>
+              
               <div className="giveaway-actions">
-                <button 
-                  className="join-giveaway-btn"
-                  onClick={() => handleJoinGiveaway(post._id)}
-                >
-                  Участвовать в розыгрыше
-                </button>
+                {!post.giveawayData.isCompleted ? (
+                  <button 
+                    className="join-giveaway-btn"
+                    onClick={() => handleJoinGiveaway(post._id)}
+                  >
+                    <Gift size={16} />
+                    Участвовать в розыгрыше
+                  </button>
+                ) : (
+                  <div className="giveaway-completed">
+                    <Check size={16} />
+                    <span>Розыгрыш завершен</span>
+                  </div>
+                )}
+                
                 {post.userId === (user._id || user.id) && (
                   <button 
                     className="view-participants-btn"
                     onClick={() => {/* Показать участников */}}
                   >
-                    Показать участников ({post.giveawayData.participants?.length || 0})
+                    <Users size={16} />
+                    Участники ({post.giveawayData.participants?.length || 0})
                   </button>
                 )}
               </div>
@@ -2421,44 +2454,6 @@ formData.append('files', file);
               </button>
             )}
             
-            {/* Расширенные реакции */}
-            <div className="reactions-section">
-              <button 
-                className="reaction-btn"
-                onClick={() => handleReaction(post._id, 'laugh')}
-                title="😂 Смешно"
-              >
-                😂
-              </button>
-              <button 
-                className="reaction-btn"
-                onClick={() => handleReaction(post._id, 'love')}
-                title="😍 Обожаю"
-              >
-                😍
-              </button>
-              <button 
-                className="reaction-btn"
-                onClick={() => handleReaction(post._id, 'wow')}
-                title="😮 Вау"
-              >
-                😮
-              </button>
-              <button 
-                className="reaction-btn"
-                onClick={() => handleReaction(post._id, 'sad')}
-                title="😢 Грустно"
-              >
-                😢
-              </button>
-              <button 
-                className="reaction-btn"
-                onClick={() => handleReaction(post._id, 'angry')}
-                title="😡 Злой"
-              >
-                😡
-              </button>
-            </div>
           </div>
 
           {showComments[post.isRepost ? post.originalPost?._id || post._id : post._id] && (
@@ -2996,25 +2991,29 @@ formData.append('files', file);
                         className={`post-type-btn ${postType === 'text' ? 'active' : ''}`}
                         onClick={() => setPostType('text')}
                       >
-                        📝 Текст
+                        <Pencil size={16} />
+                        Текст
                       </button>
                       <button 
                         className={`post-type-btn ${postType === 'giveaway' ? 'active' : ''}`}
                         onClick={() => setPostType('giveaway')}
                       >
-                        🎁 Розыгрыш
+                        <Gift size={16} />
+                        Розыгрыш
                       </button>
                       <button 
                         className={`post-type-btn ${postType === 'poll' ? 'active' : ''}`}
                         onClick={() => setPostType('poll')}
                       >
-                        📊 Опрос
+                        <BarChart3 size={16} />
+                        Опрос
                       </button>
                       <button 
                         className={`post-type-btn ${postType === 'quiz' ? 'active' : ''}`}
                         onClick={() => setPostType('quiz')}
                       >
-                        🧠 Квиз
+                        <HelpCircle size={16} />
+                        Квиз
                       </button>
                     </div>
                   </div>
@@ -3049,13 +3048,72 @@ formData.append('files', file);
                     {postType === 'giveaway' && (
                       <div className="giveaway-form">
                         <h4>🎁 Создание розыгрыша</h4>
-                        <input
-                          type="text"
-                          placeholder="Приз (например: iPhone 15)"
-                          value={giveawayData.prize}
-                          onChange={(e) => setGiveawayData(prev => ({ ...prev, prize: e.target.value }))}
-                          className="form-input"
-                        />
+                        
+                        <div className="prize-type-selector">
+                          <label>Тип приза:</label>
+                          <div className="prize-type-options">
+                            <label className="prize-type-option">
+                              <input
+                                type="radio"
+                                name="prizeType"
+                                value="text"
+                                checked={giveawayData.prizeType === 'text'}
+                                onChange={(e) => setGiveawayData(prev => ({ ...prev, prizeType: e.target.value }))}
+                              />
+                              <span>Текстовый приз</span>
+                            </label>
+                            <label className="prize-type-option">
+                              <input
+                                type="radio"
+                                name="prizeType"
+                                value="points"
+                                checked={giveawayData.prizeType === 'points'}
+                                onChange={(e) => setGiveawayData(prev => ({ ...prev, prizeType: e.target.value }))}
+                              />
+                              <span>Баллы</span>
+                            </label>
+                            <label className="prize-type-option">
+                              <input
+                                type="radio"
+                                name="prizeType"
+                                value="balance"
+                                checked={giveawayData.prizeType === 'balance'}
+                                onChange={(e) => setGiveawayData(prev => ({ ...prev, prizeType: e.target.value }))}
+                              />
+                              <span>Баланс</span>
+                            </label>
+                            <label className="prize-type-option">
+                              <input
+                                type="radio"
+                                name="prizeType"
+                                value="premium"
+                                checked={giveawayData.prizeType === 'premium'}
+                                onChange={(e) => setGiveawayData(prev => ({ ...prev, prizeType: e.target.value }))}
+                              />
+                              <span>Премиум</span>
+                            </label>
+                          </div>
+                        </div>
+
+                        {giveawayData.prizeType === 'text' ? (
+                          <input
+                            type="text"
+                            placeholder="Приз (например: iPhone 15)"
+                            value={giveawayData.prize}
+                            onChange={(e) => setGiveawayData(prev => ({ ...prev, prize: e.target.value }))}
+                            className="form-input"
+                          />
+                        ) : (
+                          <input
+                            type="number"
+                            placeholder={`Количество ${giveawayData.prizeType === 'points' ? 'баллов' : giveawayData.prizeType === 'balance' ? 'рублей' : 'дней премиума'}`}
+                            value={giveawayData.prizeAmount}
+                            onChange={(e) => setGiveawayData(prev => ({ ...prev, prizeAmount: parseInt(e.target.value) || 0 }))}
+                            className="form-input"
+                            min="1"
+                          />
+                        )}
+
                         <textarea
                           placeholder="Описание розыгрыша и условия участия..."
                           value={giveawayData.description}
@@ -3063,21 +3121,24 @@ formData.append('files', file);
                           className="form-textarea"
                           rows="3"
                         />
-                        <input
-                          type="datetime-local"
-                          placeholder="Дата окончания"
-                          value={giveawayData.endDate}
-                          onChange={(e) => setGiveawayData(prev => ({ ...prev, endDate: e.target.value }))}
-                          className="form-input"
-                        />
-                        <input
-                          type="number"
-                          placeholder="Баллы для участия (0 = бесплатно)"
-                          value={giveawayData.pointsRequired}
-                          onChange={(e) => setGiveawayData(prev => ({ ...prev, pointsRequired: parseInt(e.target.value) || 0 }))}
-                          className="form-input"
-                          min="0"
-                        />
+                        
+                        <div className="form-row">
+                          <input
+                            type="datetime-local"
+                            placeholder="Дата окончания"
+                            value={giveawayData.endDate}
+                            onChange={(e) => setGiveawayData(prev => ({ ...prev, endDate: e.target.value }))}
+                            className="form-input"
+                          />
+                          <input
+                            type="number"
+                            placeholder="Баллы для участия (0 = бесплатно)"
+                            value={giveawayData.pointsRequired}
+                            onChange={(e) => setGiveawayData(prev => ({ ...prev, pointsRequired: parseInt(e.target.value) || 0 }))}
+                            className="form-input"
+                            min="0"
+                          />
+                        </div>
                       </div>
                     )}
                     
