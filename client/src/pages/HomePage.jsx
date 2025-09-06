@@ -1832,7 +1832,7 @@ formData.append('files', file);
     setIsPosting(true);
     try {
       const formData = new FormData();
-      formData.append('content', `🎁 РОЗЫГРЫШ: ${giveawayData.prize}\n\n${giveawayData.description}`);
+      formData.append('content', ''); // Пустой контент, так как вся информация в виджете
       formData.append('postType', 'giveaway');
       
       const giveawayDataToSend = {
@@ -1907,7 +1907,7 @@ formData.append('files', file);
     setIsPosting(true);
     try {
       const formData = new FormData();
-      formData.append('content', `📊 ОПРОС: ${pollData.question}`);
+      formData.append('content', ''); // Пустой контент, так как вся информация в виджете
       formData.append('postType', 'poll');
       formData.append('pollData', JSON.stringify({
         question: pollData.question,
@@ -2224,12 +2224,15 @@ formData.append('files', file);
           </div>
           
           <div className="post-content">
-            <p className="post-text">
-              {post.isRepost ? post.originalPost?.content || post.content : post.content}
-            </p>
+            {/* Показываем текстовый контент только для обычных постов и репостов */}
+            {(post.postType === 'text' || !post.postType) && (
+              <p className="post-text">
+                {post.isRepost ? post.originalPost?.content || post.content : post.content}
+              </p>
+            )}
             
-            {/* Отображение файлов */}
-            {(post.isRepost ? post.originalPost?.files : post.files) && (post.isRepost ? post.originalPost?.files : post.files).length > 0 && (
+            {/* Отображение файлов только для обычных постов */}
+            {(post.postType === 'text' || !post.postType) && (post.isRepost ? post.originalPost?.files : post.files) && (post.isRepost ? post.originalPost?.files : post.files).length > 0 && (
               <div className="post-files">
                 {(post.isRepost ? post.originalPost?.files : post.files).map((file, index) => {
                   console.log('Rendering file:', {
@@ -3093,88 +3096,141 @@ formData.append('files', file);
                         </div>
 
                         {giveawayData.prizeType === 'text' ? (
-                          <input
-                            type="text"
-                            placeholder="Приз (например: iPhone 15)"
-                            value={giveawayData.prize}
-                            onChange={(e) => setGiveawayData(prev => ({ ...prev, prize: e.target.value }))}
-                            className="form-input"
-                          />
+                          <div className="form-field">
+                            <label className="form-label">Название приза:</label>
+                            <input
+                              type="text"
+                              placeholder="Приз (например: iPhone 15)"
+                              value={giveawayData.prize}
+                              onChange={(e) => setGiveawayData(prev => ({ ...prev, prize: e.target.value }))}
+                              className="form-input"
+                            />
+                          </div>
                         ) : (
-                          <input
-                            type="number"
-                            placeholder={`Количество ${giveawayData.prizeType === 'balance' ? 'рублей' : 'дней премиума'}`}
-                            value={giveawayData.prizeAmount}
-                            onChange={(e) => setGiveawayData(prev => ({ ...prev, prizeAmount: parseInt(e.target.value) || 0 }))}
-                            className="form-input"
-                            min="1"
-                          />
+                          <div className="form-field">
+                            <label className="form-label">
+                              {giveawayData.prizeType === 'balance' ? 'Сумма в рублях:' : 'Количество дней премиума:'}
+                            </label>
+                            <input
+                              type="number"
+                              placeholder={giveawayData.prizeType === 'balance' ? 'Введите сумму в рублях' : 'Введите количество дней'}
+                              value={giveawayData.prizeAmount}
+                              onChange={(e) => setGiveawayData(prev => ({ ...prev, prizeAmount: parseInt(e.target.value) || 0 }))}
+                              className="form-input"
+                              min="1"
+                            />
+                            <small className="form-hint">
+                              {giveawayData.prizeType === 'balance' 
+                                ? 'Минимум 1 рубль' 
+                                : 'Минимум 1 день'
+                              }
+                            </small>
+                          </div>
                         )}
 
-                        <textarea
-                          placeholder="Описание розыгрыша и условия участия..."
-                          value={giveawayData.description}
-                          onChange={(e) => setGiveawayData(prev => ({ ...prev, description: e.target.value }))}
-                          className="form-textarea"
-                          rows="3"
-                        />
+                        <div className="form-field">
+                          <label className="form-label">Описание розыгрыша:</label>
+                          <textarea
+                            placeholder="Описание розыгрыша и условия участия..."
+                            value={giveawayData.description}
+                            onChange={(e) => setGiveawayData(prev => ({ ...prev, description: e.target.value }))}
+                            className="form-textarea"
+                            rows="3"
+                          />
+                        </div>
                         
+                        <div className="form-field">
+                          <label className="form-label">Дата окончания (необязательно):</label>
                           <input
                             type="datetime-local"
-                          placeholder="Дата окончания (необязательно)"
+                            placeholder="Дата окончания (необязательно)"
                             value={giveawayData.endDate}
                             onChange={(e) => setGiveawayData(prev => ({ ...prev, endDate: e.target.value }))}
                             className="form-input"
                           />
+                          <small className="form-hint">Если не указано, розыгрыш будет бессрочным</small>
+                        </div>
                       </div>
                     )}
                     
                     {postType === 'poll' && (
                       <div className="poll-form">
                         <h4>📊 Создание опроса</h4>
-                        <input
-                          type="text"
-                          placeholder="Вопрос опроса"
-                          value={pollData.question}
-                          onChange={(e) => setPollData(prev => ({ ...prev, question: e.target.value }))}
-                          className="form-input"
-                        />
-                        {pollData.options.map((option, index) => (
+                        
+                        <div className="form-field">
+                          <label className="form-label">Вопрос опроса:</label>
                           <input
-                            key={index}
                             type="text"
-                            placeholder={`Вариант ${index + 1}`}
-                            value={option}
-                            onChange={(e) => {
-                              const newOptions = [...pollData.options];
-                              newOptions[index] = e.target.value;
-                              setPollData(prev => ({ ...prev, options: newOptions }));
-                            }}
+                            placeholder="Введите вопрос для опроса"
+                            value={pollData.question}
+                            onChange={(e) => setPollData(prev => ({ ...prev, question: e.target.value }))}
                             className="form-input"
                           />
-                        ))}
-                        <button
-                          type="button"
-                          onClick={() => setPollData(prev => ({ ...prev, options: [...prev.options, ''] }))}
-                          className="add-option-btn"
-                        >
-                          + Добавить вариант
-                        </button>
-                        <label className="checkbox-label">
+                        </div>
+                        
+                        <div className="form-field">
+                          <label className="form-label">Варианты ответов:</label>
+                          {pollData.options.map((option, index) => (
+                            <div key={index} className="option-input-group">
+                              <input
+                                type="text"
+                                placeholder={`Вариант ${index + 1}`}
+                                value={option}
+                                onChange={(e) => {
+                                  const newOptions = [...pollData.options];
+                                  newOptions[index] = e.target.value;
+                                  setPollData(prev => ({ ...prev, options: newOptions }));
+                                }}
+                                className="form-input"
+                              />
+                              {pollData.options.length > 2 && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const newOptions = pollData.options.filter((_, i) => i !== index);
+                                    setPollData(prev => ({ ...prev, options: newOptions }));
+                                  }}
+                                  className="remove-option-btn"
+                                  title="Удалить вариант"
+                                >
+                                  ×
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                          <button
+                            type="button"
+                            onClick={() => setPollData(prev => ({ ...prev, options: [...prev.options, ''] }))}
+                            className="add-option-btn"
+                          >
+                            + Добавить вариант
+                          </button>
+                          <small className="form-hint">Минимум 2 варианта, максимум 10</small>
+                        </div>
+                        
+                        <div className="form-field">
+                          <label className="checkbox-label">
+                            <input
+                              type="checkbox"
+                              checked={pollData.allowMultiple}
+                              onChange={(e) => setPollData(prev => ({ ...prev, allowMultiple: e.target.checked }))}
+                            />
+                            Разрешить множественный выбор
+                          </label>
+                          <small className="form-hint">Если включено, пользователи смогут выбрать несколько вариантов</small>
+                        </div>
+                        
+                        <div className="form-field">
+                          <label className="form-label">Дата окончания (необязательно):</label>
                           <input
-                            type="checkbox"
-                            checked={pollData.allowMultiple}
-                            onChange={(e) => setPollData(prev => ({ ...prev, allowMultiple: e.target.checked }))}
+                            type="datetime-local"
+                            placeholder="Дата окончания (необязательно)"
+                            value={pollData.endDate}
+                            onChange={(e) => setPollData(prev => ({ ...prev, endDate: e.target.value }))}
+                            className="form-input"
                           />
-                          Разрешить множественный выбор
-                        </label>
-                        <input
-                          type="datetime-local"
-                          placeholder="Дата окончания (необязательно)"
-                          value={pollData.endDate}
-                          onChange={(e) => setPollData(prev => ({ ...prev, endDate: e.target.value }))}
-                          className="form-input"
-                        />
+                          <small className="form-hint">Если не указано, опрос будет бессрочным</small>
+                        </div>
                       </div>
                     )}
                     

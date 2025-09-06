@@ -11626,4 +11626,65 @@ html, body {
     padding: 5px 8px;
   }
 }
+
+/* Стили для улучшенных форм */
+.form-field {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  display: block;
+  color: #cbd5e1;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.form-hint {
+  display: block;
+  color: #94a3b8;
+  font-size: 12px;
+  margin-top: 4px;
+  font-style: italic;
+}
+
+.option-input-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.option-input-group .form-input {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.remove-option-btn {
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.remove-option-btn:hover {
+  background: #b91c1c;
+  transform: scale(1.05);
+}
+
+.remove-option-btn:active {
+  transform: scale(0.95);
+}
   
