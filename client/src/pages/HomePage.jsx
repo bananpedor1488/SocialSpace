@@ -1926,7 +1926,7 @@ formData.append('files', file);
         prizeType: giveawayData.prizeType || 'text',
         prizeAmount: giveawayData.prizeType === 'points' ? (giveawayData.prizeAmount || 0) : (giveawayData.prizeAmount || 0),
         description: giveawayData.description,
-        endDate: giveawayData.endDate,
+        endDate: giveawayData.endDate ? new Date(giveawayData.endDate).toISOString() : null,
         participants: [],
         isCompleted: false
       };
@@ -2500,6 +2500,15 @@ formData.append('files', file);
                       hour: '2-digit',
                       minute: '2-digit'
                     })}</span>
+                    {/* Отладочная информация */}
+                    {console.log('Giveaway endDate raw:', post.giveawayData.endDate)}
+                    {console.log('Giveaway endDate formatted:', formatTimeWithTimezone(post.giveawayData.endDate, {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    }))}
                   </div>
                 )}
               </div>

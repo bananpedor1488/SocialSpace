@@ -28,8 +28,14 @@ export const getServerTime = () => {
 
 // Функция для форматирования времени с учетом часового пояса
 export const formatTimeWithTimezone = (timestamp, options = {}) => {
-  const serverTimestamp = new Date(timestamp).getTime() + serverTimeOffset;
-  return new Date(serverTimestamp).toLocaleString('ru-RU', {
+  // Проверяем, что timestamp валидный
+  if (!timestamp || isNaN(new Date(timestamp).getTime())) {
+    console.warn('Invalid timestamp:', timestamp);
+    return 'Неверная дата';
+  }
+  
+  // Используем timestamp как есть, но применяем часовой пояс клиента
+  return new Date(timestamp).toLocaleString('ru-RU', {
     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     ...options
   });
