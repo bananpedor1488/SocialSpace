@@ -1924,7 +1924,7 @@ formData.append('files', file);
       const giveawayDataToSend = {
         prize: giveawayData.prize,
         prizeType: giveawayData.prizeType || 'text',
-        prizeAmount: giveawayData.prizeAmount || 0,
+        prizeAmount: giveawayData.prizeType === 'points' ? (giveawayData.prizeAmount || 0) : (giveawayData.prizeAmount || 0),
         description: giveawayData.description,
         endDate: giveawayData.endDate,
         participants: [],
@@ -3232,8 +3232,18 @@ formData.append('files', file);
                             <input
                               type="number"
                               placeholder="Введите количество баллов"
-                              value={giveawayData.prizeAmount}
-                              onChange={(e) => setGiveawayData(prev => ({ ...prev, prizeAmount: parseInt(e.target.value) || 0 }))}
+                              value={giveawayData.prizeAmount || ''}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                if (value === '') {
+                                  setGiveawayData(prev => ({ ...prev, prizeAmount: '' }));
+                                } else {
+                                  const numValue = parseInt(value);
+                                  if (!isNaN(numValue) && numValue > 0) {
+                                    setGiveawayData(prev => ({ ...prev, prizeAmount: numValue }));
+                                  }
+                                }
+                              }}
                               className="form-input"
                               min="1"
                             />
