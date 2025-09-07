@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Phone, CheckCircle, AlertCircle, Copy, ExternalLink, Clock, CheckSquare } from 'lucide-react';
 import API_CONFIG from '../config/api';
 import './PhoneVerification.css';
+import { formatDate } from '../utils/timeUtils';
 
 const PhoneVerification = ({ onClose }) => {
   const [verificationStatus, setVerificationStatus] = useState(null);
@@ -251,7 +252,7 @@ const PhoneVerification = ({ onClose }) => {
           <h3>Номер телефона верифицирован!</h3>
           <p className="phone-number">+{verificationStatus.phoneNumber}</p>
           <p className="verification-date">
-            Верифицирован: {new Date(verificationStatus.phoneVerifiedAt).toLocaleDateString('ru-RU')}
+            Верифицирован: {formatDate(verificationStatus.phoneVerifiedAt)}
           </p>
           <div className="success-benefits">
             <h4>Преимущества верификации:</h4>

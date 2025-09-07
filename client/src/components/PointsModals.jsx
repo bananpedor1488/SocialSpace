@@ -4,6 +4,7 @@ import axios from 'axios';
 import Avatar from './Avatar';
 import OnlineStatus from './OnlineStatus';
 import { usePoints } from '../context/PointsContext';
+import { formatDate, formatDateTime } from '../utils/timeUtils';
 
 const PointsModals = () => {
   const [balance, setBalance] = useState(0);
@@ -183,16 +184,6 @@ const PointsModals = () => {
     return () => clearTimeout(timer);
   }, [giftData.recipientUsername]);
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('ru-RU', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
   const formatAmount = (amount) => {
     return amount.toLocaleString('ru-RU');
   };
@@ -241,7 +232,7 @@ const PointsModals = () => {
                         {transaction.description}
                       </div>
                       <div className="transaction-date">
-                        {formatDate(transaction.createdAt)}
+                        {formatDateTime(transaction.createdAt)}
                       </div>
                     </div>
                     
@@ -278,7 +269,7 @@ const PointsModals = () => {
                 <div className="premium-status">
                   <Crown size={32} className="premium-icon" />
                   <h5>🎉 Премиум активен!</h5>
-                  <p className="premium-expires">Действует до: {premiumInfo.expiresAt ? new Date(premiumInfo.expiresAt).toLocaleDateString('ru-RU') : 'Неизвестно'}</p>
+                  <p className="premium-expires">Действует до: {premiumInfo.expiresAt ? formatDate(premiumInfo.expiresAt) : 'Неизвестно'}</p>
                   
                   <div className="premium-benefits">
                     <h6>✨ Ваши премиум возможности:</h6>
@@ -449,7 +440,7 @@ const PointsModals = () => {
                       <div className="found-user-username">@{foundGiftUser.username}</div>
                       {foundGiftUserStatus && !foundGiftUserStatus.isOnline && foundGiftUserStatus.lastSeen && (
                         <div className="found-user-last-seen">
-                          Был в сети {new Date(foundGiftUserStatus.lastSeen).toLocaleDateString('ru-RU', {
+                          Был в сети {formatDateTime(foundGiftUserStatus.lastSeen, {
                             day: 'numeric',
                             month: 'short',
                             hour: '2-digit',
@@ -559,7 +550,7 @@ const PointsModals = () => {
               
               <div className="transaction-detail-row">
                 <span className="detail-label">Дата:</span>
-                <span className="detail-value">{formatDate(selectedTransaction.createdAt)}</span>
+                <span className="detail-value">{formatDateTime(selectedTransaction.createdAt)}</span>
               </div>
               
               {selectedTransaction.sender && (

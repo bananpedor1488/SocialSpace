@@ -3,6 +3,7 @@ import { Coins, Send, History, Trophy, X, ChevronDown, ChevronUp, Crown, Gift } 
 import axios from 'axios';
 import Avatar from './Avatar';
 import { usePoints } from '../context/PointsContext';
+import { formatDateTime } from '../utils/timeUtils';
 
 const Points = () => {
   const [balance, setBalance] = useState(0);
@@ -80,17 +81,6 @@ const Points = () => {
   const handleGiftPremium = async (e) => {
     e.preventDefault();
     setError('Функция подарка премиума недоступна в хедере');
-  };
-
-  // Форматировать дату
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('ru-RU', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
   };
 
   // Форматировать сумму

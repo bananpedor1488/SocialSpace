@@ -42,6 +42,14 @@ import {
   switchToChat,
   switchToChatsList
 } from '../utils/mobileMessages';
+import { 
+  syncServerTime, 
+  formatTimeWithTimezone, 
+  formatDateTime, 
+  formatDate, 
+  formatTime,
+  initializeTimeSync 
+} from '../utils/timeUtils';
 
 const HomePage = () => {
   const [user, setUser] = useState(null);
@@ -159,6 +167,7 @@ const HomePage = () => {
   
   // Состояние для создания поста
   const [isPosting, setIsPosting] = useState(false);
+  
 
   const updateMobileChatOffsets = () => {
     try {
@@ -469,7 +478,7 @@ const HomePage = () => {
           files: newPost.files || [], // Добавляем файлы поста
           likes: newPost.likes?.length || 0,
           liked: newPost.likes?.includes(user._id || user.id) || false,
-          date: new Date(newPost.createdAt || Date.now()).toLocaleDateString('ru-RU', {
+          date: formatTimeWithTimezone(newPost.createdAt || Date.now(), {
             day: 'numeric',
             month: 'short',
             year: 'numeric',
@@ -505,7 +514,7 @@ const HomePage = () => {
           files: repostData.originalPost?.files || [], // Добавляем файлы оригинального поста
           likes: repostData.originalPost?.likes?.length || 0,
           liked: repostData.originalPost?.likes?.includes(user._id || user.id) || false,
-          date: new Date(repostData.createdAt || Date.now()).toLocaleDateString('ru-RU', {
+          date: formatTimeWithTimezone(repostData.createdAt || Date.now(), {
             day: 'numeric',
             month: 'short',
             year: 'numeric',
@@ -620,6 +629,64 @@ const HomePage = () => {
         setProfilePosts(prev => prev.map(post => 
           post._id === postId 
             ? { ...post, commentsCount: Math.max(0, (post.commentsCount || 0) - 1) }
+            : post
+        ));
+      });
+
+      // Обновление голосования в опросе
+      socketRef.current.on('pollVoteUpdate', ({ postId, votes }) => {
+        console.log('Poll vote update received:', { postId, votes });
+        
+        setPosts(prev => prev.map(post => 
+          post._id === postId 
+            ? { 
+                ...post, 
+                pollData: { 
+                  ...post.pollData, 
+                  votes: votes
+                }
+              }
+            : post
+        ));
+
+        setProfilePosts(prev => prev.map(post => 
+          post._id === postId 
+            ? { 
+                ...post, 
+                pollData: { 
+                  ...post.pollData, 
+                  votes: votes
+                }
+              }
+            : post
+        ));
+      });
+
+      // Обновление участников розыгрыша
+      socketRef.current.on('giveawayParticipantUpdate', ({ postId, participants }) => {
+        console.log('Giveaway participant update received:', { postId, participants });
+        
+        setPosts(prev => prev.map(post => 
+          post._id === postId 
+            ? { 
+                ...post, 
+                giveawayData: { 
+                  ...post.giveawayData, 
+                  participants: participants
+                }
+              }
+            : post
+        ));
+
+        setProfilePosts(prev => prev.map(post => 
+          post._id === postId 
+            ? { 
+                ...post, 
+                giveawayData: { 
+                  ...post.giveawayData, 
+                  participants: participants
+                }
+              }
             : post
         ));
       });
@@ -985,6 +1052,8 @@ const HomePage = () => {
       }
 
       try {
+        // Синхронизируем время с сервером при инициализации
+        await initializeTimeSync();
         const savedUser = localStorage.getItem('user');
         if (savedUser) {
           const parsedUser = JSON.parse(savedUser);
@@ -1580,7 +1649,7 @@ const HomePage = () => {
           likes: Array.isArray(post.likes) ? post.likes.length : (post.likes || 0),
           liked: Array.isArray(post.likes) && user ? post.likes.includes(user._id || user.id) : false,
           commentsCount: post.commentsCount || (post.comments ? post.comments.length : 0),
-          date: new Date(post.createdAt).toLocaleDateString('ru-RU', {
+          date: formatTimeWithTimezone(post.createdAt, {
             day: 'numeric',
             month: 'short',
             year: 'numeric',
@@ -1954,6 +2023,19 @@ formData.append('files', file);
 
   const handleVotePoll = async (postId, optionIndex) => {
     try {
+      // Проверяем, голосовал ли уже пользователь в этом опросе
+      const currentPost = posts.find(post => post._id === postId);
+      if (!currentPost?.pollData) return;
+      
+      const userId = user._id || user.id;
+      const userVotes = currentPost.pollData.votes?.[userId] || [];
+      
+      // Если пользователь уже голосовал, не разрешаем голосовать снова
+      if (userVotes.length > 0) {
+        showWarning('Вы уже проголосовали в этом опросе');
+        return;
+      }
+      
       const response = await axios.post(`https://server-pqqy.onrender.com/api/posts/${postId}/vote-poll`, {
         optionIndex
       });
@@ -2115,7 +2197,7 @@ formData.append('files', file);
         likes: Array.isArray(post.likes) ? post.likes.length : (post.likes || 0),
         liked: Array.isArray(post.likes) && user ? post.likes.includes(user._id || user.id) : false,
         commentsCount: post.commentsCount || (post.comments ? post.comments.length : 0),
-        date: new Date(post.createdAt).toLocaleDateString('ru-RU', {
+        date: formatTimeWithTimezone(post.createdAt, {
           day: 'numeric',
           month: 'short',
           year: 'numeric',
@@ -2229,7 +2311,7 @@ formData.append('files', file);
             </div>
             <span className="post-date">
               {post.isRepost && post.originalPost?.createdAt 
-                ? new Date(post.originalPost.createdAt).toLocaleDateString('ru-RU', {
+                ? formatTimeWithTimezone(post.originalPost.createdAt, {
                     day: 'numeric',
                     month: 'short',
                     year: 'numeric',
@@ -2369,7 +2451,7 @@ formData.append('files', file);
                 {post.giveawayData?.endDate && (
                   <div className="giveaway-end">
                     <Clock size={16} />
-                    <span>Окончание: {new Date(post.giveawayData.endDate).toLocaleString('ru-RU')}</span>
+                    <span>Окончание: {formatTimeWithTimezone(post.giveawayData.endDate)}</span>
                   </div>
                 )}
               </div>
@@ -2423,19 +2505,19 @@ formData.append('files', file);
                     <button 
                       className={`poll-option-btn ${post.pollData.votes?.[user._id || user.id]?.includes(index) ? 'voted' : ''}`}
                       onClick={() => handleVotePoll(post._id, index)}
-                      disabled={post.pollData.isActive === false}
+                      disabled={post.pollData.isActive === false || (post.pollData.votes?.[user._id || user.id] && post.pollData.votes[user._id || user.id].length > 0)}
                     >
                       {option}
                     </button>
                     <div className="poll-stats">
                       <span className="vote-count">
-                        {post.pollData.votes?.[index]?.length || 0} голосов
+                        {Object.values(post.pollData.votes || {}).filter(userVotes => userVotes.includes(index)).length} голосов
                       </span>
                       <div className="vote-bar">
                         <div 
                           className="vote-fill"
                           style={{ 
-                            width: `${((post.pollData.votes?.[index]?.length || 0) / Math.max(1, Object.values(post.pollData.votes || {}).flat().length)) * 100}%` 
+                            width: `${(Object.values(post.pollData.votes || {}).filter(userVotes => userVotes.includes(index)).length / Math.max(1, Object.values(post.pollData.votes || {}).flat().length)) * 100}%` 
                           }}
                         ></div>
                       </div>
@@ -2448,7 +2530,7 @@ formData.append('files', file);
               </p>
               {post.pollData.endDate && (
                 <p className="poll-end-date">
-                  Окончание: {new Date(post.pollData.endDate).toLocaleString('ru-RU')}
+                  Окончание: {formatTimeWithTimezone(post.pollData.endDate)}
                 </p>
               )}
             </div>
@@ -2528,7 +2610,7 @@ formData.append('files', file);
                             )}
                           </span>
                           <span className="comment-date">
-                            {new Date(comment.createdAt).toLocaleDateString('ru-RU')}
+                            {formatTimeWithTimezone(comment.createdAt)}
                           </span>
                         </div>
                       </div>
@@ -2862,7 +2944,7 @@ formData.append('files', file);
   };
 
   const formatWalletDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('ru-RU', {
+    return formatTimeWithTimezone(dateString, {
       day: 'numeric',
       month: 'short',
       year: 'numeric',
@@ -3577,7 +3659,7 @@ formData.append('files', file);
                                       if (message.type === 'call') return null;
                                       const isOwn = message.sender._id === (user._id || user.id);
                                       const date = new Date(message.createdAt);
-                                      const messageTime = date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+                                      const messageTime = formatTimeWithTimezone(message.createdAt, { hour: '2-digit', minute: '2-digit' });
                                       return (
                                         <div key={message._id} className={`message ${isOwn ? 'own' : 'other'}`}>
                                           {!isOwn && (
@@ -3854,7 +3936,7 @@ formData.append('files', file);
                                             )}
                                           </span>
                                           <span className="message-time">
-                                            {new Date(message.createdAt).toLocaleTimeString('ru-RU', {
+                                            {formatTimeWithTimezone(message.createdAt, {
                                               hour: '2-digit',
                                               minute: '2-digit'
                                             })}
@@ -4275,7 +4357,11 @@ formData.append('files', file);
                         Время регистрации
                       </div>
                       <div className="more-value">
-                        {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('ru-RU') : 'Неизвестно'}
+                        {user?.createdAt ? formatTimeWithTimezone(user.createdAt, {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric'
+                        }) : 'Неизвестно'}
                       </div>
                     </div>
                     
@@ -4583,7 +4669,11 @@ formData.append('files', file);
                           <Crown className="premium-icon" size={48} />
                           <div className="premium-status">
                             <h5>Премиум активен</h5>
-                            <p className="premium-expires">Действует до: {premiumInfo.expiresAt ? new Date(premiumInfo.expiresAt).toLocaleDateString('ru-RU') : '—'}</p>
+                            <p className="premium-expires">Действует до: {premiumInfo.expiresAt ? formatTimeWithTimezone(premiumInfo.expiresAt, {
+                              day: 'numeric',
+                              month: 'long',
+                              year: 'numeric'
+                            }) : '—'}</p>
                           </div>
                         </div>
                       ) : (
@@ -4711,7 +4801,11 @@ formData.append('files', file);
                 <p>По всем вопросам, связанным с настоящим соглашением, обращайтесь к администрации сервиса.</p>
                 
                 <div className="license-date">
-                  Дата последнего обновления: {new Date().toLocaleDateString('ru-RU')}
+                  Дата последнего обновления: {formatTimeWithTimezone(Date.now(), {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                  })}
                 </div>
               </div>
             </div>
@@ -4841,7 +4935,7 @@ formData.append('files', file);
                         <div className="found-user-username">@{foundUser.username}</div>
                         {foundUserStatus && !foundUserStatus.isOnline && foundUserStatus.lastSeen && (
                           <div className="found-user-last-seen">
-                            Был в сети {new Date(foundUserStatus.lastSeen).toLocaleDateString('ru-RU', {
+                            Был в сети {formatTimeWithTimezone(foundUserStatus.lastSeen, {
                               day: 'numeric',
                               month: 'short',
                               hour: '2-digit',

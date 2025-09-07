@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 import './AccountSettings.css';
+import { formatDate } from '../utils/timeUtils';
 
 const AccountSettings = ({ isOpen, onClose, user, onLogout, isDarkTheme, onToggleTheme }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -203,11 +204,7 @@ const AccountSettings = ({ isOpen, onClose, user, onLogout, isDarkTheme, onToggl
                   <div className="info-item">
                     <span className="info-label">Дата регистрации</span>
                     <span className="info-value">
-                      {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('ru-RU', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric'
-                      }) : 'Неизвестно'}
+                      {user?.createdAt ? formatDate(user.createdAt) : 'Неизвестно'}
                     </span>
                   </div>
                   <div className="info-item">
