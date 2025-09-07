@@ -1966,8 +1966,18 @@ formData.append('files', file);
   // Проверка, истек ли розыгрыш
   const isGiveawayExpired = (endDate) => {
     if (!endDate) return false;
-    const now = new Date();
+    
+    // Используем синхронизированное время сервера для точного сравнения
+    const { getServerTime } = require('../utils/timeUtils');
+    const now = getServerTime();
     const end = new Date(endDate);
+    
+    console.log('Checking giveaway expiration:');
+    console.log('  - End date:', endDate);
+    console.log('  - End date parsed:', end.toISOString());
+    console.log('  - Current server time:', now.toISOString());
+    console.log('  - Is expired:', now > end);
+    
     return now > end;
   };
 
