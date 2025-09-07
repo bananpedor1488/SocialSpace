@@ -1664,7 +1664,7 @@ const HomePage = () => {
           repostedBy: post.repostedBy || null,
           // Добавляем поля для интерактивных элементов
           postType: post.postType || 'text',
-          giveawayData: post.giveawayData || null,
+          giveawayData: post.giveawayData ? { ...post.giveawayData, _postId: post._id } : null,
           pollData: post.pollData || null,
           quizData: post.quizData || null
         };
@@ -1984,7 +1984,16 @@ formData.append('files', file);
   // Проверка статуса розыгрыша
   const getGiveawayStatus = (giveawayData) => {
     if (giveawayData?.isCompleted) return 'completed';
-    if (giveawayData?.endDate && isGiveawayExpired(giveawayData.endDate)) return 'expired';
+    if (giveawayData?.endDate && isGiveawayExpired(giveawayData.endDate)) {
+      // Если розыгрыш истек, но не завершен, немедленно завершаем его
+      if (!giveawayData.isCompleted && giveawayData.participants?.length > 0) {
+        // Завершаем розыгрыш немедленно при истечении времени
+        setTimeout(() => {
+          handleCompleteGiveaway(giveawayData._postId);
+        }, 100);
+      }
+      return 'expired';
+    }
     return 'active';
   };
 
@@ -2528,6 +2537,27 @@ formData.append('files', file);
                   const status = getGiveawayStatus(post.giveawayData);
                   
                   if (status === 'completed') {
+                    // Проверяем, является ли текущий пользователь победителем
+                    const isWinner = post.giveawayData?.winner && 
+                      (post.giveawayData.winner.toString() === (user._id || user.id).toString());
+                    
+                    if (isWinner) {
+                      return (
+                        <div className="giveaway-winner">
+                          <Gift size={16} />
+                          <span>🎉 Поздравляем! Вы выиграли!</span>
+                          <div className="winner-prize">
+                            {post.giveawayData?.prizeType === 'points' 
+                              ? `+${post.giveawayData?.prizeAmount} баллов`
+                              : post.giveawayData?.prizeType === 'premium'
+                              ? `+${post.giveawayData?.prizeAmount} дней премиума`
+                              : post.giveawayData?.prize || 'Приз'
+                            }
+                          </div>
+                        </div>
+                      );
+                    }
+                    
                     return (
                       <div className="giveaway-completed">
                         <Check size={16} />

@@ -11426,6 +11426,40 @@ html, body {
   background: #f57c00;
 }
 
+.giveaway-winner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  border: 2px solid #d97706;
+  border-radius: 12px;
+  color: #92400e;
+  font-weight: 600;
+  text-align: center;
+  animation: winnerGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes winnerGlow {
+  from {
+    box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+  }
+  to {
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.8);
+  }
+}
+
+.winner-prize {
+  font-size: 18px;
+  font-weight: 700;
+  color: #92400e;
+  background: rgba(255, 255, 255, 0.3);
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
 .winner-info {
   color: #fbbf24;
   font-size: 12px;
