@@ -11397,6 +11397,35 @@ html, body {
   text-align: center;
 }
 
+.giveaway-expired {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: #fff3e0;
+  border: 1px solid #ff9800;
+  border-radius: 8px;
+  color: #e65100;
+  font-weight: 500;
+}
+
+.complete-giveaway-btn {
+  background: #ff9800;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-left: auto;
+}
+
+.complete-giveaway-btn:hover {
+  background: #f57c00;
+}
+
 .winner-info {
   color: #fbbf24;
   font-size: 12px;

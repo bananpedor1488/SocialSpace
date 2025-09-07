@@ -1963,6 +1963,48 @@ formData.append('files', file);
     }
   };
 
+  // Проверка, истек ли розыгрыш
+  const isGiveawayExpired = (endDate) => {
+    if (!endDate) return false;
+    const now = new Date();
+    const end = new Date(endDate);
+    return now > end;
+  };
+
+  // Проверка статуса розыгрыша
+  const getGiveawayStatus = (giveawayData) => {
+    if (giveawayData?.isCompleted) return 'completed';
+    if (giveawayData?.endDate && isGiveawayExpired(giveawayData.endDate)) return 'expired';
+    return 'active';
+  };
+
+  const handleCompleteGiveaway = async (postId) => {
+    try {
+      const response = await axios.post(`https://server-pqqy.onrender.com/api/posts/${postId}/complete-giveaway`);
+      
+      // Обновляем состояние поста
+      setPosts(prevPosts => 
+        prevPosts.map(post => 
+          post._id === postId 
+            ? { 
+                ...post, 
+                giveawayData: { 
+                  ...post.giveawayData, 
+                  isCompleted: true, 
+                  winner: response.data.winner 
+                } 
+              }
+            : post
+        )
+      );
+      
+      showSuccess('Розыгрыш завершен!');
+    } catch (error) {
+      console.error('Ошибка завершения розыгрыша:', error);
+      showError('Ошибка при завершении розыгрыша');
+    }
+  };
+
   const handleJoinGiveaway = async (postId) => {
     try {
       const response = await axios.post(`https://server-pqqy.onrender.com/api/posts/${postId}/join-giveaway`);
@@ -2451,47 +2493,78 @@ formData.append('files', file);
                 {post.giveawayData?.endDate && (
                   <div className="giveaway-end">
                     <Clock size={16} />
-                    <span>Окончание: {formatTimeWithTimezone(post.giveawayData.endDate)}</span>
+                    <span>Окончание: {formatTimeWithTimezone(post.giveawayData.endDate, {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}</span>
                   </div>
                 )}
               </div>
               
               <div className="giveaway-actions">
-                {!post.giveawayData?.isCompleted ? (
-                  <>
-                  <button 
-                    className="join-giveaway-btn"
-                    onClick={() => handleJoinGiveaway(post._id)}
-                      disabled={post.giveawayData?.participants?.includes(user._id || user.id)}
-                  >
-                    <Gift size={16} />
-                      {post.giveawayData?.participants?.includes(user._id || user.id) 
-                        ? 'Вы участвуете' 
-                        : 'Участвовать в розыгрыше'
-                      }
-                  </button>
-                
-                {post.userId === (user._id || user.id) && (
-                  <button 
-                    className="view-participants-btn"
-                    onClick={() => {/* Показать участников */}}
-                  >
-                    <Users size={16} />
-                        Участники ({post.giveawayData?.participants?.length || 0})
-                  </button>
-                    )}
-                  </>
-                ) : (
-                  <div className="giveaway-completed">
-                    <Check size={16} />
-                    <span>Розыгрыш завершен</span>
-                    {post.giveawayData?.winner && (
-                      <span className="winner-info">
-                        Победитель: @{post.giveawayData.winner}
-                      </span>
-                    )}
-                  </div>
-                )}
+                {(() => {
+                  const status = getGiveawayStatus(post.giveawayData);
+                  
+                  if (status === 'completed') {
+                    return (
+                      <div className="giveaway-completed">
+                        <Check size={16} />
+                        <span>Розыгрыш завершен</span>
+                        {post.giveawayData?.winner && (
+                          <span className="winner-info">
+                            Победитель: @{post.giveawayData.winner}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  }
+                  
+                  if (status === 'expired') {
+                    return (
+                      <div className="giveaway-expired">
+                        <Clock size={16} />
+                        <span>Розыгрыш истек</span>
+                        {post.userId === (user._id || user.id) && (
+                          <button 
+                            className="complete-giveaway-btn"
+                            onClick={() => handleCompleteGiveaway(post._id)}
+                          >
+                            Завершить розыгрыш
+                          </button>
+                        )}
+                      </div>
+                    );
+                  }
+                  
+                  return (
+                    <>
+                      <button 
+                        className="join-giveaway-btn"
+                        onClick={() => handleJoinGiveaway(post._id)}
+                        disabled={post.giveawayData?.participants?.includes(user._id || user.id)}
+                      >
+                        <Gift size={16} />
+                        {post.giveawayData?.participants?.includes(user._id || user.id) 
+                          ? 'Вы участвуете' 
+                          : 'Участвовать в розыгрыше'
+                        }
+                      </button>
+                      
+                      {post.userId === (user._id || user.id) && (
+                        <button 
+                          className="view-participants-btn"
+                          onClick={() => {/* Показать участников */}}
+                        >
+                          <Users size={16} />
+                          Участники ({post.giveawayData?.participants?.length || 0})
+                        </button>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
             </div>
           )}
