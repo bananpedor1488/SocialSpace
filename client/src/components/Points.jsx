@@ -98,15 +98,12 @@ const Points = () => {
       {/* Основная информация о баллах с выпадающим меню */}
       <div className="points-header">
         <div 
-          className="points-balance clickable"
+          className="points-balance-compact"
           onClick={() => setShowDropdown(!showDropdown)}
         >
-          <Coins size={24} className="points-icon" />
-          <div className="balance-info">
-            <span className="balance-label">Ваши баллы</span>
-            <span className="balance-amount">{formatAmount(balance)}</span>
-          </div>
-          {showDropdown ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          <Coins size={16} className="points-icon-compact" />
+          <span className="balance-compact">{formatAmount(balance)}</span>
+          {showDropdown ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
         </div>
       </div>
 
