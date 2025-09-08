@@ -1778,6 +1778,11 @@ html, body {
   .home-container:not(.show-right-sidebar) .main-content {
     border-right: none;
   }
+
+  /* Когда правая панель показана, добавляем отступ справа */
+  .home-container.show-right-sidebar .main-content {
+    margin-right: 340px;
+  }
   
   /* Создание поста */
   .create-post {
@@ -2380,8 +2385,10 @@ html, body {
     flex-direction: column;
     gap: 20px;
     height: calc(100vh - 60px);
-    position: sticky;
+    position: fixed;
     top: 60px;
+    right: 0;
+    width: 300px;
     overflow-y: auto;
     background: rgba(15, 23, 42, 0.95);
     backdrop-filter: blur(20px);
@@ -2389,9 +2396,7 @@ html, body {
     border-left: 1px solid rgba(71, 85, 105, 0.3);
     box-shadow: -4px 0 16px rgba(0, 0, 0, 0.2);
     padding: 20px;
-    /* Стабилизация позиционирования */
-    transform: translateZ(0);
-    will-change: auto;
+    z-index: 999;
   }
   
   /* Скрываем правую панель по умолчанию */
@@ -10110,12 +10115,25 @@ html, body {
   
   /* Стили для профиля на ПК */
   .profile-view {
-    display: grid;
-    grid-template-columns: 600px 1fr;
-    gap: 15px;
+    display: block;
     max-width: 1600px;
     margin: 0 auto;
     padding: 10px 10px;
+    position: relative;
+  }
+
+  .profile-view .profile-header {
+    position: fixed;
+    top: 90px;
+    left: 50%;
+    transform: translateX(-790px);
+    width: 580px;
+    z-index: 998;
+  }
+
+  .profile-view .profile-posts {
+    margin-left: 615px;
+    width: calc(100% - 615px);
   }
   
   .profile-view .profile-details {
@@ -10161,9 +10179,6 @@ html, body {
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15), 0 6px 20px rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(10px);
     overflow: hidden;
-    /* Стабилизация позиционирования */
-    transform: translateZ(0);
-    will-change: auto;
   }
   
   .profile-header::before {
