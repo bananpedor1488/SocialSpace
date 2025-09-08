@@ -1256,7 +1256,7 @@ html, body {
     gap: 15px;
     max-width: 100%;
     height: 100%;
-    overflow: hidden;
+    overflow: visible;
   }
   
   .logo h1 {
@@ -5855,8 +5855,8 @@ html, body {
 
   /* Специфичные стили для кнопки баллов в хедере */
   .user-info .points-container .points-balance {
-    border-radius: 25px !important;
-    padding: 8px 16px !important;
+    border-radius: 20px !important;
+    padding: 8px 12px !important;
     background: rgba(51, 65, 85, 0.7) !important;
     border: 1px solid rgba(71, 85, 105, 0.5) !important;
     display: flex !important;
@@ -5869,7 +5869,7 @@ html, body {
   .user-info .points-container .points-balance:hover {
     background: rgba(71, 85, 105, 0.8) !important;
     border-color: rgba(100, 116, 139, 0.7) !important;
-    border-radius: 25px !important;
+    border-radius: 20px !important;
   }
   
   .points-header {
@@ -5884,8 +5884,8 @@ html, body {
     gap: 8px;
     background: rgba(51, 65, 85, 0.7);
     border: 1px solid rgba(71, 85, 105, 0.5);
-    border-radius: 25px;
-    padding: 8px 16px;
+    border-radius: 20px;
+    padding: 8px 12px;
     transition: all 0.3s ease;
     cursor: pointer;
   }
@@ -6401,7 +6401,7 @@ html, body {
     
     .points-balance {
       padding: 6px 10px;
-      border-radius: 25px;
+      border-radius: 20px;
     }
     
     .balance-amount {
@@ -6423,7 +6423,7 @@ html, body {
   .points-balance.clickable:hover {
     background: rgba(71, 85, 105, 0.8);
     border-color: rgba(100, 116, 139, 0.7);
-    border-radius: 25px;
+    border-radius: 20px;
   }
   
   .points-dropdown {
@@ -6436,31 +6436,14 @@ html, body {
     border: 1px solid rgba(71, 85, 105, 0.3);
     border-radius: 8px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    z-index: 99999;
+    z-index: 1000;
     margin-top: 5px;
-    overflow: visible;
+    overflow: hidden;
     opacity: 0;
     transform: translateY(-10px) scale(0.95);
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* Специфичные стили для dropdown в хедере */
-  .user-info .points-container .points-dropdown {
-    position: absolute !important;
-    top: 100% !important;
-    left: 0 !important;
-    right: 0 !important;
-    z-index: 99999 !important;
-    overflow: visible !important;
-    opacity: 0;
-    transform: translateY(-10px) scale(0.95);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .user-info .points-container .points-dropdown.show {
-    opacity: 1 !important;
-    transform: translateY(0) scale(1) !important;
-  }
   
   /* Стили для модального окна перевода балов */
   .points-modal {
