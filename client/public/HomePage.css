@@ -5849,6 +5849,7 @@ html, body {
   .points-container {
     position: relative;
     display: inline-block;
+    z-index: 1000;
   }
   
   .points-header {
@@ -6399,8 +6400,9 @@ html, body {
   }
   
   .points-balance.clickable:hover {
-    background: rgba(51, 65, 85, 0.3);
-    border-radius: 8px;
+    background: rgba(71, 85, 105, 0.8);
+    border-color: rgba(100, 116, 139, 0.7);
+    border-radius: 25px;
   }
   
   .points-dropdown {
@@ -6413,7 +6415,7 @@ html, body {
     border: 1px solid rgba(71, 85, 105, 0.3);
     border-radius: 8px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    z-index: 10001;
+    z-index: 99999;
     margin-top: 5px;
     overflow: hidden;
     opacity: 0;
