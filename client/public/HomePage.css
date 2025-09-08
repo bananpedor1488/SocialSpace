@@ -1782,6 +1782,7 @@ html, body {
   /* Когда правая панель показана, grid автоматически распределит пространство */
   .home-container.show-right-sidebar .main-content {
     margin-right: 0;
+    border-right: none;
   }
   
   /* Создание поста */
@@ -2407,6 +2408,10 @@ html, body {
   /* Показываем правую панель только когда нужно */
   .home-container.show-right-sidebar .right-sidebar {
     display: flex;
+    position: static;
+    width: auto;
+    height: calc(100vh - 60px);
+    border-left: 1px solid rgba(71, 85, 105, 0.3);
   }
   
   .trending, .suggestions, .changelog {
