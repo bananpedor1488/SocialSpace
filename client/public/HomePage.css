@@ -1676,9 +1676,9 @@ html, body {
     border-right: 1px solid rgba(71, 85, 105, 0.3);
     box-shadow: 4px 0 16px rgba(0, 0, 0, 0.2);
     padding: 20px;
-    height: calc(100vh - 80px);
+    height: calc(100vh - 60px);
     position: sticky;
-    top: 80px;
+    top: 60px;
     overflow-y: auto;
     z-index: 1000;
   }
@@ -1769,7 +1769,7 @@ html, body {
     border-left: 1px solid rgba(71, 85, 105, 0.3);
     border-right: 1px solid rgba(71, 85, 105, 0.3);
     padding: 30px;
-    height: calc(100vh - 80px);
+    height: calc(100vh - 60px);
     overflow-y: auto;
     min-width: 0;
   }
@@ -10154,10 +10154,9 @@ html, body {
     border: 1px solid rgba(71, 85, 105, 0.5);
     height: fit-content;
     position: sticky;
-    top: 20px;
+    top: 80px;
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15), 0 6px 20px rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(10px);
-    position: relative;
     overflow: hidden;
   }
   
