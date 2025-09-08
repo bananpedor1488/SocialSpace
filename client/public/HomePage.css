@@ -2182,87 +2182,218 @@ html, body {
     font-size: 15px;
   }
   
-  /* Профиль */
+  /* ==========================================
+     НОВЫЕ СТИЛИ ПРОФИЛЯ - ДВУХКОЛОНОЧНЫЙ LAYOUT
+     ========================================== */
+
+  /* Основной контейнер профиля */
   .profile-view {
-    padding: 20px 0;
+    display: grid !important;
+    grid-template-columns: 400px 1fr !important;
+    gap: 30px !important;
+    padding: 20px 0 !important;
+    height: calc(100vh - 80px) !important;
+    max-width: 1400px !important;
+    margin: 0 auto !important;
+    transition: all 0.3s ease !important;
+    position: static !important;
   }
   
+  /* Левая колонка - информация о пользователе (фиксированная) */
   .profile-header {
-    background: rgba(30, 41, 59, 0.9);
-    border-radius: 20px;
-    padding: 30px;
-    margin-bottom: 30px;
-    border: 1px solid rgba(71, 85, 105, 0.4);
+    grid-column: 1 !important;
+    position: sticky !important;
+    top: 20px !important;
+    left: auto !important;
+    width: auto !important;
+    height: fit-content !important;
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(51, 65, 85, 0.9) 100%) !important;
+    border-radius: 24px !important;
+    padding: 30px !important;
+    border: 1px solid rgba(71, 85, 105, 0.4) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+    backdrop-filter: blur(20px) !important;
+    overflow: hidden !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    z-index: 1 !important;
+  }
+
+  .profile-header:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    border-color: rgba(71, 85, 105, 0.6);
+  }
+
+  /* Градиентная полоска сверху */
+  .profile-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4);
+    border-radius: 24px 24px 0 0;
+  }
+
+  /* Правая колонка - посты (скроллируемая) */
+  .profile-posts {
+    grid-column: 2 !important;
+    height: calc(100vh - 100px) !important;
+    overflow-y: auto !important;
+    padding-right: 10px !important;
+    scroll-behavior: smooth !important;
+    margin-left: 0 !important;
+    width: auto !important;
+  }
+
+  /* Кастомный скроллбар для постов */
+  .profile-posts::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .profile-posts::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.3);
+    border-radius: 3px;
+  }
+
+  .profile-posts::-webkit-scrollbar-thumb {
+    background: rgba(71, 85, 105, 0.6);
+    border-radius: 3px;
+    transition: background 0.2s ease;
+  }
+
+  .profile-posts::-webkit-scrollbar-thumb:hover {
+    background: rgba(100, 116, 139, 0.8);
   }
   
+  /* Информация о пользователе */
   .profile-main-info {
-    display: flex;
-    align-items: flex-start;
-    gap: 25px;
-    flex-wrap: wrap;
+    text-align: center;
+    margin-bottom: 25px;
     position: relative;
   }
-  
-  .profile-info {
-    flex: 1;
-    min-width: 300px;
-    margin-left: 0;
+
+  .profile-avatar-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
   }
   
   .profile-username {
     color: #f1f5f9;
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 700;
-    margin-bottom: 8px;
+    margin-bottom: 5px;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 12px;
     flex-wrap: wrap;
+    animation: fadeInUp 0.6s ease;
+  }
+
+  .profile-handle {
+    color: rgba(148, 163, 184, 0.8);
+    font-size: 16px;
+    margin-bottom: 20px;
+    animation: fadeInUp 0.6s ease 0.1s both;
   }
   
   .own-profile-badge {
-    background: rgba(34, 197, 94, 0.2);
+    background: rgba(34, 197, 94, 0.15);
     color: #4ade80;
-    padding: 4px 12px;
+    padding: 6px 16px;
     border-radius: 20px;
-    font-size: 13px;
-    font-weight: 500;
-    display: flex;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
     align-items: center;
     gap: 6px;
     border: 1px solid rgba(34, 197, 94, 0.3);
     white-space: nowrap;
+    margin-top: 10px;
+    animation: fadeInUp 0.6s ease 0.2s both;
   }
   
-  .profile-handle {
-    color: rgba(148, 163, 184, 0.9);
-    font-size: 16px;
-    margin-bottom: 0;
-  }
   
+  /* Статистика профиля */
   .profile-stats {
-    display: flex;
-    gap: 30px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin: 25px 0;
+    animation: fadeInUp 0.6s ease 0.3s both;
   }
-  
+
   .profile-stat {
     text-align: center;
+    padding: 20px 15px;
+    background: rgba(30, 41, 59, 0.6);
+    border-radius: 16px;
+    border: 1px solid rgba(71, 85, 105, 0.3);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
   }
-  
+
+  .profile-stat::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .profile-stat:hover {
+    transform: translateY(-2px);
+    background: rgba(30, 41, 59, 0.8);
+    border-color: rgba(71, 85, 105, 0.5);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  .profile-stat:hover::before {
+    left: 100%;
+  }
+
   .stat-number {
     display: block;
     color: #f1f5f9;
-    font-size: 32px;
+    font-size: 24px;
     font-weight: 700;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
+    line-height: 1;
   }
-  
+
   .stat-label {
     color: rgba(148, 163, 184, 0.8);
-    font-size: 13px;
-    font-weight: 500;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: 1;
+  }
+
+  /* Биография */
+  .profile-bio {
+    color: rgba(148, 163, 184, 0.9);
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 20px 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    text-align: left;
+    background: rgba(15, 23, 42, 0.3);
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid rgba(71, 85, 105, 0.2);
+    animation: fadeInUp 0.6s ease 0.4s both;
   }
   
   .follow-btn {
@@ -2294,29 +2425,102 @@ html, body {
   /* Контейнер для кнопок профиля */
   .profile-actions {
     display: flex;
-    align-items: center;
+    flex-direction: column;
     gap: 12px;
-    margin-top: 15px;
+    margin-top: 25px;
+    animation: fadeInUp 0.6s ease 0.5s both;
   }
   
+  /* Заголовок постов */
   .profile-posts-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid rgba(71, 85, 105, 0.3);
-    flex-wrap: wrap;
-    gap: 10px;
+    margin-bottom: 25px;
+    padding: 20px 0 15px;
+    border-bottom: 2px solid rgba(71, 85, 105, 0.3);
+    position: sticky;
+    top: 0;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(20px);
+    z-index: 10;
   }
-  
+
   .profile-posts-header h3 {
     color: #f1f5f9;
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 600;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
+  }
+
+  /* Анимации */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Адаптивность профиля */
+  @media (max-width: 1200px) {
+    .profile-view {
+      grid-template-columns: 350px 1fr;
+      gap: 25px;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    .profile-view {
+      grid-template-columns: 300px 1fr;
+      gap: 20px;
+    }
+    
+    .profile-header {
+      padding: 25px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .profile-view {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      height: auto;
+    }
+    
+    .profile-header {
+      position: static;
+      margin-bottom: 20px;
+    }
+    
+    .profile-posts {
+      height: auto;
+      overflow-y: visible;
+      padding-right: 0;
+    }
+    
+    .profile-stats {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    
+    .profile-stat {
+      padding: 15px 10px;
+    }
+    
+    .stat-number {
+      font-size: 20px;
+    }
+    
+    .stat-label {
+      font-size: 11px;
+    }
   }
   
   .posts-count {
