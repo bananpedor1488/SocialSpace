@@ -1779,9 +1779,9 @@ html, body {
     border-right: none;
   }
 
-  /* Когда правая панель показана, добавляем отступ справа */
+  /* Когда правая панель показана, grid автоматически распределит пространство */
   .home-container.show-right-sidebar .main-content {
-    margin-right: 340px;
+    margin-right: 0;
   }
   
   /* Создание поста */
