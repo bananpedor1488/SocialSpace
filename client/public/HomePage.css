@@ -5853,24 +5853,6 @@ html, body {
     z-index: 1000;
   }
 
-  /* Специфичные стили для кнопки баллов в хедере */
-  .user-info .points-container .points-balance {
-    border-radius: 20px !important;
-    padding: 8px 12px !important;
-    background: rgba(51, 65, 85, 0.7) !important;
-    border: 1px solid rgba(71, 85, 105, 0.5) !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    transition: all 0.3s ease !important;
-    cursor: pointer !important;
-  }
-
-  .user-info .points-container .points-balance:hover {
-    background: rgba(71, 85, 105, 0.8) !important;
-    border-color: rgba(100, 116, 139, 0.7) !important;
-    border-radius: 20px !important;
-  }
   
   .points-header {
     display: flex;
@@ -5901,8 +5883,7 @@ html, body {
   
   .balance-info {
     display: flex;
-    flex-direction: column;
-    gap: 2px;
+    align-items: center;
   }
   
   .balance-label {
@@ -6423,7 +6404,6 @@ html, body {
   .points-balance.clickable:hover {
     background: rgba(71, 85, 105, 0.8);
     border-color: rgba(100, 116, 139, 0.7);
-    border-radius: 20px;
   }
   
   .points-dropdown {
