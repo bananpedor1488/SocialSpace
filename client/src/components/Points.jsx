@@ -101,9 +101,12 @@ const Points = () => {
           className="points-balance-compact"
           onClick={() => setShowDropdown(!showDropdown)}
         >
-          <Coins size={16} className="points-icon-compact" />
-          <span className="balance-compact">{formatAmount(balance)}</span>
-          {showDropdown ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+          <Coins size={18} className="points-icon-compact" />
+          <div className="balance-info-compact">
+            <span className="balance-label-compact">Ваши баллы</span>
+            <span className="balance-compact">{formatAmount(balance)}</span>
+          </div>
+          {showDropdown ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
         </div>
       </div>
 

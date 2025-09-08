@@ -5857,16 +5857,13 @@ html, body {
   .points-balance-compact {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     background: rgba(51, 65, 85, 0.7);
     border: 1px solid rgba(71, 85, 105, 0.5);
-    border-radius: 16px;
-    padding: 6px 10px;
+    border-radius: 18px;
+    padding: 8px 14px;
     transition: all 0.3s ease;
     cursor: pointer;
-    font-size: 13px;
-    font-weight: 600;
-    color: #f1f5f9;
     white-space: nowrap;
   }
 
@@ -5888,10 +5885,25 @@ html, body {
     flex-shrink: 0;
   }
 
+  .balance-info-compact {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .balance-label-compact {
+    font-size: 10px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: 1;
+  }
+
   .balance-compact {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     color: #f1f5f9;
+    line-height: 1;
   }
 
   
