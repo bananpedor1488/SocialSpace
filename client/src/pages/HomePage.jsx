@@ -8,7 +8,7 @@ import {
   Heart, MessageSquare, Repeat, Pencil, Trash2, Users, UserCheck, Send, X, ChevronDown, ChevronLeft,
   Moon, Sun, Wifi, WifiOff, Flame, Clock, Phone, Settings, Trophy, DollarSign,
   Check, Play, HelpCircle, History, Crown, Gift, ArrowLeft, MoreVertical, FileText,
-  Info, Shield, Lock, Calendar, Paperclip, Image, File, Video, BarChart3
+  Info, Shield, Lock, Calendar, Paperclip, Image, File, Video, BarChart3, ExternalLink
 } from 'lucide-react';
 
 import GiveawayConfirmModal from '../components/GiveawayConfirmModal';
@@ -20,7 +20,7 @@ import Avatar from '../components/Avatar';
 import Points from '../components/Points';
 // import PointsModals from '../components/PointsModals';
 import PhoneVerification from '../components/PhoneVerification';
-import TokenDebug from '../components/TokenDebug';
+import AdminPanel from '../components/AdminPanel';
 import ImageViewer from '../components/ImageViewer';
 import NotificationContainer from '../components/NotificationContainer';
 import useNotifications from '../hooks/useNotifications';
@@ -52,6 +52,40 @@ import {
   initializeTimeSync 
 } from '../utils/timeUtils';
 
+// Функция для парсинга ссылок в тексте
+const parseTextWithLinks = (text) => {
+  if (!text) return '';
+  
+  // Регулярное выражение для поиска ссылок
+  const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(?:\/[^\s]*)?)/g;
+  
+  // Разбиваем текст на части и заменяем ссылки
+  const parts = text.split(urlRegex);
+  
+  return parts.map((part, index) => {
+    if (urlRegex.test(part)) {
+      // Добавляем протокол если его нет
+      let href = part;
+      if (!part.startsWith('http://') && !part.startsWith('https://')) {
+        href = 'https://' + part;
+      }
+      
+      return (
+        <a 
+          key={index} 
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <ExternalLink className="post-link-icon" size={14} />
+          {part}
+        </a>
+      );
+    }
+    return part;
+  });
+};
+
 const HomePage = () => {
   const [user, setUser] = useState(null);
   
@@ -65,6 +99,7 @@ const HomePage = () => {
   const [isDragOver, setIsDragOver] = useState(false);
   const [showProfileSettings, setShowProfileSettings] = useState(false);
   const [showAccountSettings, setShowAccountSettings] = useState(false);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [posts, setPosts] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
@@ -2458,6 +2493,12 @@ formData.append('files', file);
               </span>
               <span className="post-username">
                 @{post.isRepost ? post.originalPost?.author?.username || 'Unknown' : post.author?.username || post.username || 'Unknown'}
+                {(post.isRepost ? post.originalPost?.author?.role === 'admin' : post.author?.role === 'admin') && (
+                  <span className="admin-badge-small">
+                    <Shield className="admin-icon" size={10} />
+                    ADMIN
+                  </span>
+                )}
               </span>
             </div>
             <span className="post-date">
@@ -2483,7 +2524,7 @@ formData.append('files', file);
             {/* Показываем текстовый контент только для обычных постов и репостов */}
             {(post.postType === 'text' || !post.postType) && (
               <p className="post-text">
-                {post.isRepost ? post.originalPost?.content || post.content : post.content}
+                {parseTextWithLinks(post.isRepost ? post.originalPost?.content || post.content : post.content)}
               </p>
             )}
             
@@ -3308,6 +3349,12 @@ formData.append('files', file);
                 Кошелек
               </button></li>
               <li><button className={getNavItemClass('profile')} onClick={() => { setActiveTab('profile'); if(user) loadUserProfile(user._id || user.id); }}><User size={18} /> Профиль</button></li>
+              {user?.role === 'admin' && (
+                <li><button className="nav-item admin-nav-btn" onClick={() => setShowAdminPanel(true)}>
+                  <Shield size={18} /> 
+                  Админ-панель
+                </button></li>
+              )}
               <li><button className={getNavItemClass('more')} onClick={() => setActiveTab('more')}><MoreVertical size={18} /> Еще</button></li>
             </ul>
           </nav>
@@ -4281,6 +4328,14 @@ formData.append('files', file);
                                 </span>
                               </div>
                             )}
+                            {profile.role === 'admin' && (
+                              <div className="admin-badge-container">
+                                <span className="admin-badge">
+                                  <Shield className="admin-icon" size={14} />
+                                  ADMIN
+                                </span>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -5007,6 +5062,13 @@ formData.append('files', file);
             onToggleTheme={toggleTheme}
           />
         )}
+        
+        {showAdminPanel && user?.role === 'admin' && (
+          <AdminPanel
+            user={user}
+            onClose={() => setShowAdminPanel(false)}
+          />
+        )}
 
         {/* Верификация телефона */}
         {showPhoneVerification && (
@@ -5258,8 +5320,6 @@ formData.append('files', file);
           onClose={closeImageViewer}
         />
         
-        {/* Отладочный компонент для токенов */}
-        {process.env.NODE_ENV === 'development' && <TokenDebug />}
         
         {/* Контейнер уведомлений */}
         <NotificationContainer 

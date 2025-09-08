@@ -4,6 +4,7 @@ import AuthPage from './pages/AuthPage';
 import HomePage from './pages/HomePage';
 import EmailVerificationPage from './pages/EmailVerificationPage';
 import MaintenancePage from './pages/MaintenancePage';
+import ExternalLinkWarning from './components/ExternalLinkWarning';
 import { PointsProvider } from './context/PointsContext';
 import API_CONFIG from './config/api';
 import axios from 'axios';
@@ -146,6 +147,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <AppRouter />
+      <ExternalLinkWarning />
     </BrowserRouter>
   );
 }
