@@ -1103,6 +1103,14 @@ const HomePage = () => {
         setUser(userData);
         localStorage.setItem('user', JSON.stringify(userData));
         
+        // Загружаем баланс пользователя сразу после получения данных
+        try {
+          const balanceRes = await axios.get('https://server-pqqy.onrender.com/api/points/balance');
+          setWalletBalance(balanceRes.data.points);
+        } catch (error) {
+          console.error('Error loading initial wallet balance:', error);
+        }
+        
         // Проверяем верификацию email
         if (!userData.emailVerified) {
           console.log('User email not verified, redirecting to verification page');
