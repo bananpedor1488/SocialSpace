@@ -10124,12 +10124,12 @@ html, body {
 
   .profile-view .profile-header {
     position: fixed;
-    top: 60px;
+    top: 58px;
     left: 240px;
     width: 580px;
     z-index: 998;
-    height: calc(100vh - 60px);
-    overflow-y: auto;
+    height: auto;
+    max-height: fit-content;
   }
 
   .profile-view .profile-posts {
@@ -10177,7 +10177,7 @@ html, body {
     border: 1px solid rgba(71, 85, 105, 0.5);
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15), 0 6px 20px rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(10px);
-    overflow: hidden;
+    overflow: visible;
   }
   
   .profile-header::before {
