@@ -2378,9 +2378,9 @@ html, body {
     display: flex;
     flex-direction: column;
     gap: 20px;
-    height: calc(100vh - 80px);
+    height: 100vh;
     position: sticky;
-    top: 80px;
+    top: 0;
     overflow-y: auto;
     background: rgba(15, 23, 42, 0.95);
     backdrop-filter: blur(20px);
@@ -5863,9 +5863,10 @@ html, body {
     gap: 8px;
     background: rgba(51, 65, 85, 0.7);
     border: 1px solid rgba(71, 85, 105, 0.5);
-    border-radius: 20px;
-    padding: 8px 12px;
+    border-radius: 25px;
+    padding: 8px 16px;
     transition: all 0.3s ease;
+    cursor: pointer;
   }
   
   .points-balance:hover {
@@ -5946,7 +5947,7 @@ html, body {
     border-radius: 12px;
     padding: 20px;
     margin-top: 10px;
-    z-index: 1000;
+    z-index: 10001;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     opacity: 0;
     transform: translateY(-10px) scale(0.95);
@@ -6412,7 +6413,7 @@ html, body {
     border: 1px solid rgba(71, 85, 105, 0.3);
     border-radius: 8px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    z-index: 1000;
+    z-index: 10001;
     margin-top: 5px;
     overflow: hidden;
     opacity: 0;
