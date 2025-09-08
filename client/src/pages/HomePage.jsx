@@ -11,6 +11,7 @@ import {
   Info, Shield, Lock, Calendar, Paperclip, Image, File, Video, BarChart3
 } from 'lucide-react';
 
+import GiveawayConfirmModal from '../components/GiveawayConfirmModal';
 import CallInterface from '../components/CallInterface';
 import OnlineStatus from '../components/OnlineStatus';
 import ProfileSettings from '../components/ProfileSettings';
@@ -167,6 +168,10 @@ const HomePage = () => {
   
   // Состояние для создания поста
   const [isPosting, setIsPosting] = useState(false);
+  
+  // Состояние для модального окна подтверждения розыгрыша
+  const [showGiveawayConfirm, setShowGiveawayConfirm] = useState(false);
+  const [pendingGiveawayData, setPendingGiveawayData] = useState(null);
   
 
   const updateMobileChatOffsets = () => {
@@ -864,6 +869,32 @@ const HomePage = () => {
           [userId]: { username, isOnline, status, lastSeen: new Date(lastSeen) }
         }));
         console.log(`👤 ${username} is now ${status}`);
+      });
+
+      // ОБРАБОТЧИК ЗАВЕРШЕНИЯ РОЗЫГРЫША
+      socketRef.current.on('giveawayCompleted', ({ postId, winner, participantsCount, updatedPost }) => {
+        console.log('Giveaway completed:', { postId, winner, participantsCount });
+        
+        // Обновляем пост с информацией о победителе
+        setPosts(prevPosts => 
+          prevPosts.map(post => 
+            post._id === postId 
+              ? { 
+                  ...post, 
+                  giveawayData: { 
+                    ...post.giveawayData, 
+                    isCompleted: true, 
+                    winner: updatedPost?.giveawayData?.winner || winner
+                  } 
+                }
+              : post
+          )
+        );
+        
+        // Показываем уведомление о завершении розыгрыша
+        if (winner) {
+          showSuccess(`Розыгрыш завершен! Победитель: @${winner.username}`);
+        }
       });
     };
 
@@ -1898,12 +1929,19 @@ formData.append('files', file);
 
   // Функции для работы с розыгрышами
   const handleCreateGiveaway = async () => {
-    if (!giveawayData.prize.trim() || !giveawayData.description.trim()) {
-      showWarning('Заполните все поля розыгрыша');
+    // Проверяем описание (обязательно для всех типов)
+    if (!giveawayData.description.trim()) {
+      showWarning('Заполните описание розыгрыша');
       return;
     }
 
-    // Проверяем, что для баллов выбран период премиума
+    // Для текстового приза проверяем название приза
+    if (giveawayData.prizeType === 'text' && !giveawayData.prize.trim()) {
+      showWarning('Заполните название приза');
+      return;
+    }
+
+    // Проверяем, что для премиума выбран период
     if (giveawayData.prizeType === 'premium' && !giveawayData.prizeAmount) {
       showWarning('Выберите период премиума');
       return;
@@ -1915,20 +1953,52 @@ formData.append('files', file);
       return;
     }
 
+    // Рассчитываем стоимость розыгрыша
+    let cost = 0;
+    if (giveawayData.prizeType === 'points') {
+      cost = giveawayData.prizeAmount || 0;
+    } else if (giveawayData.prizeType === 'premium') {
+      // Стоимость премиума: 30дн-300, 60дн-600, 90дн-900
+      const premiumCosts = { 30: 300, 60: 600, 90: 900 };
+      cost = premiumCosts[giveawayData.prizeAmount] || 0;
+    }
+
+    // Показываем модальное окно подтверждения
+    setPendingGiveawayData({
+      ...giveawayData,
+      cost: cost
+    });
+    setShowGiveawayConfirm(true);
+  };
+
+  const handleConfirmGiveaway = async () => {
+    if (!pendingGiveawayData) return;
+
     setIsPosting(true);
     try {
       const formData = new FormData();
       formData.append('content', ''); // Пустой контент, так как вся информация в виджете
       formData.append('postType', 'giveaway');
       
+      // Автоматически заполняем название приза для баллов и премиума, если оно пустое
+      let prizeName = pendingGiveawayData.prize;
+      if (!prizeName || prizeName.trim() === '') {
+        if (pendingGiveawayData.prizeType === 'points') {
+          prizeName = `${pendingGiveawayData.prizeAmount} баллов`;
+        } else if (pendingGiveawayData.prizeType === 'premium') {
+          prizeName = `${pendingGiveawayData.prizeAmount} дней премиума`;
+        }
+      }
+
       const giveawayDataToSend = {
-        prize: giveawayData.prize,
-        prizeType: giveawayData.prizeType || 'text',
-        prizeAmount: giveawayData.prizeType === 'points' ? (giveawayData.prizeAmount || 0) : (giveawayData.prizeAmount || 0),
-        description: giveawayData.description,
-        endDate: giveawayData.endDate ? new Date(giveawayData.endDate).toISOString() : null,
+        prize: prizeName,
+        prizeType: pendingGiveawayData.prizeType || 'text',
+        prizeAmount: pendingGiveawayData.prizeType === 'points' ? (pendingGiveawayData.prizeAmount || 0) : (pendingGiveawayData.prizeAmount || 0),
+        description: pendingGiveawayData.description,
+        endDate: pendingGiveawayData.endDate ? new Date(pendingGiveawayData.endDate).toISOString() : null,
         participants: [],
-        isCompleted: false
+        isCompleted: false,
+        cost: pendingGiveawayData.cost // Добавляем стоимость для сервера
       };
       
       console.log('Sending giveaway data:', giveawayDataToSend);
@@ -1937,8 +2007,8 @@ formData.append('files', file);
       const response = await axios.post('https://server-pqqy.onrender.com/api/posts', formData);
       console.log('Giveaway created successfully:', response.data);
       
-      // Если розыгрыш с баллами, обновляем баланс пользователя
-      if (giveawayData.prizeType === 'points' && response.data.userBalance !== undefined) {
+      // Если розыгрыш с баллами или премиумом, обновляем баланс пользователя
+      if ((pendingGiveawayData.prizeType === 'points' || pendingGiveawayData.prizeType === 'premium') && response.data.userBalance !== undefined) {
         setWalletBalance(response.data.userBalance);
         console.log('Updated user balance:', response.data.userBalance);
       }
@@ -1955,11 +2025,23 @@ formData.append('files', file);
         participants: [] 
       });
       setPostType('text');
+      
+      showSuccess('Розыгрыш успешно создан!');
     } catch (err) {
       console.error('Ошибка создания розыгрыша:', err);
-      showError('Ошибка при создании розыгрыша');
+      
+      let errorMessage = 'Ошибка при создании розыгрыша';
+      if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err.response?.status === 400) {
+        errorMessage = 'Недостаточно баллов для создания розыгрыша';
+      }
+      
+      showError(errorMessage);
     } finally {
       setIsPosting(false);
+      setShowGiveawayConfirm(false);
+      setPendingGiveawayData(null);
     }
   };
 
@@ -2539,7 +2621,8 @@ formData.append('files', file);
                   if (status === 'completed') {
                     // Проверяем, является ли текущий пользователь победителем
                     const isWinner = post.giveawayData?.winner && 
-                      (post.giveawayData.winner.toString() === (user._id || user.id).toString());
+                      (post.giveawayData.winner._id?.toString() === (user._id || user.id).toString() ||
+                       post.giveawayData.winner.toString() === (user._id || user.id).toString());
                     
                     if (isWinner) {
                       return (
@@ -2564,7 +2647,7 @@ formData.append('files', file);
                         <span>Розыгрыш завершен</span>
                         {post.giveawayData?.winner && (
                           <span className="winner-info">
-                            Победитель: @{post.giveawayData.winner}
+                            Победитель: @{post.giveawayData.winner.username || post.giveawayData.winner}
                           </span>
                         )}
                       </div>
@@ -3347,6 +3430,18 @@ formData.append('files', file);
                               <option value={90}>90 дней</option>
                             </select>
                             <small className="form-hint">Выберите один из доступных периодов</small>
+                            
+                            <div className="form-field" style={{ marginTop: '12px' }}>
+                              <label className="form-label">Название приза (необязательно):</label>
+                              <input
+                                type="text"
+                                placeholder="Например: Премиум на месяц"
+                                value={giveawayData.prize}
+                                onChange={(e) => setGiveawayData(prev => ({ ...prev, prize: e.target.value }))}
+                                className="form-input"
+                              />
+                              <small className="form-hint">Если не указано, будет использовано автоматическое название</small>
+                            </div>
                           </div>
                         ) : (
                           <div className="form-field">
@@ -3370,6 +3465,18 @@ formData.append('files', file);
                               min="1"
                             />
                             <small className="form-hint">Минимум 1 балл. Баллы будут списаны с вашего баланса</small>
+                            
+                            <div className="form-field" style={{ marginTop: '12px' }}>
+                              <label className="form-label">Название приза (необязательно):</label>
+                              <input
+                                type="text"
+                                placeholder="Например: Бонусные баллы"
+                                value={giveawayData.prize}
+                                onChange={(e) => setGiveawayData(prev => ({ ...prev, prize: e.target.value }))}
+                                className="form-input"
+                              />
+                              <small className="form-hint">Если не указано, будет использовано автоматическое название</small>
+                            </div>
                           </div>
                         )}
 
@@ -5150,6 +5257,21 @@ formData.append('files', file);
         <NotificationContainer 
           notifications={notifications}
           onRemoveNotification={removeNotification}
+        />
+        
+        {/* Модальное окно подтверждения розыгрыша */}
+        <GiveawayConfirmModal
+          isOpen={showGiveawayConfirm}
+          onClose={() => {
+            setShowGiveawayConfirm(false);
+            setPendingGiveawayData(null);
+          }}
+          onConfirm={handleConfirmGiveaway}
+          giveawayType={pendingGiveawayData?.prizeType}
+          prizeAmount={pendingGiveawayData?.prizeAmount}
+          prizeDescription={pendingGiveawayData?.prize}
+          cost={pendingGiveawayData?.cost || 0}
+          userPoints={walletBalance}
         />
       </div>
       </>
