@@ -2379,9 +2379,9 @@ html, body {
     display: flex;
     flex-direction: column;
     gap: 20px;
-    height: 100vh;
+    height: calc(100vh - 60px);
     position: sticky;
-    top: 0;
+    top: 60px;
     overflow-y: auto;
     background: rgba(15, 23, 42, 0.95);
     backdrop-filter: blur(20px);
@@ -2389,6 +2389,9 @@ html, body {
     border-left: 1px solid rgba(71, 85, 105, 0.3);
     box-shadow: -4px 0 16px rgba(0, 0, 0, 0.2);
     padding: 20px;
+    /* Стабилизация позиционирования */
+    transform: translateZ(0);
+    will-change: auto;
   }
   
   /* Скрываем правую панель по умолчанию */
@@ -4971,7 +4974,7 @@ html, body {
   /* Высокие экраны */
   @media (min-height: 900px) {
     .sidebar, .right-sidebar {
-      height: calc(100vh - 80px);
+      height: calc(100vh - 60px);
     }
   }
   
@@ -10154,10 +10157,13 @@ html, body {
     border: 1px solid rgba(71, 85, 105, 0.5);
     height: fit-content;
     position: sticky;
-    top: 80px;
+    top: 90px;
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15), 0 6px 20px rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(10px);
     overflow: hidden;
+    /* Стабилизация позиционирования */
+    transform: translateZ(0);
+    will-change: auto;
   }
   
   .profile-header::before {
