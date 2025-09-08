@@ -10124,16 +10124,18 @@ html, body {
 
   .profile-view .profile-header {
     position: fixed;
-    top: 90px;
-    left: 50%;
-    transform: translateX(-790px);
+    top: 60px;
+    left: 240px;
     width: 580px;
     z-index: 998;
+    height: calc(100vh - 60px);
+    overflow-y: auto;
   }
 
   .profile-view .profile-posts {
-    margin-left: 615px;
-    width: calc(100% - 615px);
+    margin-left: 840px;
+    width: calc(100% - 840px);
+    min-width: 0;
   }
   
   .profile-view .profile-details {
@@ -10173,9 +10175,6 @@ html, body {
     border-radius: 24px;
     padding: 35px;
     border: 1px solid rgba(71, 85, 105, 0.5);
-    height: fit-content;
-    position: sticky;
-    top: 90px;
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15), 0 6px 20px rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(10px);
     overflow: hidden;
