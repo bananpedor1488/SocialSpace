@@ -18,7 +18,7 @@ import ProfileSettings from '../components/ProfileSettings';
 import AccountSettings from '../components/AccountSettings';
 import Avatar from '../components/Avatar';
 import Points from '../components/Points';
-import PointsModals from '../components/PointsModals';
+// import PointsModals from '../components/PointsModals';
 import PhoneVerification from '../components/PhoneVerification';
 import TokenDebug from '../components/TokenDebug';
 import ImageViewer from '../components/ImageViewer';
@@ -5059,7 +5059,7 @@ formData.append('files', file);
           </div>
         )}
         
-        <PointsModals />
+        {/* <PointsModals /> */}
         
         {/* Wallet Transfer Modal - Глобальная модалка */}
         {showWalletTransfer && (
