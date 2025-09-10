@@ -6,6 +6,28 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 
+// Определяем базовый URL для API
+const getBaseURL = () => {
+  if (window.location.hostname === 'localhost') {
+    return 'http://localhost:3000';
+  }
+  return 'https://server-1-ewdd.onrender.com';
+};
+
+const api = axios.create({
+  baseURL: `${getBaseURL()}/api`,
+  withCredentials: true
+});
+
+// Добавляем токен авторизации к каждому запросу
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('accessToken');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 const AdminPanel = ({ user, onClose }) => {
   const [activeTab, setActiveTab] = useState('users');
   const [users, setUsers] = useState([]);
@@ -27,10 +49,13 @@ const AdminPanel = ({ user, onClose }) => {
   const loadUsers = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('/api/admin/users');
-      setUsers(response.data);
+      console.log('Загружаем пользователей...');
+      const response = await api.get('/admin/users');
+      console.log('Ответ от сервера:', response.data);
+      setUsers(response.data.users || response.data);
     } catch (error) {
       console.error('Ошибка загрузки пользователей:', error);
+      console.error('Детали ошибки:', error.response?.data);
     }
     setLoading(false);
   };
@@ -38,10 +63,13 @@ const AdminPanel = ({ user, onClose }) => {
   const loadPosts = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('/api/admin/posts');
-      setPosts(response.data);
+      console.log('Загружаем посты...');
+      const response = await api.get('/admin/posts');
+      console.log('Ответ от сервера (посты):', response.data);
+      setPosts(response.data.posts || response.data);
     } catch (error) {
       console.error('Ошибка загрузки постов:', error);
+      console.error('Детали ошибки:', error.response?.data);
     }
     setLoading(false);
   };
@@ -49,10 +77,13 @@ const AdminPanel = ({ user, onClose }) => {
   const loadStats = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('/api/admin/stats');
+      console.log('Загружаем статистику...');
+      const response = await api.get('/admin/stats');
+      console.log('Ответ от сервера (статистика):', response.data);
       setStats(response.data);
     } catch (error) {
       console.error('Ошибка загрузки статистики:', error);
+      console.error('Детали ошибки:', error.response?.data);
     }
     setLoading(false);
   };
@@ -60,7 +91,7 @@ const AdminPanel = ({ user, onClose }) => {
   const toggleUserRole = async (userId, currentRole) => {
     try {
       const newRole = currentRole === 'admin' ? 'user' : 'admin';
-      await axios.put(`/api/admin/users/${userId}/role`, { role: newRole });
+      await api.put(`/admin/users/${userId}/role`, { role: newRole });
       loadUsers();
     } catch (error) {
       console.error('Ошибка изменения роли:', error);
@@ -69,7 +100,7 @@ const AdminPanel = ({ user, onClose }) => {
 
   const banUser = async (userId) => {
     try {
-      await axios.put(`/api/admin/users/${userId}/ban`);
+      await api.put(`/admin/users/${userId}/ban`);
       loadUsers();
     } catch (error) {
       console.error('Ошибка бана пользователя:', error);
@@ -78,7 +109,7 @@ const AdminPanel = ({ user, onClose }) => {
 
   const deletePost = async (postId) => {
     try {
-      await axios.delete(`/api/admin/posts/${postId}`);
+      await api.delete(`/admin/posts/${postId}`);
       loadPosts();
     } catch (error) {
       console.error('Ошибка удаления поста:', error);
@@ -149,9 +180,17 @@ const AdminPanel = ({ user, onClose }) => {
             <div className="admin-users">
               <div className="admin-users-header">
                 <h3>Пользователи ({filteredUsers.length})</h3>
+                <div style={{fontSize: '12px', color: '#666'}}>
+                  Всего пользователей: {users.length} | Отфильтровано: {filteredUsers.length}
+                </div>
               </div>
               <div className="admin-users-list">
-                {filteredUsers.map(u => (
+                {filteredUsers.length === 0 ? (
+                  <div style={{padding: '20px', textAlign: 'center', color: '#666'}}>
+                    {users.length === 0 ? 'Пользователи не найдены' : 'Нет пользователей по поиску'}
+                  </div>
+                ) : (
+                  filteredUsers.map(u => (
                   <div key={u._id} className="admin-user-item">
                     <div className="admin-user-info">
                       <div className="admin-user-avatar">
@@ -198,7 +237,8 @@ const AdminPanel = ({ user, onClose }) => {
                       </button>
                     </div>
                   </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
           )}
@@ -207,9 +247,17 @@ const AdminPanel = ({ user, onClose }) => {
             <div className="admin-posts">
               <div className="admin-posts-header">
                 <h3>Посты ({filteredPosts.length})</h3>
+                <div style={{fontSize: '12px', color: '#666'}}>
+                  Всего постов: {posts.length} | Отфильтровано: {filteredPosts.length}
+                </div>
               </div>
               <div className="admin-posts-list">
-                {filteredPosts.map(post => (
+                {filteredPosts.length === 0 ? (
+                  <div style={{padding: '20px', textAlign: 'center', color: '#666'}}>
+                    {posts.length === 0 ? 'Посты не найдены' : 'Нет постов по поиску'}
+                  </div>
+                ) : (
+                  filteredPosts.map(post => (
                   <div key={post._id} className="admin-post-item">
                     <div className="admin-post-info">
                       <div className="admin-post-author">
@@ -240,7 +288,8 @@ const AdminPanel = ({ user, onClose }) => {
                       </button>
                     </div>
                   </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
           )}

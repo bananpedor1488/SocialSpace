@@ -91,8 +91,8 @@ const AuthPage = () => {
 
     try {
       const url = isLogin
-        ? 'https://server-pqqy.onrender.com/api/auth/login'
-        : 'https://server-pqqy.onrender.com/api/auth/register';
+        ? 'https://server-1-ewdd.onrender.com/api/auth/login'
+        : 'https://server-1-ewdd.onrender.com/api/auth/register';
 
       const payload = isLogin
         ? { email: data.identifier, password: data.password }

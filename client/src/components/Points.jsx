@@ -29,7 +29,7 @@ const Points = () => {
   // Загрузить баланс
   const loadBalance = async () => {
     try {
-      const response = await axios.get('https://server-pqqy.onrender.com/api/points/balance');
+      const response = await axios.get('https://server-1-ewdd.onrender.com/api/points/balance');
       setBalance(response.data.points);
     } catch (error) {
       console.error('Error loading balance:', error);
@@ -39,7 +39,7 @@ const Points = () => {
   // Загрузить рейтинг
   const loadLeaderboard = async () => {
     try {
-      const response = await axios.get('https://server-pqqy.onrender.com/api/points/leaderboard');
+      const response = await axios.get('https://server-1-ewdd.onrender.com/api/points/leaderboard');
       setLeaderboard(response.data.leaderboard);
     } catch (error) {
       console.error('Error loading leaderboard:', error);
@@ -49,7 +49,7 @@ const Points = () => {
   // Загрузить информацию о премиуме
   const loadPremiumInfo = async () => {
     try {
-      const response = await axios.get('https://server-pqqy.onrender.com/api/points/premium-info');
+      const response = await axios.get('https://server-1-ewdd.onrender.com/api/points/premium-info');
       setPremiumInfo(response.data.premium);
       setBalance(response.data.points);
     } catch (error) {
@@ -62,7 +62,7 @@ const Points = () => {
     try {
       setLoading(true);
       setError('');
-      const response = await axios.post('https://server-pqqy.onrender.com/api/points/buy-premium');
+      const response = await axios.post('https://server-1-ewdd.onrender.com/api/points/buy-premium');
       
       setSuccess('Премиум успешно куплен!');
       setPremiumInfo(response.data.premium);

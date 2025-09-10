@@ -7,7 +7,7 @@ class AuthManager: ObservableObject {
     @Published var isLoading = false
     @Published var errorMessage: String?
     
-    private let baseURL = "https://server-pqqy.onrender.com/api"
+    private let baseURL = "https://server-1-ewdd.onrender.com/api"
     private let userDefaults = UserDefaults.standard
     
     init() {

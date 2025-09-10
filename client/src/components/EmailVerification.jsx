@@ -101,7 +101,7 @@ const EmailVerification = ({ userId, email, onVerificationSuccess, onBack, isFro
 
     setIsLoading(true);
     try {
-      const response = await axios.post('https://server-pqqy.onrender.com/api/auth/verify-email', {
+      const response = await axios.post('https://server-1-ewdd.onrender.com/api/auth/verify-email', {
         userId,
         code: verificationCode
       });
@@ -147,7 +147,7 @@ const EmailVerification = ({ userId, email, onVerificationSuccess, onBack, isFro
     
     setIsLoading(true);
     try {
-      await axios.post('https://server-pqqy.onrender.com/api/auth/resend-verification', {
+      await axios.post('https://server-1-ewdd.onrender.com/api/auth/resend-verification', {
         userId
       });
       
@@ -175,7 +175,7 @@ const EmailVerification = ({ userId, email, onVerificationSuccess, onBack, isFro
 
     setIsChangingEmail(true);
     try {
-      const response = await axios.post('https://server-pqqy.onrender.com/api/auth/change-email', {
+      const response = await axios.post('https://server-1-ewdd.onrender.com/api/auth/change-email', {
         userId,
         newEmail
       });

@@ -2,7 +2,7 @@ import Foundation
 
 class NetworkTest {
     static let shared = NetworkTest()
-    private let baseURL = "https://server-pqqy.onrender.com/api"
+    private let baseURL = "https://server-1-ewdd.onrender.com/api"
     
     func testConnection() async -> (Bool, String) {
         do {

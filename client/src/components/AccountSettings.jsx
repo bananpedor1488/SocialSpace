@@ -26,7 +26,7 @@ const AccountSettings = ({ isOpen, onClose, user, onLogout, isDarkTheme, onToggl
   const fetchSessions = async () => {
     try {
       setSessionsLoading(true);
-      const response = await axios.get('https://server-pqqy.onrender.com/api/auth/sessions', {
+      const response = await axios.get('https://server-1-ewdd.onrender.com/api/auth/sessions', {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`
         }
@@ -43,7 +43,7 @@ const AccountSettings = ({ isOpen, onClose, user, onLogout, isDarkTheme, onToggl
   const handleLogout = async () => {
     try {
       setIsLoading(true);
-      await axios.post('https://server-pqqy.onrender.com/api/auth/logout');
+      await axios.post('https://server-1-ewdd.onrender.com/api/auth/logout');
       onLogout();
     } catch (error) {
       console.error('Ошибка при выходе:', error);
@@ -56,7 +56,7 @@ const AccountSettings = ({ isOpen, onClose, user, onLogout, isDarkTheme, onToggl
 
   const handleTerminateSession = async (sessionId) => {
     try {
-      await axios.delete(`https://server-pqqy.onrender.com/api/auth/sessions/${sessionId}`, {
+      await axios.delete(`https://server-1-ewdd.onrender.com/api/auth/sessions/${sessionId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`
         }
@@ -71,7 +71,7 @@ const AccountSettings = ({ isOpen, onClose, user, onLogout, isDarkTheme, onToggl
 
   const handleTerminateAllSessions = async () => {
     try {
-      await axios.delete('https://server-pqqy.onrender.com/api/auth/sessions/all', {
+      await axios.delete('https://server-1-ewdd.onrender.com/api/auth/sessions/all', {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`
         }

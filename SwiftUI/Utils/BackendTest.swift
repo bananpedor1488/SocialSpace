@@ -2,7 +2,7 @@ import Foundation
 
 class BackendTest {
     static let shared = BackendTest()
-    private let baseURL = "https://server-pqqy.onrender.com/api"
+    private let baseURL = "https://server-1-ewdd.onrender.com/api"
     
     // Тест базового подключения к серверу
     func testBasicConnection() async -> (Bool, String) {

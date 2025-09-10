@@ -35,7 +35,7 @@ const EmailVerificationPage = () => {
         }
 
         // Получаем данные пользователя
-        const response = await axios.get('https://server-pqqy.onrender.com/api/me');
+        const response = await axios.get('https://server-1-ewdd.onrender.com/api/me');
         const userData = response.data.user;
 
         // Проверяем верификацию email

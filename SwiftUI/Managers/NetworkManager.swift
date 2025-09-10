@@ -5,7 +5,7 @@ class NetworkManager: ObservableObject {
     @Published var isConnected = false
     @Published var connectionStatus = "Подключение..."
     
-    private let baseURL = "https://server-pqqy.onrender.com/api"
+    private let baseURL = "https://server-1-ewdd.onrender.com/api"
     private let authManager: AuthManager
     
     init(authManager: AuthManager = AuthManager()) {

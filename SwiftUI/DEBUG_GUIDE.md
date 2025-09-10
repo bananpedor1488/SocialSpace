@@ -76,7 +76,7 @@
 
 ## 🌐 Проверка Backend
 
-### URL: `https://server-pqqy.onrender.com/api`
+### URL: `https://server-1-ewdd.onrender.com/api`
 
 ### Endpoint'ы:
 - `GET /` - Базовое подключение

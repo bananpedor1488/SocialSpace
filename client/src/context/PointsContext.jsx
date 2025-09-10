@@ -27,7 +27,7 @@ export const PointsProvider = ({ children }) => {
   const loadTransactions = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('https://server-pqqy.onrender.com/api/points/transactions');
+      const response = await axios.get('https://server-1-ewdd.onrender.com/api/points/transactions');
       console.log('Ответ сервера:', response.data);
       // Проверяем структуру ответа и устанавливаем правильный массив
       if (response.data && response.data.transactions) {

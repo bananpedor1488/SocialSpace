@@ -106,7 +106,7 @@
 
 Приложение использует тот же backend API, что и веб-версия:
 
-- **Base URL**: `https://server-pqqy.onrender.com/api`
+- **Base URL**: `https://server-1-ewdd.onrender.com/api`
 - **Аутентификация**: JWT Bearer токены
 - **Формат данных**: JSON
 - **WebSocket**: Socket.IO (для real-time функций)

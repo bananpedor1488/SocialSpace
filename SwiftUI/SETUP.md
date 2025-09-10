@@ -94,7 +94,7 @@
 Перед запуском убедитесь, что backend доступен:
 
 ```bash
-curl https://server-pqqy.onrender.com/api/me
+curl https://server-1-ewdd.onrender.com/api/me
 ```
 
 Должен вернуть JSON ответ.

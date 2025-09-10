@@ -90,7 +90,7 @@ const HomePage = () => {
   const [user, setUser] = useState(null);
   
   // Система уведомлений
-  const { notifications, showSuccess, showError, showWarning, showInfo, removeNotification } = useNotifications();
+  const { notifications, showSuccess, showError, showWarning, showInfo, removeNotification } =  useNotifications();
 
   const [activeTab, setActiveTab] = useState('home');
   const [postText, setPostText] = useState('');
@@ -100,6 +100,13 @@ const HomePage = () => {
   const [showProfileSettings, setShowProfileSettings] = useState(false);
   const [showAccountSettings, setShowAccountSettings] = useState(false);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
+  
+  // Функция для получения базового URL API
+  const getBaseURL = () => {
+    // Всегда используем хостинг, пока не исправим локальный сервер
+    return 'https://server-1-ewdd.onrender.com';
+  };
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [posts, setPosts] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
@@ -419,7 +426,7 @@ const HomePage = () => {
     }
 
     try {
-      const response = await axios.post('https://server-pqqy.onrender.com/api/auth/refresh', {
+      const response = await axios.post('https://server-1-ewdd.onrender.com/api/auth/refresh', {
         refreshToken: refreshToken
       });
       
@@ -462,7 +469,7 @@ const HomePage = () => {
       console.log('Initializing Socket.IO connection...');
       setConnectionStatus('Подключение...');
 
-      socketRef.current = io('https://server-pqqy.onrender.com', {
+      socketRef.current = io(window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://server-1-ewdd.onrender.com', {
         auth: {
           token: accessToken
         },
@@ -735,7 +742,7 @@ const HomePage = () => {
       socketRef.current.on('followUpdate', ({ targetUserId, followerId, followerUsername, isFollowing, followersCount }) => {
         console.log('Follow update received:', { targetUserId, followerId, followerUsername, isFollowing, followersCount });
         
-        if (profile && profile._id === targetUserId) {
+        if (profile && !profile.loading && profile._id === targetUserId) {
           setFollowers(followersCount);
           setProfile(prev => ({
             ...prev,
@@ -753,7 +760,7 @@ const HomePage = () => {
       socketRef.current.on('followingUpdate', ({ userId, followingCount }) => {
         console.log('Following update received:', { userId, followingCount });
         
-        if (profile && profile._id === userId && isOwnProfile()) {
+        if (profile && !profile.loading && profile._id === userId && isOwnProfile()) {
           setFollowing(followingCount);
         }
       });
@@ -968,7 +975,7 @@ const HomePage = () => {
                 socketRef.current.disconnect();
                 setTimeout(() => {
                   if (user) {
-                    const newSocket = io('https://server-pqqy.onrender.com', {
+                    const newSocket = io(window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://server-1-ewdd.onrender.com', {
                       auth: { token: accessToken },
                       transports: ['websocket', 'polling']
                     });
@@ -1105,7 +1112,7 @@ const HomePage = () => {
 
   // Проверяем, является ли профиль собственным
   const isOwnProfile = () => {
-    if (!user || !profile) return false;
+    if (!user || !profile || profile.loading || profile.error) return false;
     return profile._id === user._id || profile._id === user.id;
   };
 
@@ -1133,14 +1140,14 @@ const HomePage = () => {
           }
         }
 
-        const res = await axios.get('https://server-pqqy.onrender.com/api/me');
+        const res = await axios.get('https://server-1-ewdd.onrender.com/api/me');
         const userData = res.data.user;
         setUser(userData);
         localStorage.setItem('user', JSON.stringify(userData));
         
         // Загружаем баланс пользователя сразу после получения данных
         try {
-          const balanceRes = await axios.get('https://server-pqqy.onrender.com/api/points/balance');
+          const balanceRes = await axios.get('https://server-1-ewdd.onrender.com/api/points/balance');
           setWalletBalance(balanceRes.data.points);
         } catch (error) {
           console.error('Error loading initial wallet balance:', error);
@@ -1155,15 +1162,15 @@ const HomePage = () => {
         
         // Очищаем любые "зависшие" звонки при загрузке
         try {
-          await axios.get('https://server-pqqy.onrender.com/api/calls/active');
+          await axios.get('https://server-1-ewdd.onrender.com/api/calls/active');
         } catch (err) {
           // Если есть активный звонок, пытаемся его завершить
           if (err.response?.status === 409) {
             console.log('Found stuck call, cleaning up...');
             try {
-              const activeCallRes = await axios.get('https://server-pqqy.onrender.com/api/calls/active');
+              const activeCallRes = await axios.get('https://server-1-ewdd.onrender.com/api/calls/active');
               if (activeCallRes.data) {
-                await axios.post(`https://server-pqqy.onrender.com/api/calls/end/${activeCallRes.data._id}`);
+                await axios.post(`https://server-1-ewdd.onrender.com/api/calls/end/${activeCallRes.data._id}`);
                 console.log('Stuck call cleaned up');
               }
             } catch (cleanupErr) {
@@ -1281,7 +1288,7 @@ const HomePage = () => {
   // Функция загрузки рекомендаций
   const loadSuggestions = async () => {
     try {
-      const res = await axios.get('https://server-pqqy.onrender.com/api/users/suggestions');
+      const res = await axios.get('https://server-1-ewdd.onrender.com/api/users/suggestions');
       console.log('Suggestions response:', res.data);
       
       setSuggestions(res.data.slice(0, 3));
@@ -1296,7 +1303,7 @@ const HomePage = () => {
     if (!activeChat) return;
     
     try {
-      const response = await axios.post('https://server-pqqy.onrender.com/api/calls/initiate', {
+      const response = await axios.post('https://server-1-ewdd.onrender.com/api/calls/initiate', {
         chatId: activeChat._id,
         type: type
       });
@@ -1355,7 +1362,7 @@ const HomePage = () => {
       console.log('Accepting call with ID:', currentCall.callId || currentCall._id);
       const callId = currentCall.callId || currentCall._id;
       
-      await axios.post(`https://server-pqqy.onrender.com/api/calls/accept/${callId}`);
+      await axios.post(`https://server-1-ewdd.onrender.com/api/calls/accept/${callId}`);
       console.log('Call accepted via API successfully');
       
       // НЕ изменяем состояние здесь - пусть это делает socket событие
@@ -1381,7 +1388,7 @@ const HomePage = () => {
     if (!currentCall) return;
     
     try {
-      await axios.post(`https://server-pqqy.onrender.com/api/calls/decline/${currentCall.callId}`);
+      await axios.post(`https://server-1-ewdd.onrender.com/api/calls/decline/${currentCall.callId}`);
       
       // Логируем отклоненный входящий звонок
       await logCallToChat({
@@ -1404,7 +1411,7 @@ const HomePage = () => {
     
     try {
       const callId = currentCall.callId || currentCall._id;
-      await axios.post(`https://server-pqqy.onrender.com/api/calls/end/${callId}`);
+      await axios.post(`https://server-1-ewdd.onrender.com/api/calls/end/${callId}`);
       console.log('Call ended successfully via API');
     } catch (err) {
       console.error('Ошибка завершения звонка:', err);
@@ -1421,7 +1428,7 @@ const HomePage = () => {
   const emergencyCleanup = async (silent = false) => {
     if (!silent) console.log('Emergency cleanup started...');
     try {
-      const response = await axios.post('https://server-pqqy.onrender.com/api/calls/cleanup');
+      const response = await axios.post('https://server-1-ewdd.onrender.com/api/calls/cleanup');
       
       // Сбрасываем состояние звонков
       setCurrentCall(null);
@@ -1451,7 +1458,7 @@ const HomePage = () => {
     // Не загружаем, если уже есть сообщения этого чата в стейте
     if (messages[chatId]) return;
     try {
-      const res = await axios.get(`https://server-pqqy.onrender.com/api/messages/chats/${chatId}/messages?page=1&limit=20`);
+      const res = await axios.get(`https://server-1-ewdd.onrender.com/api/messages/chats/${chatId}/messages?page=1&limit=20`);
       const { messages: newMessages, pagination } = res.data;
       setMessages(prev => ({ ...prev, [chatId]: newMessages }));
       setMessagesPagination(prev => ({ ...prev, [chatId]: pagination }));
@@ -1462,7 +1469,7 @@ const HomePage = () => {
 
   const loadChats = async () => {
     try {
-      const res = await axios.get('https://server-pqqy.onrender.com/api/messages/chats');
+      const res = await axios.get('https://server-1-ewdd.onrender.com/api/messages/chats');
       console.log('Chats response:', res.data);
       
       // Сортируем чаты по времени последнего сообщения
@@ -1494,7 +1501,7 @@ const HomePage = () => {
         await fetchOnlineStatus(Array.from(allParticipantIds));
       }
       
-      const unreadRes = await axios.get('https://server-pqqy.onrender.com/api/messages/unread-count');
+      const unreadRes = await axios.get('https://server-1-ewdd.onrender.com/api/messages/unread-count');
       setTotalUnread(unreadRes.data.totalUnread);
     } catch (err) {
       console.error('Ошибка загрузки чатов:', err);
@@ -1506,7 +1513,7 @@ const HomePage = () => {
     
     setMessagesLoading(true);
     try {
-      const res = await axios.get(`https://server-pqqy.onrender.com/api/messages/chats/${chatId}/messages?page=${page}&limit=20`);
+      const res = await axios.get(`https://server-1-ewdd.onrender.com/api/messages/chats/${chatId}/messages?page=${page}&limit=20`);
       console.log('Messages loaded for chat:', res.data);
       
       const { messages: newMessages, pagination } = res.data;
@@ -1544,7 +1551,7 @@ const HomePage = () => {
       }
       
       // Отмечаем как прочитанные
-      await axios.put(`https://server-pqqy.onrender.com/api/messages/chats/${chatId}/read`);
+      await axios.put(`https://server-1-ewdd.onrender.com/api/messages/chats/${chatId}/read`);
       
       setChats(prev => prev.map(chat => 
         chat._id === chatId ? { ...chat, unreadCount: 0 } : chat
@@ -1568,7 +1575,7 @@ const HomePage = () => {
 
     
     try {
-      const response = await axios.post(`https://server-pqqy.onrender.com/api/messages/chats/${activeChat._id}/messages`, {
+      const response = await axios.post(`https://server-1-ewdd.onrender.com/api/messages/chats/${activeChat._id}/messages`, {
         content: messageContent
       });
       
@@ -1626,7 +1633,7 @@ const HomePage = () => {
     setLoadingOlderMessages(true);
     try {
       const nextPage = currentPagination.page + 1;
-      const res = await axios.get(`https://server-pqqy.onrender.com/api/messages/chats/${chatId}/messages?page=${nextPage}&limit=20`);
+      const res = await axios.get(`https://server-1-ewdd.onrender.com/api/messages/chats/${chatId}/messages?page=${nextPage}&limit=20`);
       
       const { messages: olderMessages, pagination } = res.data;
       
@@ -1648,7 +1655,7 @@ const HomePage = () => {
 
   const deleteMessage = async (messageId) => {
     try {
-      await axios.delete(`https://server-pqqy.onrender.com/api/messages/messages/${messageId}`);
+      await axios.delete(`https://server-1-ewdd.onrender.com/api/messages/messages/${messageId}`);
     } catch (err) {
       console.error('Ошибка удаления сообщения:', err);
     }
@@ -1656,7 +1663,7 @@ const HomePage = () => {
 
   const startChat = async (userId) => {
     try {
-      const res = await axios.post('https://server-pqqy.onrender.com/api/messages/chats', {
+      const res = await axios.post('https://server-1-ewdd.onrender.com/api/messages/chats', {
         participantId: userId
       });
       
@@ -1681,7 +1688,7 @@ const HomePage = () => {
     console.log('Loading posts, page:', pageNum);
     
     try {
-      const res = await axios.get('https://server-pqqy.onrender.com/api/posts', {
+      const res = await axios.get('https://server-1-ewdd.onrender.com/api/posts', {
         params: {
           page: pageNum,
           limit: 10
@@ -1773,7 +1780,7 @@ const HomePage = () => {
   const loadLeaderboard = async () => {
     try {
       setLeaderboardLoading(true);
-      const response = await axios.get('https://server-pqqy.onrender.com/api/points/leaderboard');
+      const response = await axios.get('https://server-1-ewdd.onrender.com/api/points/leaderboard');
       console.log('Leaderboard response:', response.data);
       
       setLeaderboard(response.data.leaderboard);
@@ -1786,7 +1793,7 @@ const HomePage = () => {
 
   const fetchComments = async (postId) => {
     try {
-      const res = await axios.get(`https://server-pqqy.onrender.com/api/posts/${postId}/comments`);
+      const res = await axios.get(`https://server-1-ewdd.onrender.com/api/posts/${postId}/comments`);
       setComments(prev => ({ ...prev, [postId]: res.data }));
     } catch (err) {
       console.error('Ошибка загрузки комментариев:', err);
@@ -1807,7 +1814,7 @@ const HomePage = () => {
   const handleLogout = async () => {
     try {
       const { refreshToken } = getTokens();
-      await axios.post('https://server-pqqy.onrender.com/api/auth/logout', {
+      await axios.post('https://server-1-ewdd.onrender.com/api/auth/logout', {
         refreshToken
       });
     } catch (error) {
@@ -1932,7 +1939,7 @@ const HomePage = () => {
 formData.append('files', file);
       });
 
-      const response = await axios.post('https://server-pqqy.onrender.com/api/posts', formData, {
+      const response = await axios.post('https://server-1-ewdd.onrender.com/api/posts', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -2047,7 +2054,7 @@ formData.append('files', file);
       console.log('Sending giveaway data:', giveawayDataToSend);
       formData.append('giveawayData', JSON.stringify(giveawayDataToSend));
 
-      const response = await axios.post('https://server-pqqy.onrender.com/api/posts', formData);
+      const response = await axios.post('https://server-1-ewdd.onrender.com/api/posts', formData);
       console.log('Giveaway created successfully:', response.data);
       
       // Если розыгрыш с баллами или премиумом, обновляем баланс пользователя
@@ -2124,7 +2131,7 @@ formData.append('files', file);
 
   const handleCompleteGiveaway = async (postId) => {
     try {
-      const response = await axios.post(`https://server-pqqy.onrender.com/api/posts/${postId}/complete-giveaway`);
+      const response = await axios.post(`https://server-1-ewdd.onrender.com/api/posts/${postId}/complete-giveaway`);
       
       // Обновляем состояние поста
       setPosts(prevPosts => 
@@ -2151,7 +2158,7 @@ formData.append('files', file);
 
   const handleJoinGiveaway = async (postId) => {
     try {
-      const response = await axios.post(`https://server-pqqy.onrender.com/api/posts/${postId}/join-giveaway`);
+      const response = await axios.post(`https://server-1-ewdd.onrender.com/api/posts/${postId}/join-giveaway`);
       
       // Обновляем состояние поста
       setPosts(prevPosts => 
@@ -2195,7 +2202,7 @@ formData.append('files', file);
         votes: {}
       }));
 
-      await axios.post('https://server-pqqy.onrender.com/api/posts', formData);
+      await axios.post('https://server-1-ewdd.onrender.com/api/posts', formData);
       
       setPollData({ question: '', options: ['', ''], allowMultiple: false, endDate: '', votes: {} });
       setPostType('text');
@@ -2222,7 +2229,7 @@ formData.append('files', file);
         return;
       }
       
-      const response = await axios.post(`https://server-pqqy.onrender.com/api/posts/${postId}/vote-poll`, {
+      const response = await axios.post(`https://server-1-ewdd.onrender.com/api/posts/${postId}/vote-poll`, {
         optionIndex
       });
       
@@ -2252,7 +2259,7 @@ formData.append('files', file);
   // Функции для расширенных реакций
   const handleReaction = async (postId, reactionType) => {
     try {
-      await axios.post(`https://server-pqqy.onrender.com/api/posts/${postId}/reaction`, {
+      await axios.post(`https://server-1-ewdd.onrender.com/api/posts/${postId}/reaction`, {
         reactionType
       });
     } catch (err) {
@@ -2262,7 +2269,7 @@ formData.append('files', file);
 
   const handleLikePost = async (postId) => {
     try {
-      await axios.post(`https://server-pqqy.onrender.com/api/posts/${postId}/like`);
+      await axios.post(`https://server-1-ewdd.onrender.com/api/posts/${postId}/like`);
     } catch (err) {
       console.error('Ошибка лайка:', err);
     }
@@ -2270,7 +2277,7 @@ formData.append('files', file);
 
   const handleRepost = async (postId) => {
     try {
-      const res = await axios.post(`https://server-pqqy.onrender.com/api/posts/${postId}/repost`);
+      const res = await axios.post(`https://server-1-ewdd.onrender.com/api/posts/${postId}/repost`);
       console.log('Repost successful:', res.data);
       // Репост появится через Socket.IO событие 'newRepost'
     } catch (err) {
@@ -2287,7 +2294,7 @@ formData.append('files', file);
     }
     
     try {
-      await axios.delete(`https://server-pqqy.onrender.com/api/posts/${postId}`);
+      await axios.delete(`https://server-1-ewdd.onrender.com/api/posts/${postId}`);
       
       // Удаляем пост из локального состояния
       setPosts(prevPosts => prevPosts.filter(post => post._id !== postId));
@@ -2306,7 +2313,7 @@ formData.append('files', file);
     setSearchQuery(raw); // оставляем @ в поле, но в запрос отдаем без неё
     if (query.trim()) {
       try {
-        const res = await axios.get(`https://server-pqqy.onrender.com/api/users/search?query=${encodeURIComponent(query)}`);
+        const res = await axios.get(`https://server-1-ewdd.onrender.com/api/users/search?query=${encodeURIComponent(query)}`);
         setSearchResults(res.data);
       } catch (err) {
         console.error('Ошибка поиска пользователей:', err);
@@ -2347,18 +2354,31 @@ formData.append('files', file);
     
     if (!userId) {
       console.error('userId is undefined or null');
+      setProfile(null);
+      setProfilePosts([]);
       return;
     }
     
+    // Показываем состояние загрузки
+    setProfile({ loading: true });
+    setProfilePosts([]);
+    
     try {
-      const res = await axios.get(`https://server-pqqy.onrender.com/api/users/${userId}`);
-      console.log('Profile response:', res.data);
-      setProfile(res.data);
+      const baseURL = getBaseURL();
+      console.log('Using baseURL:', baseURL);
       
+      const res = await axios.get(`${baseURL}/api/users/${userId}`);
+      console.log('Profile response:', res.data);
+      
+      if (!res.data) {
+        throw new Error('Профиль не найден');
+      }
+      
+      setProfile(res.data);
       setFollowers(res.data.followersCount || 0);
       setFollowing(res.data.followingCount || 0);
       
-      const postsRes = await axios.get(`https://server-pqqy.onrender.com/api/users/${userId}/posts`);
+      const postsRes = await axios.get(`${baseURL}/api/users/${userId}/posts`);
       console.log('Profile posts response:', postsRes.data);
 
       // Унифицируем форму ответа: поддерживаем массив и обёртки вида {posts: []} или {data: []}
@@ -2404,7 +2424,14 @@ formData.append('files', file);
       
     } catch (err) {
       console.error('Ошибка загрузки профиля:', err);
-      setProfile(null);
+      console.error('Error details:', err.response?.data);
+      console.error('Error status:', err.response?.status);
+      
+      // Не сбрасываем профиль полностью, показываем ошибку
+      setProfile({ 
+        error: true, 
+        errorMessage: err.response?.data?.message || 'Ошибка загрузки профиля' 
+      });
       setProfilePosts([]);
       setFollowers(0);
       setFollowing(0);
@@ -2413,7 +2440,7 @@ formData.append('files', file);
 
   const toggleFollow = async (userId) => {
     try {
-      await axios.post(`https://server-pqqy.onrender.com/api/follow/${userId}`);
+      await axios.post(`https://server-1-ewdd.onrender.com/api/follow/${userId}`);
     } catch (err) {
       console.error('Ошибка подписки/отписки:', err);
     }
@@ -2424,7 +2451,7 @@ formData.append('files', file);
     if (!commentText?.trim()) return;
     
     try {
-      await axios.post(`https://server-pqqy.onrender.com/api/posts/${postId}/comment`, 
+      await axios.post(`https://server-1-ewdd.onrender.com/api/posts/${postId}/comment`, 
         { content: commentText }
       );
       setNewComment(prev => ({
@@ -2490,15 +2517,15 @@ formData.append('files', file);
                     </span>
                   )
                 }
-              </span>
-              <span className="post-username">
-                @{post.isRepost ? post.originalPost?.author?.username || 'Unknown' : post.author?.username || post.username || 'Unknown'}
                 {(post.isRepost ? post.originalPost?.author?.role === 'admin' : post.author?.role === 'admin') && (
-                  <span className="admin-badge-small">
+                  <span className="admin-badge-mini">
                     <Shield className="admin-icon" size={10} />
                     ADMIN
                   </span>
                 )}
+              </span>
+              <span className="post-username">
+                @{post.isRepost ? post.originalPost?.author?.username || 'Unknown' : post.author?.username || post.username || 'Unknown'}
               </span>
             </div>
             <span className="post-date">
@@ -2862,6 +2889,12 @@ formData.append('files', file);
                                 </svg>
                               </span>
                             )}
+                            {comment.author?.role === 'admin' && (
+                              <span className="admin-badge-mini">
+                                <Shield className="admin-icon" size={10} />
+                                ADMIN
+                              </span>
+                            )}
                           </span>
                           <span className="comment-date">
                             {formatTimeWithTimezone(comment.createdAt)}
@@ -2945,7 +2978,7 @@ formData.append('files', file);
     const timer = setTimeout(async () => {
       try {
         setTransferSearchLoading(true);
-        const res = await axios.get(`https://server-pqqy.onrender.com/api/users/search?query=${encodeURIComponent(query)}`);
+        const res = await axios.get(`https://server-1-ewdd.onrender.com/api/users/search?query=${encodeURIComponent(query)}`);
         if (transferSuppressSearch) return; // Проверяем еще раз после запроса
         
         const suggestions = res.data || [];
@@ -2961,7 +2994,7 @@ formData.append('files', file);
             setFoundUser(exactMatch);
             // Получаем статус пользователя
             try {
-              const statusRes = await axios.get(`https://server-pqqy.onrender.com/api/users/online-status?userIds=${exactMatch._id}`);
+              const statusRes = await axios.get(`https://server-1-ewdd.onrender.com/api/users/online-status?userIds=${exactMatch._id}`);
               if (statusRes.data && statusRes.data[exactMatch._id]) {
                 setFoundUserStatus(statusRes.data[exactMatch._id]);
               }
@@ -3019,7 +3052,7 @@ formData.append('files', file);
   const loadWalletBalance = async () => {
     try {
       setWalletLoading(true);
-      const response = await axios.get('https://server-pqqy.onrender.com/api/points/balance');
+      const response = await axios.get('https://server-1-ewdd.onrender.com/api/points/balance');
       setWalletBalance(response.data.points);
       // можем отрисовать бейдж "Premium" рядом с балансом при необходимости через response.data.premiumActive
     } catch (error) {
@@ -3034,7 +3067,7 @@ formData.append('files', file);
   const loadWalletTransactions = async () => {
     try {
       setWalletLoading(true);
-      const response = await axios.get('https://server-pqqy.onrender.com/api/points/transactions?limit=10');
+      const response = await axios.get('https://server-1-ewdd.onrender.com/api/points/transactions?limit=10');
       setWalletTransactions(response.data.transactions || []);
     } catch (error) {
       console.error('Error loading wallet transactions:', error);
@@ -3049,7 +3082,7 @@ formData.append('files', file);
     try {
       setShowHistoryModal(true);
       setHistoryLoading(true);
-      const response = await axios.get('https://server-pqqy.onrender.com/api/points/transactions?page=1&limit=20');
+      const response = await axios.get('https://server-1-ewdd.onrender.com/api/points/transactions?page=1&limit=20');
       setHistoryTransactions(response.data.transactions || []);
       setHistoryPagination({
         page: 1,
@@ -3068,7 +3101,7 @@ formData.append('files', file);
     try {
       setHistoryLoading(true);
       const nextPage = historyPagination.page + 1;
-      const response = await axios.get(`https://server-pqqy.onrender.com/api/points/transactions?page=${nextPage}&limit=${historyPagination.limit}`);
+      const response = await axios.get(`https://server-1-ewdd.onrender.com/api/points/transactions?page=${nextPage}&limit=${historyPagination.limit}`);
       setHistoryTransactions(prev => [...prev, ...(response.data.transactions || [])]);
       setHistoryPagination(prev => ({
         ...prev,
@@ -3088,7 +3121,7 @@ formData.append('files', file);
       setPremiumError('');
       setPremiumSuccess('');
       setPremiumLoading(true);
-      const response = await axios.get('https://server-pqqy.onrender.com/api/points/premium-info');
+      const response = await axios.get('https://server-1-ewdd.onrender.com/api/points/premium-info');
       setPremiumInfo({
         active: response.data.premium?.active || false,
         expiresAt: response.data.premium?.expiresAt || null,
@@ -3108,7 +3141,7 @@ formData.append('files', file);
     try {
       setPremiumLoading(true);
       setPremiumError('');
-      const response = await axios.post('https://server-pqqy.onrender.com/api/points/buy-premium');
+      const response = await axios.post('https://server-1-ewdd.onrender.com/api/points/buy-premium');
       setPremiumSuccess('Премиум успешно куплен!');
       setWalletBalance(response.data.newBalance);
       await openPremiumModal();
@@ -3129,7 +3162,7 @@ formData.append('files', file);
       setGiftLoading(true);
       setGiftError('');
       setGiftSuccess('');
-      const response = await axios.post('https://server-pqqy.onrender.com/api/points/gift-premium', giftData);
+      const response = await axios.post('https://server-1-ewdd.onrender.com/api/points/gift-premium', giftData);
       setWalletBalance(response.data.newBalance);
       setGiftSuccess('Премиум успешно подарен!');
       setGiftData({ recipientUsername: '' });
@@ -3167,7 +3200,7 @@ formData.append('files', file);
     try {
       setWalletLoading(true);
       setWalletError('');
-      const response = await axios.post('https://server-pqqy.onrender.com/api/points/transfer', {
+      const response = await axios.post('https://server-1-ewdd.onrender.com/api/points/transfer', {
         recipientUsername: (transferData.recipientUsername || '').replace(/^@/, ''),
         amount: amount,
         description: transferData.description
@@ -3975,6 +4008,12 @@ formData.append('files', file);
                                                     </svg>
                                                   </span>
                                                 )}
+                                                {message.sender.role === 'admin' && (
+                                                  <span className="admin-badge-mini">
+                                                    <Shield className="admin-icon" size={10} />
+                                                    ADMIN
+                                                  </span>
+                                                )}
                                               </span>
                                               <span className="message-time">{messageTime}</span>
                                             </div>
@@ -4228,6 +4267,12 @@ formData.append('files', file);
                                                 </svg>
                                               </span>
                                             )}
+                                            {message.sender.role === 'admin' && (
+                                              <span className="admin-badge-mini">
+                                                <Shield className="admin-icon" size={10} />
+                                                ADMIN
+                                              </span>
+                                            )}
                                           </span>
                                           <span className="message-time">
                                             {formatTimeWithTimezone(message.createdAt, {
@@ -4297,7 +4342,39 @@ formData.append('files', file);
               </>
             )}
             
-            {activeTab === 'profile' && profile && (
+            {activeTab === 'profile' && profile && profile.loading && (
+              <div className="profile-loading">
+                <div className="loading-spinner"></div>
+                <p>Загрузка профиля...</p>
+              </div>
+            )}
+            
+            {activeTab === 'profile' && profile && profile.error && (
+              <div className="profile-view">
+                <div className="profile-header">
+                  <div className="profile-content">
+                    <div className="profile-main-info">
+                      <div className="profile-avatar-section">
+                        <div className="avatar-name-container">
+                          <div className="profile-error">
+                            <h2>Ошибка загрузки профиля</h2>
+                            <p>{profile.errorMessage}</p>
+                            <button 
+                              onClick={() => loadUserProfile(user._id || user.id)}
+                              className="retry-button"
+                            >
+                              Попробовать снова
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {activeTab === 'profile' && profile && !profile.loading && !profile.error && (
               <div className="profile-view">
                 <div className="profile-header">
                   <div className="profile-content">
@@ -4323,9 +4400,16 @@ formData.append('files', file);
                             <p className="profile-handle">@{profile.username}</p>
                             {isOwnProfile() && (
                               <div className="own-profile-badge-container">
-                                <span className="own-profile-badge">
-                                  <UserCheck size={16} /> Ваш профиль
-                                </span>
+                                <div className="profile-badges-row">
+                                  <span className="own-profile-badge">
+                                    <UserCheck size={16} /> Ваш профиль
+                                  </span>
+                                  {user?.role === 'admin' && (
+                                    <span className="admin-badge-profile">
+                                      <Shield size={16} /> ADMIN
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                             )}
                             {profile.role === 'admin' && (

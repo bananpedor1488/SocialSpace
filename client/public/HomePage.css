@@ -77,6 +77,21 @@ html, body {
     min-width: 300px !important;
   }
 
+  /* Исправляем main-content на мобильных - полная высота и скрытый скроллбар */
+  .main-content {
+    height: calc(100vh - 60px) !important;
+    min-height: calc(100vh - 60px) !important;
+    overflow-y: auto !important;
+    /* Скрываем скроллбар на мобильных */
+    scrollbar-width: none !important; /* Firefox */
+    -ms-overflow-style: none !important; /* IE and Edge */
+  }
+  
+  /* Скрываем скроллбар для WebKit браузеров */
+  .main-content::-webkit-scrollbar {
+    display: none !important;
+  }
+
   /* Исключаем модальные окна из ограничений на мобильных */
   .home-container .modal,
   .home-container .modal-content,
@@ -148,6 +163,20 @@ html, body {
       position: relative !important;
       min-height: 100vh !important;
     }
+    
+    /* Стили для модальных окон на мобильных устройствах */
+    .modal-overlay {
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      align-items: flex-start !important;
+      padding-top: 20px !important;
+    }
+    
+    .modal-content {
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      max-height: calc(100vh - 40px) !important;
+    }
   
     /* Главный контейнер */
     .app-container,
@@ -209,6 +238,8 @@ html, body {
       bottom: 0 !important;
       left: 0 !important;
       right: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
       z-index: 10000 !important;
       height: 60px !important;
       background: rgba(15, 23, 42, 0.98) !important;
@@ -217,6 +248,7 @@ html, body {
       padding-bottom: env(safe-area-inset-bottom) !important;
       margin: 0 !important;
       border-radius: 0 !important;
+      box-sizing: border-box !important;
     }
   
     /* Основной контент - правильные отступы */
@@ -326,7 +358,9 @@ html, body {
   
     /* Показ только чата при открытом чате */
     body.mobile-chat-open .messages-container {
-      display: block !important;
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: flex-start !important;
       position: fixed !important;
       top: 0 !important;
       left: 0 !important;
@@ -377,7 +411,9 @@ html, body {
   
     /* Показываем мобильную навигацию в чате */
     body.mobile-chat-open.dark-theme .mobile-nav {
-      display: block !important;
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: flex-start !important;
       position: fixed !important;
       bottom: 0 !important;
       left: 0 !important;
@@ -435,7 +471,9 @@ html, body {
     }
   
     body.mobile-chat-open.dark-theme .mobile-messages-list {
-      display: block !important;
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: flex-start !important;
     }
   
     body.mobile-chat-open.dark-theme .mobile-message {
@@ -540,7 +578,7 @@ html, body {
   
     .mobile-message-input-wrapper { 
       display: flex !important; 
-      align-items: center !important; 
+      align-items: flex-start !important; 
       gap: 8px !important; 
       width: 100% !important; 
     }
@@ -1337,20 +1375,6 @@ html, body {
     font-size: 14px;
   }
   
-  /* Скрываем кнопку поиска на десктопе */
-  .mobile-search-toggle {
-    display: none !important;
-  }
-  
-  /* Скрываем мобильные результаты поиска на десктопе */
-  .mobile-search-results {
-    display: none !important;
-  }
-  
-  /* Скрываем мобильный оверлей поиска на десктопе */
-  .mobile-search-overlay {
-    display: none !important;
-  }
   
   /* Стили для вкладки "Еще" на ПК */
   .more-page {
@@ -2424,6 +2448,37 @@ html, body {
      НОВЫЕ СТИЛИ ПРОФИЛЯ - ДВУХКОЛОНОЧНЫЙ LAYOUT
      ========================================== */
 
+  /* Стили для загрузки профиля */
+  .profile-loading,
+  .profile .loading {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    min-height: 300px !important;
+    text-align: center !important;
+    color: #94a3b8 !important;
+    font-size: 16px !important;
+    padding: 40px 20px !important;
+  }
+  
+  .profile-loading::before,
+  .profile .loading::before {
+    content: '';
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(71, 85, 105, 0.3);
+    border-top: 3px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
   /* Основной контейнер профиля */
   .profile-view {
     display: grid !important;
@@ -2554,6 +2609,14 @@ html, body {
     animation: fadeInUp 0.6s ease 0.1s both !important;
   }
   
+  .profile-badges-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
   .own-profile-badge {
     background: rgba(34, 197, 94, 0.15);
     color: #4ade80;
@@ -2568,6 +2631,38 @@ html, body {
     white-space: nowrap;
     margin-top: 10px;
     animation: fadeInUp 0.6s ease 0.2s both;
+    transition: all 0.3s ease;
+  }
+
+  .own-profile-badge:hover {
+    background: rgba(34, 197, 94, 0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+  }
+
+  .admin-badge-profile {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.1));
+    color: #ef4444;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    white-space: nowrap;
+    margin-top: 10px;
+    animation: fadeInUp 0.6s ease 0.3s both;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .admin-badge-profile:hover {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.15));
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
   }
 
   /* ==========================================
@@ -2620,24 +2715,60 @@ html, body {
   .admin-badge-small {
     background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.15));
     color: #ef4444;
-    padding: 3px 8px;
-    border-radius: 12px;
-    font-size: 10px;
-    font-weight: 700;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
     border: 1px solid rgba(239, 68, 68, 0.4);
     white-space: nowrap;
-    margin-left: 8px;
     text-transform: uppercase;
     letter-spacing: 0.3px;
+    transition: all 0.3s ease;
   }
 
   .admin-badge-small .admin-icon {
+    width: 14px;
+    height: 14px;
+    color: #ef4444;
+  }
+
+  .admin-badge-small:hover {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(220, 38, 38, 0.2));
+    transform: translateY(-1px);
+  }
+
+  /* Мини админ значок для постов */
+  .admin-badge-mini {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.1));
+    color: #ef4444;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 9px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    transition: all 0.2s ease;
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+
+  .admin-badge-mini .admin-icon {
     width: 10px;
     height: 10px;
     color: #ef4444;
+  }
+
+  .admin-badge-mini:hover {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.15));
+    transform: scale(1.05);
   }
 
   /* Кнопка админ-панели в навигации */
@@ -3259,28 +3390,52 @@ html, body {
     }
   }
 
-  @media (max-width: 768px) {
-    .profile-view {
-      display: flex !important;
-      flex-direction: column !important;
-      gap: 20px !important;
-      height: auto !important;
-    }
-    
-    .profile-header {
-      position: static !important;
-      margin-bottom: 20px !important;
-    }
-    
-    .profile-posts {
-      height: auto !important;
-      overflow-y: visible !important;
-      padding-right: 0 !important;
-    }
+   @media (max-width: 768px) {
+     .profile-view {
+       display: flex !important;
+       flex-direction: column !important;
+       gap: 20px !important;
+       height: auto !important;
+       overflow-y: visible !important;
+       padding-bottom: 20px !important;
+     }
+     
+     /* Стили для загрузки профиля на мобильных */
+     .profile-loading,
+     .profile .loading {
+       min-height: 250px !important;
+       padding: 30px 15px !important;
+       font-size: 14px !important;
+     }
+     
+     .profile-loading::before,
+     .profile .loading::before {
+       width: 30px !important;
+       height: 30px !important;
+       margin-bottom: 15px !important;
+     }
+     
+     .profile-header {
+       position: relative !important;
+       top: auto !important;
+       z-index: auto !important;
+       margin-bottom: 20px !important;
+       flex-shrink: 0 !important;
+       height: fit-content !important;
+     }
+     
+     .profile-posts {
+       height: auto !important;
+       overflow-y: visible !important;
+       padding-right: 0 !important;
+       flex: 1 !important;
+     }
     
     .profile-stats {
       display: flex !important;
-      gap: 15px !important;
+      gap: 10px !important;
+      justify-content: center !important;
+      align-items: center !important;
     }
     
     .profile-stat {
@@ -3297,16 +3452,18 @@ html, body {
     }
 
     .profile-main-info {
-      text-align: center !important;
+      text-align: left !important;
+      gap: 10px !important;
     }
 
     .profile-avatar-section {
-      flex-direction: column !important;
-      align-items: center !important;
+      flex-direction: row !important;
+      align-items: flex-start !important;
+      gap: 10px !important;
     }
 
     .profile-username {
-      justify-content: center !important;
+      justify-content: flex-start !important;
     }
   }
   
@@ -3782,6 +3939,7 @@ html, body {
       backdrop-filter: blur(10px) !important;
       border-bottom: 1px solid rgba(71, 85, 105, 0.3) !important;
       padding-top: env(safe-area-inset-top) !important;
+      overflow: visible !important;
     }
   
     .header-content {
@@ -3793,6 +3951,8 @@ html, body {
       display: flex;
       justify-content: space-between;
       position: relative;
+      overflow: visible;
+      box-sizing: border-box;
     }
   
     /* Порядок элементов в мобильной версии */
@@ -3800,32 +3960,17 @@ html, body {
       order: 1;
       flex-shrink: 0;
     }
-  
-    .logo h1 {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin: 0;
-    }
-  
+
     .mobile-search-toggle {
-      order: 3;
-      flex-shrink: 0;
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-  
-    .header-search.desktop-only {
       order: 2;
+      margin-left: auto;
     }
-  
+
     .user-info.desktop-only {
-      order: 4;
+      order: 3;
     }
-    
-    /* Кнопка поиска для мобильных устройств */
+
+    /* Мобильная кнопка поиска */
     .mobile-search-toggle {
       display: flex !important;
       align-items: center;
@@ -3834,11 +3979,51 @@ html, body {
       height: 40px;
       background: rgba(51, 65, 85, 0.7);
       border: 1px solid rgba(71, 85, 105, 0.5);
-      border-radius: 50%;
+      border-radius: 12px;
       color: #e2e8f0;
       cursor: pointer;
       transition: all 0.3s ease;
       flex-shrink: 0;
+      order: 2;
+      position: relative;
+      z-index: 10001;
+    }
+    
+    /* Мобильный оверлей поиска */
+    .mobile-search-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: 9999;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 80px;
+      opacity: 0;
+      animation: fadeIn 0.3s ease forwards;
+    }
+    
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+    
+    /* Скрываем кнопку баллов на мобильных устройствах */
+    .points-balance-compact {
+      display: none !important;
+    }
+
+    .header-search.desktop-only {
+      order: 4;
+    }
+
+    .user-info.desktop-only {
+      order: 3;
     }
   
     .mobile-search-toggle:hover {
@@ -3873,16 +4058,23 @@ html, body {
   
     /* Контейнер мобильного поиска */
     .mobile-search-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
+      position: relative;
+      width: 90%;
+      max-width: 400px;
       background: rgba(15, 23, 42, 0.98);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(71, 85, 105, 0.3);
-      padding: calc(env(safe-area-inset-top) + 15px) 15px 15px 15px;
-      animation: slideDown 0.3s ease-out;
-      z-index: 10002;
+      border: 1px solid rgba(71, 85, 105, 0.4);
+      border-radius: 20px;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      transform: translateY(-20px);
+      animation: slideInDown 0.3s ease forwards;
+    }
+    
+    @keyframes slideInDown {
+      to {
+        transform: translateY(0);
+      }
     }
   
     @keyframes slideDown {
@@ -3910,7 +4102,7 @@ html, body {
       height: 40px;
       background: rgba(51, 65, 85, 0.7);
       border: 1px solid rgba(71, 85, 105, 0.5);
-      border-radius: 50%;
+      border-radius: 12px;
       color: #e2e8f0;
       cursor: pointer;
       transition: all 0.3s ease;
@@ -3937,6 +4129,7 @@ html, body {
       color: #e2e8f0;
       font-size: 16px;
       transition: all 0.3s ease;
+      outline: none;
     }
   
     .mobile-search-input::placeholder {
@@ -4043,14 +4236,24 @@ html, body {
       display: none !important;
     }
   
+    /* Показываем user-info на мобильных устройствах */
+    .user-info.desktop-only {
+      display: flex !important;
+      order: 3 !important;
+    }
+  
     /* Показываем мобильные результаты поиска */
     .mobile-search-results {
-      display: block !important;
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: flex-start !important;
     }
   
     /* Показываем мобильный оверлей поиска */
     .mobile-search-overlay {
-      display: block !important;
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: flex-start !important;
     }
   
   
@@ -4087,11 +4290,15 @@ html, body {
     }
   
     .mobile-nav {
-      display: block !important;
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: flex-start !important;
       position: fixed !important;
       bottom: 0 !important;
       left: 0 !important;
       right: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
       z-index: 10000 !important;
       height: 60px !important;
       background: rgba(15, 23, 42, 0.98) !important;
@@ -4100,15 +4307,20 @@ html, body {
       padding-bottom: env(safe-area-inset-bottom) !important;
       margin: 0 !important;
       border-radius: 0 !important;
+      box-sizing: border-box !important;
     }
   
     /* Стили для мобильной навигации */
     .mobile-nav-menu {
       display: flex !important;
       justify-content: space-around !important;
-      align-items: center !important;
+      align-items: flex-start !important;
       height: 100% !important;
+      width: 100% !important;
+      max-width: 100% !important;
       padding: 0 10px !important;
+      margin: 0 !important;
+      box-sizing: border-box !important;
     }
   
     .mobile-nav-button {
@@ -4281,6 +4493,8 @@ html, body {
       max-height: calc(100vh - 40px) !important;
       position: relative !important;
       z-index: 10001 !important;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch !important;
     }
   
     .form-group {
@@ -4341,6 +4555,12 @@ html, body {
       gap: 10px;
     }
   
+    .mobile-search-toggle {
+      width: 36px !important;
+      height: 36px !important;
+      margin-right: 8px !important;
+    }
+  
     /* Исправление поиска на маленьких экранах */
     .header-search {
       max-width: calc(100vw - 180px) !important;
@@ -4365,6 +4585,11 @@ html, body {
     .mobile-nav {
       padding: 6px 0 !important;
       height: 60px !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      left: 0 !important;
+      right: 0 !important;
+      box-sizing: border-box !important;
     }
   
     .mobile-nav-button {
@@ -4396,8 +4621,10 @@ html, body {
       gap: 20px !important;
       max-width: none !important;
       margin: 10px !important;
-      padding: 0 !important;
+      padding: 0 0 20px 0 !important;
       grid-template-columns: none !important;
+      height: auto !important;
+      overflow-y: visible !important;
     }
   
     .profile-header {
@@ -4405,75 +4632,110 @@ html, body {
       border-radius: 20px !important;
       padding: 25px !important;
       border: 1px solid rgba(71, 85, 105, 0.4) !important;
-      position: relative !important;
-      height: auto !important;
-      top: auto !important;
+      position: sticky !important;
+      top: 80px !important;
+      z-index: 10 !important;
+      height: fit-content !important;
+      flex-shrink: 0 !important;
     }
   
     .profile-main-info {
-      text-align: center !important;
+      text-align: left !important;
       position: static !important;
     }
   
     .profile-avatar-section {
       position: relative !important;
-      display: block !important;
-      text-align: center !important;
-      gap: 0 !important;
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: flex-start !important;
+      text-align: left !important;
+      gap: 10px !important;
       margin-bottom: 20px !important;
     }
   
     .profile-info {
-      flex: none !important;
-      text-align: center !important;
+      flex: 1 !important;
+      text-align: left !important;
     }
   
     .profile-header-row {
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
-      gap: 15px !important;
+      gap: 10px !important;
       margin-bottom: 15px !important;
     }
   
     .profile-display-name {
-      text-align: center !important;
-      justify-content: center !important;
+      text-align: left !important;
+      justify-content: flex-start !important;
     }
   
     .own-profile-badge-container {
       position: static !important;
       top: auto !important;
       right: auto !important;
-      text-align: center !important;
+      text-align: left !important;
       margin-bottom: 20px !important;
-    }
-  
-    .own-profile-badge {
-      padding: 10px 20px !important;
-      border-radius: 25px !important;
-      font-size: 14px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
       gap: 8px !important;
     }
   
+    .own-profile-badge {
+      background: rgba(34, 197, 94, 0.15) !important;
+      color: #4ade80 !important;
+      padding: 6px 16px !important;
+      border-radius: 20px !important;
+      font-size: 12px !important;
+      font-weight: 600 !important;
+      gap: 6px !important;
+      border: 1px solid rgba(34, 197, 94, 0.3) !important;
+      margin-top: 0 !important;
+    }
+  
     .profile-bio {
-      text-align: center !important;
+      text-align: left !important;
     }
   
     .profile-posts {
-      background: rgba(30, 41, 59, 0.9) !important;
-      border-radius: 20px !important;
-      padding: 25px !important;
-      border: 1px solid rgba(71, 85, 105, 0.4) !important;
-      margin-bottom: 15px !important;
+      background: none !important;
+      border-radius: 0 !important;
+      padding: 0 !important;
+      border: none !important;
+      margin-bottom: 0 !important;
       width: 100% !important;
       box-sizing: border-box !important;
+      /* Ультратонкий скроллбар на мобильных */
+      scrollbar-width: thin !important; /* Firefox */
+      scrollbar-color: rgba(71, 85, 105, 0.3) transparent !important; /* Firefox */
+    }
+    
+    /* Ультратонкий скроллбар для WebKit браузеров */
+    .profile-posts::-webkit-scrollbar {
+      width: 2px !important;
+    }
+    
+    .profile-posts::-webkit-scrollbar-track {
+      background: transparent !important;
+    }
+    
+    .profile-posts::-webkit-scrollbar-thumb {
+      background: rgba(71, 85, 105, 0.3) !important;
+      border-radius: 1px !important;
+    }
+    
+    .profile-posts::-webkit-scrollbar-thumb:hover {
+      background: rgba(71, 85, 105, 0.5) !important;
     }
   
     .profile-settings-btn-round {
       position: absolute !important;
-      top: 0 !important;
-      right: 0 !important;
+      top: 15px !important;
+      right: 15px !important;
       margin-top: 0 !important;
       align-self: auto !important;
     }
@@ -4486,6 +4748,8 @@ html, body {
       gap: 15px;
       width: 100% !important;
       box-sizing: border-box !important;
+      justify-content: center !important;
+      align-items: center !important;
     }
   
     .post-actions {
@@ -4540,7 +4804,7 @@ html, body {
     }
   
     .wallet-balance-card {
-      gap: 15px !important;
+      gap: 10px !important;
       margin-bottom: 20px !important;
     }
   
@@ -4587,7 +4851,7 @@ html, body {
     }
   
     .wallet-transactions-list {
-      gap: 15px !important;
+      gap: 10px !important;
     }
   
     .wallet-transaction-item {
@@ -4692,6 +4956,11 @@ html, body {
     .mobile-nav {
       padding: 4px 0 !important;
       height: 60px !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      left: 0 !important;
+      right: 0 !important;
+      box-sizing: border-box !important;
     }
   
     .mobile-nav-button {
@@ -5908,7 +6177,9 @@ html, body {
     }
     
     .chats-sidebar {
-      display: block !important;
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: flex-start !important;
       flex: 0 0 auto !important;
       height: 100vh !important;
       width: 100% !important;
@@ -6877,6 +7148,13 @@ html, body {
       display: none !important;
     }
   }
+  
+  /* Показываем кнопку баллов только на ПК */
+  @media (min-width: 1024px) {
+    .points-balance-compact {
+      display: flex !important;
+    }
+  }
 
   .points-balance-compact:hover {
     background: rgba(71, 85, 105, 0.8);
@@ -7286,6 +7564,11 @@ html, body {
     text-align: center;
     color: #94a3b8;
     font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
   }
   
   /* Leaderboard */
@@ -7915,6 +8198,8 @@ html, body {
     justify-content: center;
     z-index: 99999;
     padding: 20px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   
   .modal-content {
@@ -8436,6 +8721,11 @@ html, body {
     color: #94a3b8;
     padding: 40px 20px;
     font-size: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
   }
   
   /* Стили для деталей транзакции */
@@ -8512,6 +8802,10 @@ html, body {
   @media (max-width: 768px) {
     .modal-overlay {
       padding: 10px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      align-items: flex-start;
+      padding-top: 20px;
     }
     
     .modal-content {
@@ -8519,6 +8813,9 @@ html, body {
       max-width: 500px;
       width: auto;
       margin: 0 auto;
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
     
     .transfer-modal .modal-content {
@@ -8554,6 +8851,9 @@ html, body {
       max-width: calc(100vw - 20px);
       width: auto;
       margin: 0 auto;
+      max-height: calc(100vh - 20px);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
     
     .modal-header h3 {
@@ -9122,11 +9422,14 @@ html, body {
     bottom: 0;
     left: 0;
     right: 0;
+    width: 100%;
+    max-width: 100%;
     background: rgba(15, 23, 42, 0.98);
     backdrop-filter: blur(20px);
     border-top: 1px solid rgba(148, 163, 184, 0.2);
     z-index: 1000;
     padding: 8px 0;
+    box-sizing: border-box;
   }
   
   .mobile-nav-menu {
@@ -9136,6 +9439,9 @@ html, body {
     list-style: none;
     margin: 0;
     padding: 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
   
   .mobile-nav-menu li {
@@ -9309,6 +9615,11 @@ html, body {
   
     .mobile-nav {
       display: block;
+      width: 100% !important;
+      max-width: 100% !important;
+      left: 0 !important;
+      right: 0 !important;
+      box-sizing: border-box !important;
     }
   
     .create-post {
@@ -9427,6 +9738,8 @@ html, body {
       max-height: calc(100vh - 40px) !important;
       position: relative !important;
       z-index: 10001 !important;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch !important;
     }
   
     .form-group {
@@ -10532,6 +10845,39 @@ html, body {
     .back-to-chats-btn {
       display: none;
     }
+    
+  /* Скрываем мобильную кнопку поиска на десктопе */
+  .mobile-search-toggle {
+    display: none !important;
+  }
+  
+  /* Скрываем мобильную навигацию на десктопе */
+  .mobile-nav {
+    display: none !important;
+  }
+  
+  .mobile-nav-menu {
+    display: none !important;
+  }
+  
+  .mobile-nav-button {
+    display: none !important;
+  }
+    
+    /* Показываем кнопку баллов на десктопе */
+    .points-balance-compact {
+      display: flex !important;
+    }
+    
+    /* Скрываем мобильные результаты поиска на десктопе */
+    .mobile-search-results {
+      display: none !important;
+    }
+    
+    /* Скрываем мобильный оверлей поиска на десктопе */
+    .mobile-search-overlay {
+      display: none !important;
+    }
   }
   
   /* Дополнительные исправления для мобильных устройств */
@@ -10667,7 +11013,7 @@ html, body {
       font-size: 10px !important;
       font-weight: 700 !important;
       min-width: 18px !important;
-      text-align: center !important;
+      text-align: left !important;
       box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4) !important;
       flex-shrink: 0 !important;
     }
@@ -10939,25 +11285,25 @@ html, body {
   
     .profile-main-info {
       flex-direction: column !important;
-      align-items: center !important;
-      text-align: center !important;
+      align-items: flex-start !important;
+      text-align: left !important;
       gap: 20px !important;
     }
   
     .profile-avatar-section {
       margin-right: 0 !important;
       display: flex !important;
-      justify-content: center !important;
+      justify-content: flex-start !important;
     }
   
     .profile-header-row {
-      justify-content: center !important;
-      gap: 15px !important;
+      justify-content: flex-start !important;
+      gap: 10px !important;
     }
   
     .profile-display-name {
       font-size: 24px !important;
-      text-align: center !important;
+      text-align: left !important;
       margin-bottom: 8px !important;
       position: relative !important;
       display: flex !important;
@@ -10977,7 +11323,7 @@ html, body {
     }
   
     .profile-bio {
-      text-align: center !important;
+      text-align: left !important;
       margin: 0 auto 20px !important;
       max-width: 100% !important;
     }
@@ -11002,7 +11348,7 @@ html, body {
     }
   
     .profile-name-section {
-      text-align: center !important;
+      text-align: left !important;
       margin-bottom: 20px !important;
     }
   
@@ -11039,21 +11385,27 @@ html, body {
   
     /* Контейнер для плашки "ваш профиль" */
     .own-profile-badge-container {
-      text-align: center !important;
+      text-align: left !important;
       margin-bottom: 15px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 8px !important;
     }
   
     .own-profile-badge {
       display: inline-flex !important;
       align-items: center !important;
       gap: 6px !important;
-      background: rgba(255, 255, 255, 0.1) !important;
-      color: #e2e8f0 !important;
-      padding: 8px 16px !important;
+      background: rgba(34, 197, 94, 0.15) !important;
+      color: #4ade80 !important;
+      padding: 6px 16px !important;
       border-radius: 20px !important;
-      font-size: 14px !important;
-      font-weight: 500 !important;
-      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      font-size: 12px !important;
+      font-weight: 600 !important;
+      border: 1px solid rgba(34, 197, 94, 0.3) !important;
+      margin-top: 0 !important;
     }
   
     .profile-stats {
@@ -11064,8 +11416,8 @@ html, body {
       display: flex !important;
       flex-direction: row !important;
       justify-content: space-between !important;
-      align-items: center !important;
-      gap: 15px !important;
+      align-items: flex-start !important;
+      gap: 10px !important;
       flex-wrap: nowrap !important;
       overflow: visible !important;
     }
@@ -11283,6 +11635,11 @@ html, body {
     position: static;
     margin-top: 10px;
     margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
   }
   
   .own-profile-badge {
@@ -11470,6 +11827,38 @@ html, body {
     box-sizing: border-box;
   }
   
+  /* Скрываем скроллбар в профиле на мобильных */
+  @media (max-width: 768px) {
+    .profile-posts {
+      background: none !important;
+      border-radius: 0 !important;
+      padding: 0 !important;
+      border: none !important;
+      margin-bottom: 0 !important;
+      /* Ультратонкий скроллбар на мобильных */
+      scrollbar-width: thin !important; /* Firefox */
+      scrollbar-color: rgba(71, 85, 105, 0.3) transparent !important; /* Firefox */
+    }
+    
+    /* Ультратонкий скроллбар для WebKit браузеров */
+    .profile-posts::-webkit-scrollbar {
+      width: 2px !important;
+    }
+    
+    .profile-posts::-webkit-scrollbar-track {
+      background: transparent !important;
+    }
+    
+    .profile-posts::-webkit-scrollbar-thumb {
+      background: rgba(71, 85, 105, 0.3) !important;
+      border-radius: 1px !important;
+    }
+    
+    .profile-posts::-webkit-scrollbar-thumb:hover {
+      background: rgba(71, 85, 105, 0.5) !important;
+    }
+  }
+  
   /* Стили для изображений в постах профиля - как в ленте */
   .profile-posts .post-image {
     width: auto; /* Нативная ширина */
@@ -11518,8 +11907,8 @@ html, body {
       flex-direction: row !important;
       flex-wrap: nowrap !important;
       justify-content: space-between !important;
-      align-items: center !important;
-      gap: 15px !important;
+      align-items: flex-start !important;
+      gap: 10px !important;
       width: 100% !important;
       margin: 10px 0 !important;
       padding: 0 !important;
@@ -11611,8 +12000,8 @@ html, body {
       max-width: 680px !important;
       width: calc(100% - 24px) !important;
       margin: 0 auto 20px !important;
-      justify-content: center !important;
-      gap: 15px !important;
+      justify-content: flex-start !important;
+      gap: 10px !important;
       flex-wrap: wrap !important;
     }
   
@@ -11681,7 +12070,7 @@ html, body {
       font-weight: 600 !important;
       color: #f1f5f9 !important;
       margin-bottom: 15px !important;
-      text-align: center !important;
+      text-align: left !important;
     }
   
     .account-settings-item,
@@ -11689,7 +12078,7 @@ html, body {
     .more-item {
       display: flex !important;
       justify-content: space-between !important;
-      align-items: center !important;
+      align-items: flex-start !important;
       padding: 15px 0 !important;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
     }
@@ -11744,8 +12133,10 @@ html, body {
         gap: 20px !important;
         max-width: none !important;
         margin: 0 15px !important;
-        padding: 0 !important;
+        padding: 0 0 20px 0 !important;
         grid-template-columns: none !important;
+        height: auto !important;
+        overflow-y: visible !important;
       }
   
     .profile-header {
@@ -11754,59 +12145,72 @@ html, body {
       padding: 25px !important;
       border: 1px solid rgba(71, 85, 105, 0.4) !important;
       position: relative !important;
-      height: auto !important;
       top: auto !important;
+      z-index: auto !important;
+      height: fit-content !important;
+      flex-shrink: 0 !important;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
     }
   
     .profile-main-info {
-      text-align: center !important;
+      text-align: left !important;
       position: static !important;
     }
   
     .profile-avatar-section {
       position: relative !important;
-      display: block !important;
-      text-align: center !important;
-      gap: 0 !important;
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: flex-start !important;
+      text-align: left !important;
+      gap: 10px !important;
       margin-bottom: 20px !important;
     }
   
     .profile-info {
-      flex: none !important;
-      text-align: center !important;
+      flex: 1 !important;
+      text-align: left !important;
     }
   
     .profile-header-row {
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
-      gap: 15px !important;
+      gap: 10px !important;
       margin-bottom: 15px !important;
     }
   
     .profile-display-name {
-      text-align: center !important;
-      justify-content: center !important;
+      text-align: left !important;
+      justify-content: flex-start !important;
     }
   
     .own-profile-badge-container {
       position: static !important;
       top: auto !important;
       right: auto !important;
-      text-align: center !important;
+      text-align: left !important;
       margin-bottom: 20px !important;
-    }
-  
-    .own-profile-badge {
-      padding: 10px 20px !important;
-      border-radius: 25px !important;
-      font-size: 14px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
       gap: 8px !important;
     }
   
+    .own-profile-badge {
+      background: rgba(59, 130, 246, 0.15) !important;
+      color: #3b82f6 !important;
+      padding: 6px 16px !important;
+      border-radius: 20px !important;
+      font-size: 12px !important;
+      font-weight: 600 !important;
+      gap: 6px !important;
+      border: 1px solid rgba(59, 130, 246, 0.3) !important;
+    }
+  
     .profile-bio {
-      text-align: center !important;
+      text-align: left !important;
       width: 100% !important;
       box-sizing: border-box !important;
       padding: 15px !important;
@@ -11814,18 +12218,39 @@ html, body {
     }
   
     .profile-bio-label {
-      text-align: center !important;
+      text-align: left !important;
       margin-bottom: 5px !important;
     }
   
     .profile-posts {
-      background: rgba(30, 41, 59, 0.9) !important;
-      border-radius: 20px !important;
-      padding: 25px !important;
-      border: 1px solid rgba(71, 85, 105, 0.4) !important;
-      margin-bottom: 15px !important;
+      background: none !important;
+      border-radius: 0 !important;
+      padding: 0 !important;
+      border: none !important;
+      margin-bottom: 0 !important;
       width: 100% !important;
       box-sizing: border-box !important;
+      /* Ультратонкий скроллбар на мобильных */
+      scrollbar-width: thin !important; /* Firefox */
+      scrollbar-color: rgba(71, 85, 105, 0.3) transparent !important; /* Firefox */
+    }
+    
+    /* Ультратонкий скроллбар для WebKit браузеров */
+    .profile-posts::-webkit-scrollbar {
+      width: 2px !important;
+    }
+    
+    .profile-posts::-webkit-scrollbar-track {
+      background: transparent !important;
+    }
+    
+    .profile-posts::-webkit-scrollbar-thumb {
+      background: rgba(71, 85, 105, 0.3) !important;
+      border-radius: 1px !important;
+    }
+    
+    .profile-posts::-webkit-scrollbar-thumb:hover {
+      background: rgba(71, 85, 105, 0.5) !important;
     }
   
     .profile-settings-btn-round {
@@ -11837,7 +12262,12 @@ html, body {
     }
   
     .own-profile-badge-container {
-      margin-top: 10px !important;
+      margin-top: 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 8px !important;
     }
   
     .profile-info {
@@ -12325,11 +12755,12 @@ html, body {
 .giveaway-widget,
 .poll-widget,
 .quiz-widget {
-  margin: 12px 0;
-  padding: 16px;
+  margin: 16px 0;
+  padding: 20px;
   background: rgba(15, 23, 42, 0.6);
   border: 1px solid rgba(71, 85, 105, 0.2);
   border-radius: 12px;
+  width: 100%;
 }
 
 .giveaway-header {
@@ -12368,8 +12799,8 @@ html, body {
 }
 
 .giveaway-prize {
-  margin-bottom: 12px;
-  padding: 12px;
+  margin-bottom: 16px;
+  padding: 16px;
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(29, 78, 216, 0.1));
   border: 1px solid rgba(59, 130, 246, 0.3);
   border-radius: 8px;
@@ -12378,7 +12809,7 @@ html, body {
 .giveaway-prize h5 {
   color: #3b82f6;
   margin: 0;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   text-align: center;
 }
@@ -12424,20 +12855,21 @@ html, body {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+  width: 100%;
 }
 
 .join-giveaway-btn,
 .view-participants-btn {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   background: linear-gradient(135deg, #10b981, #059669);
   color: white;
   border: none;
   border-radius: 8px;
-  padding: 10px 16px;
+  padding: 12px 20px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   transition: all 0.2s ease;
   flex: 1;
@@ -12464,26 +12896,31 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   color: #10b981;
   font-weight: 600;
-  padding: 12px 16px;
+  padding: 16px 20px;
   background: rgba(16, 185, 129, 0.1);
   border: 1px solid rgba(16, 185, 129, 0.3);
   border-radius: 8px;
   text-align: center;
+  font-size: 15px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .giveaway-expired {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px;
+  padding: 12px 16px;
   background: #fff3e0;
   border: 1px solid #ff9800;
   border-radius: 8px;
   color: #e65100;
   font-weight: 500;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .complete-giveaway-btn {
@@ -12507,8 +12944,8 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 16px;
+  gap: 12px;
+  padding: 20px;
   background: linear-gradient(135deg, #fbbf24, #f59e0b);
   border: 2px solid #d97706;
   border-radius: 12px;
@@ -12516,6 +12953,9 @@ html, body {
   font-weight: 600;
   text-align: center;
   animation: winnerGlow 2s ease-in-out infinite alternate;
+  margin: 16px 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 @keyframes winnerGlow {
@@ -12528,18 +12968,18 @@ html, body {
 }
 
 .winner-prize {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   color: #92400e;
   background: rgba(255, 255, 255, 0.3);
-  padding: 8px 16px;
+  padding: 12px 20px;
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 .winner-info {
   color: #fbbf24;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
 }
 
@@ -12788,6 +13228,102 @@ html, body {
   }
 }
 
+/* Стили для ПК - розыгрыши на всю ширину */
+@media (min-width: 769px) {
+  .giveaway-widget,
+  .poll-widget,
+  .quiz-widget {
+    margin: 16px 0;
+    padding: 20px;
+    width: 100%;
+  }
+  
+  .giveaway-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .giveaway-actions {
+    flex-direction: row;
+    gap: 12px;
+  }
+  
+  .join-giveaway-btn,
+  .view-participants-btn {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+  
+  .giveaway-prize {
+    padding: 16px;
+  }
+  
+  .giveaway-prize h5 {
+    font-size: 20px;
+  }
+  
+  .giveaway-info {
+    flex-direction: row;
+    gap: 12px;
+  }
+  
+  .giveaway-end,
+  .giveaway-points {
+    flex: 1;
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+  
+  .giveaway-completed {
+    padding: 16px 20px;
+    font-size: 15px;
+    gap: 10px;
+  }
+  
+  .giveaway-winner {
+    padding: 20px;
+    margin: 16px 0;
+    gap: 12px;
+  }
+  
+  .winner-prize {
+    font-size: 20px;
+    padding: 12px 20px;
+  }
+  
+  .winner-info {
+    font-size: 14px;
+  }
+  
+  .giveaway-expired {
+    padding: 16px 20px;
+    font-size: 15px;
+    gap: 10px;
+  }
+  
+  .poll-option-btn {
+    padding: 14px 18px;
+    font-size: 14px;
+  }
+  
+  .poll-stats {
+    margin-top: 8px;
+  }
+  
+  .vote-count {
+    min-width: 80px;
+    font-size: 13px;
+  }
+  
+  .poll-total-votes {
+    font-size: 15px;
+    margin: 12px 0 0 0;
+  }
+}
+
 /* Стили для улучшенных форм */
 .form-field {
   margin-bottom: 16px;
@@ -12864,5 +13400,42 @@ select.form-input {
 .form-input select:focus,
 select.form-input:focus {
   background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fbbf24' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+}
+
+/* Дополнительные стили для админ значка в профиле */
+@media (max-width: 768px) {
+  .profile-badges-row {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 8px !important;
+    justify-content: flex-start !important;
+  }
+  
+  /* Выравнивание значков admin и профиля по горизонтали */
+  .admin-badge-profile {
+    margin-top: 0 !important;
+    align-self: center !important;
+  }
+  
+  .profile-settings-btn-round {
+    top: 15px !important;
+    right: 15px !important;
+  }
+  
+  /* Выравниваем контейнер с бейджами с кнопкой настроек */
+  .own-profile-badge-container {
+    margin-top: 0 !important;
+    margin-bottom: 15px !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .profile-badges-row {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
 }
   

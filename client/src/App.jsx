@@ -35,7 +35,7 @@ const setupAxiosInterceptors = () => {
         const refreshToken = localStorage.getItem('refreshToken');
         if (refreshToken) {
           try {
-            const response = await axios.post('https://server-pqqy.onrender.com/api/auth/refresh', {
+            const response = await axios.post('https://server-1-ewdd.onrender.com/api/auth/refresh', {
               refreshToken: refreshToken
             });
             
@@ -93,7 +93,7 @@ function AppRouter() {
     }
 
     try {
-      const response = await axios.get('https://server-pqqy.onrender.com/api/me');
+      const response = await axios.get('https://server-1-ewdd.onrender.com/api/me');
       if (response.data.user) {
         setIsAuthenticated(true);
         navigate('/home');

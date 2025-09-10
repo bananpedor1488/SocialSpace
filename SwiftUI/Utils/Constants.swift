@@ -3,7 +3,7 @@ import SwiftUI
 
 // MARK: - API Constants
 struct APIConstants {
-    static let baseURL = "https://server-pqqy.onrender.com/api"
+    static let baseURL = "https://server-1-ewdd.onrender.com/api"
     
     struct Endpoints {
         // Auth

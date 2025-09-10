@@ -63,7 +63,7 @@ const ProfileSettings = ({ isOpen, onClose, user, onProfileUpdate }) => {
       
       // Отправляем на сервер
       const response = await axios.put(
-        `https://server-pqqy.onrender.com/api/users/profile/${user._id || user.id}`, 
+        `https://server-1-ewdd.onrender.com/api/users/profile/${user._id || user.id}`, 
         profileData
       );
       

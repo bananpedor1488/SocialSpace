@@ -6,7 +6,7 @@ let serverTimeOffset = 0; // разница между сервером и кл�
 export const syncServerTime = async () => {
   try {
     const startTime = Date.now();
-    const response = await fetch('https://server-pqqy.onrender.com/api/time');
+    const response = await fetch('https://server-1-ewdd.onrender.com/api/time');
     const endTime = Date.now();
     const networkDelay = (endTime - startTime) / 2;
     const serverTime = new Date((await response.json()).timestamp).getTime();
