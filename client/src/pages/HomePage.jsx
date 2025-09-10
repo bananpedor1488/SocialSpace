@@ -469,7 +469,7 @@ const HomePage = () => {
       console.log('Initializing Socket.IO connection...');
       setConnectionStatus('Подключение...');
 
-      socketRef.current = io(window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://server-1-ewdd.onrender.com', {
+      socketRef.current = io('https://server-1-ewdd.onrender.com', {
         auth: {
           token: accessToken
         },
@@ -975,7 +975,7 @@ const HomePage = () => {
                 socketRef.current.disconnect();
                 setTimeout(() => {
                   if (user) {
-                    const newSocket = io(window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://server-1-ewdd.onrender.com', {
+                    const newSocket = io('https://server-1-ewdd.onrender.com', {
                       auth: { token: accessToken },
                       transports: ['websocket', 'polling']
                     });
@@ -4342,14 +4342,13 @@ formData.append('files', file);
               </>
             )}
             
-            {activeTab === 'profile' && profile && profile.loading && (
+            {activeTab === 'profile' && profile && profile.loading && user && (
               <div className="profile-loading">
-                <div className="loading-spinner"></div>
                 <p>Загрузка профиля...</p>
               </div>
             )}
             
-            {activeTab === 'profile' && profile && profile.error && (
+            {activeTab === 'profile' && profile && profile.error && user && (
               <div className="profile-view">
                 <div className="profile-header">
                   <div className="profile-content">
@@ -4374,7 +4373,7 @@ formData.append('files', file);
               </div>
             )}
             
-            {activeTab === 'profile' && profile && !profile.loading && !profile.error && (
+            {activeTab === 'profile' && profile && !profile.loading && !profile.error && user && (
               <div className="profile-view">
                 <div className="profile-header">
                   <div className="profile-content">

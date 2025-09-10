@@ -2,7 +2,7 @@
 
 class AuthManager {
   constructor() {
-    this.baseURL = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : 'https://server-1-ewdd.onrender.com/api';
+    this.baseURL = 'https://server-1-ewdd.onrender.com/api';
   }
 
   // Получение токенов из localStorage

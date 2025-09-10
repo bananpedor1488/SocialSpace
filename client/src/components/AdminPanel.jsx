@@ -5,18 +5,12 @@ import {
   FileText, X, UserX, Crown, Wifi
 } from 'lucide-react';
 import axios from 'axios';
+import API_CONFIG from '../config/api';
 
-// Определяем базовый URL для API
-const getBaseURL = () => {
-  if (window.location.hostname === 'localhost') {
-    return 'http://localhost:3000';
-  }
-  return 'https://server-1-ewdd.onrender.com';
-};
-
+// Создаем axios instance с правильной конфигурацией
 const api = axios.create({
-  baseURL: `${getBaseURL()}/api`,
-  withCredentials: true
+  baseURL: `${API_CONFIG.BASE_URL}/api`,
+  withCredentials: false
 });
 
 // Добавляем токен авторизации к каждому запросу

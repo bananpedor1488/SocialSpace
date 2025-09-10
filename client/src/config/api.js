@@ -1,7 +1,7 @@
 // Конфигурация API
 const API_CONFIG = {
   // Базовый URL для API
-  BASE_URL: process.env.REACT_APP_API_URL || (window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://server-1-ewdd.onrender.com'),
+  BASE_URL: process.env.REACT_APP_API_URL || 'https://server-1-ewdd.onrender.com',
   
   // Режим обслуживания - установите true для включения страницы "сайт закрыт"
   MAINTENANCE_MODE: false, // Временно включен для тестирования

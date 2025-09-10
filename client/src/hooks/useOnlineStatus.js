@@ -22,9 +22,7 @@ const useOnlineStatus = (socket) => {
     
     try {
       const token = localStorage.getItem('accessToken');
-      const baseURL = window.location.hostname === 'localhost' ? 
-        'http://localhost:3000' : 
-        'https://server-1-ewdd.onrender.com';
+      const baseURL = 'https://server-1-ewdd.onrender.com';
       
       console.log(`Fetching online status for users: ${userIds.join(',')}`);
       
